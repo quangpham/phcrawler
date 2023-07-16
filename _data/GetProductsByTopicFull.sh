@@ -32,50 +32,36 @@ curl 'https://www.producthunt.com/frontend/graphql' \
               {
                 id slug name description postsCount followersCount parent{id name slug}
                 
-                products(first:20 after:$cursor order:$order excludeHidden:false)
-                {
-                  edges
-                  {
-                    node
-                    {
-                      id ...ProductExtra
-                      topics(first:100)
-                        {
-                          edges
-                            {
-                              node{id slug parent{id slug}}
-                            }
-                            totalCount
-                        }
-                      
-                      posts(first:100)
-                          {
-                              edges
-                                  {
-                                      node{id ...PostItemFragment}
-                                  }
-                              totalCount
-                          }
+                products(first:10 after:$cursor order:$order excludeHidden:false) {
+                  edges {
+                    node {
+                      id slug name tagline followersCount logoUuid createdAt
+                      reviewsRating reviewsCount
 
+                      reviews(first:50){
+                        edges{node{id user{id name username twitterUsername} }}
+                        totalCount
+                      }
+                      
+                      topics(first:100) {
+                        edges{node{id slug parent{id}}}
+                        totalCount
+                      }
+                      
+                      posts(first:100) {
+                        edges{node{id ...PostItemFragment}}
+                        totalCount
+                      }
                     }
                   }
                   totalCount pageInfo {endCursor hasNextPage}
                 }
               }
           }
-                 
-          fragment ProductExtra on Product{
-            slug name tagline followersCount reviewsCount reviewsRating 
-            isSubscribed isMaker
-            logoUuid isNoLongerOnline
-            createdAt
-          }
 
           fragment PostItemFragment on Post{
-            id commentsCount name slug tagline updatedAt createdAt featuredAt
-            pricingType
+            id commentsCount name slug tagline updatedAt createdAt featuredAt pricingType votesCount
             topics(first:1){edges{node{id }} totalCount }
-            id ...on Votable{id votesCount}
           }
 
           "
@@ -104,3 +90,6 @@ curl 'https://www.producthunt.com/frontend/graphql' \
   # -H 'x-requested-with: XMLHttpRequest' \
   # --data-raw $'{"operationName":"TopicPage","variables":{"slug":"productivity","cursor":"MTA","topPostsVariant":"THIS_WEEK","order":"best_rated","includeLayout":false},"query":"query TopicPage($slug:String\u0021$cursor:String$order:ProductsOrder\u0021){topic(slug:$slug){id slug parent{id name slug __typename}...MetaTags ...TopicPageHeaderFragment ...TopicPageProductListFragment ...TopicPageProductQuestionsFragment ...TopReviewedProductsCardFragment targetedAd(kind:\\"feed\\"){...AdFragment __typename}subscribers(first:50){edges{node{id ...UserGridCardFragment __typename}__typename}__typename}recentStacks(first:3){edges{node{id ...TopicPageRecentStackFragment __typename}__typename}__typename}__typename}viewer{id ...TopicsNewsletterCardFragment __typename}}fragment MetaTags on SEOInterface{id meta{canonicalUrl creator description image mobileAppUrl oembedUrl robots title type author authorUrl __typename}__typename}fragment AdFragment on Ad{id subject post{id slug name updatedAt commentsCount topics(first:1){edges{node{id name __typename}__typename}__typename}...PostVoteButtonFragment __typename}ctaText name tagline thumbnailUuid url __typename}fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt product{id isSubscribed __typename}disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}fragment TopicPageHeaderFragment on Topic{id name description parent{id name slug __typename}...TopicFollowButtonFragment __typename}fragment TopicFollowButtonFragment on Topic{id slug name isFollowed followersCount ...TopicImage __typename}fragment TopicImage on Topic{name imageUuid __typename}fragment TopicPageProductListFragment on Topic{id name slug products(first:10 after:$cursor order:$order excludeHidden:true){edges{node{id ...ReviewCTAPromptFragment ...ProductItemFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}__typename}fragment ProductItemFragment on Product{id slug name tagline followersCount reviewsCount topics(first:2){edges{node{id slug name __typename}__typename}__typename}...ProductFollowButtonFragment ...ProductThumbnailFragment ...ProductMuteButtonFragment ...FacebookShareButtonV6Fragment ...ReviewStarRatingCTAFragment __typename}fragment ProductThumbnailFragment on Product{id name logoUuid isNoLongerOnline __typename}fragment ProductFollowButtonFragment on Product{id followersCount isSubscribed __typename}fragment ProductMuteButtonFragment on Product{id isMuted __typename}fragment FacebookShareButtonV6Fragment on Shareable{id url __typename}fragment ReviewStarRatingCTAFragment on Product{id slug name isMaker reviewsRating __typename}fragment ReviewCTAPromptFragment on Product{id isMaker viewerReview{id __typename}...ReviewCTASharePromptFragment __typename}fragment ReviewCTASharePromptFragment on Product{id name tagline slug ...ProductThumbnailFragment ...FacebookShareButtonFragment __typename}fragment FacebookShareButtonFragment on Shareable{id url __typename}fragment TopReviewedProductsCardFragment on Topic{id topReviewedProducts(first:4){edges{node{id name tagline reviewsRating slug path ...ProductThumbnailFragment ...ReviewStarRatingCTAFragment reviewSnippet{id overallExperience user{id ...UserImage __typename}__typename}__typename}__typename}__typename}__typename}fragment UserImage on User{id name username avatarUrl __typename}fragment UserGridCardFragment on User{id ...UserImage __typename}fragment TopicsNewsletterCardFragment on Viewer{id settings{sendAiEmail sendProductivityEmail __typename}__typename}fragment TopicPageRecentStackFragment on ProductStack{id user{id name username isTrashed ...UserImage __typename}product{id name tagline slug ...ProductThumbnailFragment __typename}__typename}fragment TopicPageProductQuestionsFragment on Topic{productQuestions(first:1 filter:NOT_ANSWERED excludeSkipped:true){edges{node{id path title ...ProductQuestionAnswerFlowFragment ...ProductQuestionAnswerPromptFragment ...ProductQuestionShareButtonFragment ...ProductQuestionReviewFlowFragment __typename}__typename}__typename}__typename}fragment ProductQuestionAnswerFlowFragment on ProductQuestion{id slug path viewerAnswer{id product{id isMaker viewerReview{id __typename}...ReviewFormProductFragment __typename}__typename}__typename}fragment ReviewFormProductFragment on Product{id name slug isMaker isSubscribed isStacked reviewsRating reviewsCount reviewsWithBodyCount reviewsWithRatingCount ratingSpecificCount{rating count __typename}viewerReview{id __typename}__typename}fragment ProductQuestionReviewFlowFragment on ProductQuestion{id placeholder viewerAnswer{id product{id name viewerReview{id __typename}__typename}__typename}__typename}fragment ProductQuestionAnswerPromptFragment on ProductQuestion{id path canViewAnswers answerAuthors(first:3){edges{node{id ...UserCircleListFragment __typename}__typename}totalCount __typename}__typename}fragment UserCircleListFragment on User{id ...UserImage __typename}fragment ProductQuestionShareButtonFragment on ProductQuestion{id ...FacebookShareButtonV6Fragment __typename}"}' \
   # --compressed
+
+
+# fragment ReviewListFragment on Reviewable{id __typename}

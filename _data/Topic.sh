@@ -31,14 +31,22 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     "operationName":"TopicsPage",
     "variables":{"query":null,"cursor":"'$3'","order":"'$2'"},
     "query":"query TopicsPage($cursor:String$query:String$order:String)
-    {topics(query:$query first:20 after:$cursor order:$order)
-      {edges
-        {node
-          {id name slug parent{id name slug __typename} description postsCount followersCount __typename}
-        __typename}
-        pageInfo{endCursor hasNextPage __typename}
-        totalCount
-      __typename}
+    {
+      topics(query:$query first:20 after:$cursor order:$order)
+      {
+        edges
+        {
+          node
+            {
+              id name slug parent{id name slug} followersCount
+              products(first:1){totalCount}
+              posts(first:1){totalCount}
+              subscribers(first:1){totalCount}
+              recentStacks(first:1){totalCount}
+            }
+        }
+        totalCount pageInfo{endCursor hasNextPage}
+      }
     }"
   }' \
   --compressed > tmp/_r.json

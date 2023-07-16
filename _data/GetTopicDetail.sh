@@ -1,5 +1,7 @@
-# ./PostByTopic.sh 1 task-management by-date NjA 
+# ./GetTopicDetail.sh so-thu-tu topic-name order-name paging-cursor
+# ./GetTopicDetail.sh 1 task-management by-date NjA 
 # stt, name, order ("best_rated", "most_followed", "most_recent","#by-date", "#most-upvoted") , cursor
+
 
 mkdir -p tmp/
 

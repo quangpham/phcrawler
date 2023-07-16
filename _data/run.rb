@@ -42,11 +42,22 @@ Dir["tmp/_r.*.json"].sort.each do |fn|
       topic = Topic.find_or_initialize_by(id: t["id"].to_i)
       topic.name = t["name"]
       topic.slug = t["slug"]
-      topic.posts_count = t["postsCount"]
       topic.followers_count = t["followersCount"]
       if t["parent"]
         parent = Topic.find_or_create_by(id: t["parent"]["id"].to_i)
         topic.parent_id = parent.id
+      end
+      if t["posts"]
+        topic.posts_count =t["posts"]["totalCount"]
+      end
+      if t["products"]
+        topic.products_count =t["products"]["totalCount"]
+      end
+      if t["subscribers"]
+        topic.subscribers_count =t["subscribers"]["totalCount"]
+      end
+      if t["recentStacks"]
+        topic.recent_stacks_count =t["recentStacks"]["totalCount"]
       end
       topic.save
       if data["data"]["topics"]["edges"].count > 0
@@ -115,7 +126,7 @@ init_tmp
 cursors = File.read("_data/cursors.txt").split(",")
 commands = []
 Topic.where("products_count > 0").each do |t|
-  cursors[..(t.products_count/20+1)].each_with_index do |cursor, i|
+  cursors[..(t.products_count/10+1)].each_with_index do |cursor, i|
     commands.push "./GetProductsByTopicFull.sh #{1000+i} #{t.slug} most_recent #{cursor}"
   end
 end
@@ -147,6 +158,7 @@ end
 def import_products json_path="tmp/run/tmp/"
   Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
     begin
+      next if File.zero?(fn)
       data = JSON.parse(File.read(fn))
       data["data"]["topic"]["products"]["edges"].each do |pen|
         n = pen["node"]
@@ -172,7 +184,8 @@ def import_products json_path="tmp/run/tmp/"
             topic.save
             product.topic_ids.push(topic.id)
           end
-          product.topic_ids = product.topic_ids.compact
+          product.topic_ids = product.topic_ids.uniq.compact
+          product.topic_ids = nil if product.topic_ids.empty?
           product.topics_count = n["topics"]["totalCount"].to_i
         end
 
@@ -197,13 +210,30 @@ def import_products json_path="tmp/run/tmp/"
               pn["topics"]["edges"].each do |tt|
                 post.topic_ids.push(tt["node"]["id"].to_i)
               end
-              post.topic_ids = post.topic_ids.compact
+              post.topic_ids = post.topic_ids.uniq.compact
+              post.topic_ids = nil if post.topic_ids.empty?
             end
             post.save
             product.post_ids.push(post.id)
           end
-          product.post_ids = product.post_ids.compact
+          product.post_ids = product.post_ids.uniq.compact
+          product.post_ids = nil if product.post_ids.empty?
           product.posts_count = n["posts"]["totalCount"].to_i
+        end
+        
+        if n["reviews"]
+          product.reviewers_ids = ([product.reviewers_ids] + []).flatten.compact
+          n["reviews"]["edges"].each do |r|
+            un = r["node"]["user"]
+            user = User.find_or_initialize_by(id: un["id"].to_i)
+            user.name = un["name"]
+            user.username = user.username || un["username"]
+            user.twitter = user.twitter || un["twitterUsername"]
+            user.save
+            product.reviewers_ids.push(user.id)
+          end
+          product.reviewers_ids = product.reviewers_ids.uniq.compact
+          product.reviewers_ids = nil if product.reviewers_ids.empty?
         end
         
         product.save
@@ -211,6 +241,8 @@ def import_products json_path="tmp/run/tmp/"
 
       if data["data"]["topic"]["products"]["edges"].count > 0
         system "rm #{fn}"
+      else
+        system "mv #{fn} #{fn.gsub(".json",".done")}"
       end
 
     end
@@ -219,6 +251,12 @@ end
 
 # import_products "/Users/quang/Downloads/done_1/"
 
+# Buoc 8
+# Manual check lai reviews(50), topics(100), posts(100)
+# Crawl them nhung thanh phan con thieu
+
+
+# Crawl topic's subscribers
 
 
 
