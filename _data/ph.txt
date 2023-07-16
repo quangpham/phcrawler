@@ -1,0 +1,105 @@
+{
+  "operationName":"TopicPage",
+  "variables":{"slug":"task-management","order":"most-upvoted","cursor":"ODA","query":null,"topPostsVariant":"THIS_WEEK","includeLayout":false},
+  "query":"query TopicPage($slug:String\u0021$cursor:String$query:String$subtopic:ID$order:String$topPostsVariant:TopPostsCardVariant\u0021)
+  {
+    topic(slug:$slug){
+      id slug parent{id name slug __typename}
+      ...TopicPagePostListFragment 
+      relatedAd(kind:\\"feed\\"){...AdFragment __typename}
+      relatedTopics(limit:3){id ...RelatedTopicsSidebarCardFragment __typename}
+    __typename}
+    stories(first:3 order:TRENDING){edges{node{id ...StoriesSidebarCardFragment __typename}__typename}__typename}
+    ...TopPostsSidebarCardFragment
+  }
+  fragment TopPostsSidebarCardFragment on Query{postsTop(preferredVariant:$topPostsVariant){variant posts{id ...SimplePostItemFragment __typename}__typename}__typename}
+  fragment SimplePostItemFragment on Post{id slug name tagline ...PostThumbnail redirectToProduct{id slug __typename}__typename}
+  fragment PostThumbnail on Post{id name thumbnailImageUuid ...PostStatusIcons __typename}
+  fragment PostStatusIcons on Post{id name productState __typename}
+  fragment StoriesSidebarCardFragment on AnthologiesStory{id slug title headerImageUuid minsToRead __typename}
+  fragment RelatedTopicsSidebarCardFragment on Topic{id slug name imageUuid description __typename}
+  fragment AdFragment on AdChannel{id post{id slug name updatedAt commentsCount ...PostVoteButtonFragment __typename}ctaText dealText name tagline thumbnailUuid url __typename}
+  fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}
+  fragment TopicFollowButton on Topic{id slug name isFollowed followersCount ...TopicImage __typename}fragment TopicImage on Topic{name imageUuid __typename}
+  fragment FacebookShareButtonFragment on Shareable{id url __typename}
+  fragment TopicPagePostListFragment on Topic{name slug posts(first:20 after:$cursor query:$query subtopic:$subtopic order:$order){edges{node{id ...PostItem ...TopicPageReviewRatingFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}__typename}
+  fragment PostItem on Post{id commentsCount name shortenedUrl slug tagline updatedAt pricingType topics(first:1){edges{node{id name slug __typename}__typename}__typename}redirectToProduct{id slug __typename}...PostThumbnail ...PostVoteButton __typename}
+  fragment PostVoteButton on Post{id featuredAt updatedAt createdAt disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}fragment TopicPageReviewRatingFragment on Post{id reviewsWithBodyCount product{id slug __typename}__typename}"
+}
+
+
+
+
+https://www.producthunt.com/topics/task-management
+Original
+
+curl 'https://www.producthunt.com/frontend/graphql' \
+  -H 'authority: www.producthunt.com' \
+  -H 'accept: */*' \
+  -H 'accept-language: en,vi;q=0.9' \
+  -H 'content-type: application/json' \
+  -H 'cookie: _ga=GA1.2.355219814.1658400138; visitor_id=ff77a19e-2a2c-42bd-9e94-5a2d2656df6e; track_code=ac988993a0; intercom-id-fe4ce68d4a8352909f553b276994db414d33a55c=84095e66-11f4-4d8b-9775-79655cc1a8a0; agreed_cookie_policy=2022-07-21+03%3A42%3A44+-0700; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221658400138043%22}%2C%22_delighted_lst%22:{%22t%22:%221658744163017%22%2C%22m%22:{%22token%22:%22mHQZ28ZqcpG77POvrubgCe8M%22}}%2C%22_delighted_lrt%22:{%22t%22:%221658802497710%22%2C%22m%22:{%22token%22:%22mHQZ28ZqcpG77POvrubgCe8M%22}}}}; ajs_user_id=4452508; ajs_anonymous_id=5e6f4f39-5a6b-4215-9604-d03467bdbe1e; _gid=GA1.2.1012758309.1663732757; first_visit=1663732757; first_referer=; intercom-session-fe4ce68d4a8352909f553b276994db414d33a55c=; g_state={"i_l":4,"i_p":1666151959806}; csrf_token=dVXitIptnobkNwhdrACxDUEauPzOqztEEd6IoXV1kR6RJjgiVZJY4ly3JtPlH8ptSyEXASZOoRHFWeFDLQ-KZA; _producthunt_session_production=NAlhRkmhQySQGfBaMD2e0AWX13M7wiew7J5t8Ssun2h83QV4AvvWrtuxf8Dv42tba6ZhXuJFbXc3EQ6N4%2BM8ztlCOh0Ki4O8uBWMzYAaL8q%2FEQ9teZ4lGhj0EctFmBxAHP5%2FYyLM8ojA7YWPPRfMI5ERMeoz2s%2BYwcXjC%2FCMOnRBv7Qj7GQSZB9qMv3PYnvRFHJ7p6BmO6RoONLUf69UZvG8J9u%2FQwI0kfgc78ng8NlrJSTwv8NVmBvzpzYG8vbsdROv5WyG37Yuwa4TWgrQQ%2BRcurjjovoLEAFcBWH2QrfWOUZEKTRlGHMTEpNBJ8NEqh7XdyUt1Ii1hXAUfjiVqZNhIln2JZ6B0JpIW%2BI9HZPsSCatdrYkzXHzilT1UDz7EBUYaYDK0LyybS7O2Y%2FesJHGl%2FIGG9yovi%2BqsZMLZulvrsxTHSQnvV%2BlG5JfFAIhYg3IWWMQZrfpJXYUjJce6JLOl4J7ghdEaMZZ%2BbfGEnRRE8sidnzcvVm3RxqBzN9cSaHGrLnI7aCWnx%2F3rx0%2B%2Bz%2BvkfrMPLpFrDQuTq7B88XQ0f1CUwER6%2BY%3D--6dsmnnoLQKpX8f1W--Wkl8fzrjpZ14HbGKMwJ2kw%3D%3D' \
+  -H 'dnt: 1' \
+  -H 'newrelic: eyJ2IjpbMCwxXSwiZCI6eyJ0eSI6IkJyb3dzZXIiLCJhYyI6IjE4NjQxMTMiLCJhcCI6IjU5NDMzNzgyMiIsImlkIjoiM2FhMDEyZDRjY2MyNzMyZCIsInRyIjoiOWFlZTVmYzJkZTVmMDQ1ZDA5YmZkOWQ2NjA2MjAwNDUiLCJ0aSI6MTY2MzczMzk2NTcxOX19' \
+  -H 'origin: https://www.producthunt.com' \
+  -H 'referer: https://www.producthunt.com/topics/task-management' \
+  -H 'sec-ch-ua: "Google Chrome";v="105", "Not)A;Brand";v="8", "Chromium";v="105"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'traceparent: 00-9aee5fc2de5f045d09bfd9d660620045-3aa012d4ccc2732d-01' \
+  -H 'tracestate: 1864113@nr=0-1-1864113-594337822-3aa012d4ccc2732d----1663733965719' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36' \
+  -H 'x-requested-with: XMLHttpRequest' \
+  --data-raw $'{"operationName":"TopicPage","variables":{"slug":"task-management","order":"most-upvoted","cursor":"NDA","query":null,"topPostsVariant":"THIS_WEEK","includeLayout":false},"query":"query TopicPage($slug:String\u0021$cursor:String$query:String$subtopic:ID$order:String$topPostsVariant:TopPostsCardVariant\u0021){topic(slug:$slug){id slug parent{id name slug __typename}...MetaTags ...TopicPageHeaderFragment ...TopicPagePostListFragment relatedAd(kind:\\"feed\\"){...AdFragment __typename}relatedTopics(limit:3){id ...RelatedTopicsSidebarCardFragment __typename}__typename}stories(first:3 order:TRENDING){edges{node{id ...StoriesSidebarCardFragment __typename}__typename}__typename}...TopPostsSidebarCardFragment}fragment TopPostsSidebarCardFragment on Query{postsTop(preferredVariant:$topPostsVariant){variant posts{id ...SimplePostItemFragment __typename}__typename}__typename}fragment SimplePostItemFragment on Post{id slug name tagline ...PostThumbnail redirectToProduct{id slug __typename}__typename}fragment PostThumbnail on Post{id name thumbnailImageUuid ...PostStatusIcons __typename}fragment PostStatusIcons on Post{id name productState __typename}fragment StoriesSidebarCardFragment on AnthologiesStory{id slug title headerImageUuid minsToRead __typename}fragment RelatedTopicsSidebarCardFragment on Topic{id slug name imageUuid description __typename}fragment MetaTags on SEOInterface{id meta{canonicalUrl creator description image mobileAppUrl oembedUrl robots title type author authorUrl __typename}__typename}fragment AdFragment on AdChannel{id post{id slug name updatedAt commentsCount ...PostVoteButtonFragment __typename}ctaText dealText name tagline thumbnailUuid url __typename}fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}fragment TopicPageHeaderFragment on Topic{id name description parent{id name slug __typename}...TopicFollowButton ...FacebookShareButtonFragment topPosts:posts(first:3 order:\\"most-upvoted\\"){edges{node{id name slug ...PostThumbnail redirectToProduct{id slug __typename}__typename}__typename}__typename}__typename}fragment TopicFollowButton on Topic{id slug name isFollowed followersCount ...TopicImage __typename}fragment TopicImage on Topic{name imageUuid __typename}fragment FacebookShareButtonFragment on Shareable{id url __typename}fragment TopicPagePostListFragment on Topic{name slug posts(first:20 after:$cursor query:$query subtopic:$subtopic order:$order){edges{node{id ...PostItem ...TopicPageReviewRatingFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}__typename}fragment PostItem on Post{id commentsCount name shortenedUrl slug tagline updatedAt pricingType topics(first:1){edges{node{id name slug __typename}__typename}__typename}redirectToProduct{id slug __typename}...PostThumbnail ...PostVoteButton __typename}fragment PostVoteButton on Post{id featuredAt updatedAt createdAt disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}fragment TopicPageReviewRatingFragment on Post{id reviewsWithBodyCount product{id slug __typename}__typename}"}' \
+  --compressed
+
+  curl 'https://www.producthunt.com/frontend/graphql' \
+  -H 'authority: www.producthunt.com' \
+  -H 'accept: */*' \
+  -H 'accept-language: en,vi;q=0.9' \
+  -H 'content-type: application/json' \
+  -H 'cookie: _ga=GA1.2.355219814.1658400138; visitor_id=ff77a19e-2a2c-42bd-9e94-5a2d2656df6e; track_code=ac988993a0; intercom-id-fe4ce68d4a8352909f553b276994db414d33a55c=84095e66-11f4-4d8b-9775-79655cc1a8a0; agreed_cookie_policy=2022-07-21+03%3A42%3A44+-0700; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221658400138043%22}%2C%22_delighted_lst%22:{%22t%22:%221658744163017%22%2C%22m%22:{%22token%22:%22mHQZ28ZqcpG77POvrubgCe8M%22}}%2C%22_delighted_lrt%22:{%22t%22:%221658802497710%22%2C%22m%22:{%22token%22:%22mHQZ28ZqcpG77POvrubgCe8M%22}}}}; ajs_user_id=4452508; ajs_anonymous_id=5e6f4f39-5a6b-4215-9604-d03467bdbe1e; _gid=GA1.2.1012758309.1663732757; first_visit=1663732757; first_referer=; intercom-session-fe4ce68d4a8352909f553b276994db414d33a55c=; g_state={"i_l":4,"i_p":1666151959806}; csrf_token=U9kbQNmt5jxfv8zsa7eSHtNCb4SfrLQj88ypG8OGBui3qsHWBlIgWOc_4mIiqOl-2XnAeXdJLnYnS8D5m_wdkg; _producthunt_session_production=pV45EiQAxYWO5mUdQsiv70oHypoqenuS1l2%2B7A0%2BuaaT7S%2B9%2BWtw68w2p%2F3E2BtBkWlu74qGbkh%2F%2BHFt%2F4dupAacL5LuUVpJ5nKip3xr3ug%2Bd4LabGYoLExs9NFkoJE8zGL9HjmHVh9niwCJGzu7nR%2FjZqk4ECVH8v0P1anC%2BMO9Z7SxNU0To6qqx9%2FTW0EP4m%2BJLhVTEPlDR4sbJwJrwhazeWuRMbR9JFsBrIY83NJn7fIgsCAQ3s1hviEZXF4uFWIgzjBrrFvBMltPOZ3C3%2FmPhYJdxInVTaaXDcJrArEpeDlwMHHrAznh7QMmNn8LTejwLfHSgeVkkV6oobfx971P1xiRKbWYa1WGbhxuadwKQ8HIkdRDzxVOYhBLrclWW6exOz8kuv5wsqUAeGFJCWtMIcdIjCZ%2FUG%2FlVshxKd0CoZ7TktZM7ee%2BQlJgEukXJzKuJfgJ1hjgfws0eU78p3JmXf1PCBo%2FppUWSkjOnl%2F5nQMMIhLunJ%2FtvIdOy5sZSE1EaTUfER8B0kUXFdAH4N9aB3nVL2V%2BroRVUCBc%2BTNxrWeXkyAiKNTehUAzuBnRSw%3D%3D--WoTaHP12VYISf5MU--jYOBqYA9tvZJZnzoDnjXJA%3D%3D' \
+  -H 'dnt: 1' \
+  -H 'newrelic: eyJ2IjpbMCwxXSwiZCI6eyJ0eSI6IkJyb3dzZXIiLCJhYyI6IjE4NjQxMTMiLCJhcCI6IjU5NDMzNzgyMiIsImlkIjoiYzkzZDhhYjJkY2JiMDEwZSIsInRyIjoiZThjYWNkMDM2Y2NhYzYzODBlYjA4N2ZjNzU4ZmE1MTgiLCJ0aSI6MTY2MzczNDA5MjE2NX19' \
+  -H 'origin: https://www.producthunt.com' \
+  -H 'referer: https://www.producthunt.com/topics/task-management' \
+  -H 'sec-ch-ua: "Google Chrome";v="105", "Not)A;Brand";v="8", "Chromium";v="105"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'traceparent: 00-e8cacd036ccac6380eb087fc758fa518-c93d8ab2dcbb010e-01' \
+  -H 'tracestate: 1864113@nr=0-1-1864113-594337822-c93d8ab2dcbb010e----1663734092165' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36' \
+  -H 'x-requested-with: XMLHttpRequest' \
+  --data-raw $'{"operationName":"TopicPage","variables":{"slug":"task-management","order":"most-upvoted","cursor":"NjA","query":null,"topPostsVariant":"THIS_WEEK","includeLayout":false},"query":"query TopicPage($slug:String\u0021$cursor:String$query:String$subtopic:ID$order:String$topPostsVariant:TopPostsCardVariant\u0021){topic(slug:$slug){id slug parent{id name slug __typename}...MetaTags ...TopicPageHeaderFragment ...TopicPagePostListFragment relatedAd(kind:\\"feed\\"){...AdFragment __typename}relatedTopics(limit:3){id ...RelatedTopicsSidebarCardFragment __typename}__typename}stories(first:3 order:TRENDING){edges{node{id ...StoriesSidebarCardFragment __typename}__typename}__typename}...TopPostsSidebarCardFragment}fragment TopPostsSidebarCardFragment on Query{postsTop(preferredVariant:$topPostsVariant){variant posts{id ...SimplePostItemFragment __typename}__typename}__typename}fragment SimplePostItemFragment on Post{id slug name tagline ...PostThumbnail redirectToProduct{id slug __typename}__typename}fragment PostThumbnail on Post{id name thumbnailImageUuid ...PostStatusIcons __typename}fragment PostStatusIcons on Post{id name productState __typename}fragment StoriesSidebarCardFragment on AnthologiesStory{id slug title headerImageUuid minsToRead __typename}fragment RelatedTopicsSidebarCardFragment on Topic{id slug name imageUuid description __typename}fragment MetaTags on SEOInterface{id meta{canonicalUrl creator description image mobileAppUrl oembedUrl robots title type author authorUrl __typename}__typename}fragment AdFragment on AdChannel{id post{id slug name updatedAt commentsCount ...PostVoteButtonFragment __typename}ctaText dealText name tagline thumbnailUuid url __typename}fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}fragment TopicPageHeaderFragment on Topic{id name description parent{id name slug __typename}...TopicFollowButton ...FacebookShareButtonFragment topPosts:posts(first:3 order:\\"most-upvoted\\"){edges{node{id name slug ...PostThumbnail redirectToProduct{id slug __typename}__typename}__typename}__typename}__typename}fragment TopicFollowButton on Topic{id slug name isFollowed followersCount ...TopicImage __typename}fragment TopicImage on Topic{name imageUuid __typename}fragment FacebookShareButtonFragment on Shareable{id url __typename}fragment TopicPagePostListFragment on Topic{name slug posts(first:20 after:$cursor query:$query subtopic:$subtopic order:$order){edges{node{id ...PostItem ...TopicPageReviewRatingFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}__typename}fragment PostItem on Post{id commentsCount name shortenedUrl slug tagline updatedAt pricingType topics(first:1){edges{node{id name slug __typename}__typename}__typename}redirectToProduct{id slug __typename}...PostThumbnail ...PostVoteButton __typename}fragment PostVoteButton on Post{id featuredAt updatedAt createdAt disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}fragment TopicPageReviewRatingFragment on Post{id reviewsWithBodyCount product{id slug __typename}__typename}"}' \
+  --compressed
+
+
+
+  curl 'https://www.producthunt.com/frontend/graphql' \
+  -H 'authority: www.producthunt.com' \
+  -H 'accept: */*' \
+  -H 'accept-language: en,vi;q=0.9' \
+  -H 'content-type: application/json' \
+  -H 'cookie: _ga=GA1.2.355219814.1658400138; visitor_id=ff77a19e-2a2c-42bd-9e94-5a2d2656df6e; track_code=ac988993a0; intercom-id-fe4ce68d4a8352909f553b276994db414d33a55c=84095e66-11f4-4d8b-9775-79655cc1a8a0; agreed_cookie_policy=2022-07-21+03%3A42%3A44+-0700; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221658400138043%22}%2C%22_delighted_lst%22:{%22t%22:%221658744163017%22%2C%22m%22:{%22token%22:%22mHQZ28ZqcpG77POvrubgCe8M%22}}%2C%22_delighted_lrt%22:{%22t%22:%221658802497710%22%2C%22m%22:{%22token%22:%22mHQZ28ZqcpG77POvrubgCe8M%22}}}}; ajs_user_id=4452508; ajs_anonymous_id=5e6f4f39-5a6b-4215-9604-d03467bdbe1e; _gid=GA1.2.1012758309.1663732757; first_visit=1663732757; first_referer=; intercom-session-fe4ce68d4a8352909f553b276994db414d33a55c=; g_state={"i_l":4,"i_p":1666151959806}; csrf_token=c-PXht4s9eI2I1m907MIne3V3lJnnY9CBQBzFHjLtSCXkA0QAdMzho6jdzOarHP95-5xr494FRfRhxr2ILGuWg; _producthunt_session_production=rfQ9fvRZ%2BgxtWbqb%2BUt71puLvR9LUigju2ob7b9wUbiYVwYlADxLJ9EbZg1CV3xBM%2B9jEvDI7M%2F1bhKiGgfsnk5c8kXo3%2FqeiVPHo3HOzpXq1yh6atRNq%2BUWe0lPVi4xtLDD64x3LrjNd0vfVgu3iFIe9RG6fmNmnlk2RP5rLxAKFGAaww1Q6zHGA5VwvWmukJFj2j3TSQ79ZFQxPkt0%2BwOc6Fn0hO21lRTjPJOiA62zbxF8g1ZK%2BzZY9hRvj5rh12SUE9szCBT3p49Es%2FFSTGltZxFqes%2BgH2YWuEPMQH9Y3R%2Bm896BYRJ%2FGJ%2FnYkEj2ZNL8U%2BEovaBHoCm7Ta9SqtD46ofi1W729f3y%2Fx0kThuVCUsuUaraAQsVFpyCrQXq%2BK55%2B5jpXhrvMJPqn%2BMlKcybv5O%2FdGQgdfaqxittRwrEQLHoKPqNpniTYAyyJGPoTuuZOGZCrf7ocADE1X%2BOBx4M6llw6VgGK8PoBc0DxmTNIQsJpkr8eUvaU9hkEPpfk1NbDvU3g5L9LfHih1f6dvABULcZE83xNNgfNbL6bDUu1cw7fuiT%2FWwYtQhg0c39%2FUY6R7Rf%2Bc5xF3MFFNrM4w%3D--1wl06MoXm22TpfYg--0y93TGmzxYFNrC6255%2Fkjg%3D%3D' \
+  -H 'dnt: 1' \
+  -H 'newrelic: eyJ2IjpbMCwxXSwiZCI6eyJ0eSI6IkJyb3dzZXIiLCJhYyI6IjE4NjQxMTMiLCJhcCI6IjU5NDMzNzgyMiIsImlkIjoiZTk2NDM3NjQ0MzE2ZDI2NSIsInRyIjoiMjZhNmYzNDUyODEyMDk1ZmYyZjk0YzRmZjAwY2E1YjgiLCJ0aSI6MTY2Mzc0OTAzNDczM319' \
+  -H 'origin: https://www.producthunt.com' \
+  -H 'referer: https://www.producthunt.com/topics/task-management' \
+  -H 'sec-ch-ua: "Google Chrome";v="105", "Not)A;Brand";v="8", "Chromium";v="105"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'traceparent: 00-26a6f3452812095ff2f94c4ff00ca5b8-e96437644316d265-01' \
+  -H 'tracestate: 1864113@nr=0-1-1864113-594337822-e96437644316d265----1663749034733' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36' \
+  -H 'x-requested-with: XMLHttpRequest' \
+  --data-raw $'{"operationName":"TopicPage","variables":{"slug":"task-management","order":"by-date","cursor":"MjA","query":null,"topPostsVariant":"THIS_WEEK","includeLayout":false},"query":"query TopicPage($slug:String\u0021$cursor:String$query:String$subtopic:ID$order:String$topPostsVariant:TopPostsCardVariant\u0021){topic(slug:$slug){id slug parent{id name slug __typename}...MetaTags ...TopicPageHeaderFragment ...TopicPagePostListFragment relatedAd(kind:\\"feed\\"){...AdFragment __typename}relatedTopics(limit:3){id ...RelatedTopicsSidebarCardFragment __typename}__typename}stories(first:3 order:TRENDING){edges{node{id ...StoriesSidebarCardFragment __typename}__typename}__typename}...TopPostsSidebarCardFragment}fragment TopPostsSidebarCardFragment on Query{postsTop(preferredVariant:$topPostsVariant){variant posts{id ...SimplePostItemFragment __typename}__typename}__typename}fragment SimplePostItemFragment on Post{id slug name tagline ...PostThumbnail redirectToProduct{id slug __typename}__typename}fragment PostThumbnail on Post{id name thumbnailImageUuid ...PostStatusIcons __typename}fragment PostStatusIcons on Post{id name productState __typename}fragment StoriesSidebarCardFragment on AnthologiesStory{id slug title headerImageUuid minsToRead __typename}fragment RelatedTopicsSidebarCardFragment on Topic{id slug name imageUuid description __typename}fragment MetaTags on SEOInterface{id meta{canonicalUrl creator description image mobileAppUrl oembedUrl robots title type author authorUrl __typename}__typename}fragment AdFragment on AdChannel{id post{id slug name updatedAt commentsCount ...PostVoteButtonFragment __typename}ctaText dealText name tagline thumbnailUuid url __typename}fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}fragment TopicPageHeaderFragment on Topic{id name description parent{id name slug __typename}...TopicFollowButton ...FacebookShareButtonFragment topPosts:posts(first:3 order:\\"most-upvoted\\"){edges{node{id name slug ...PostThumbnail redirectToProduct{id slug __typename}__typename}__typename}__typename}__typename}fragment TopicFollowButton on Topic{id slug name isFollowed followersCount ...TopicImage __typename}fragment TopicImage on Topic{name imageUuid __typename}fragment FacebookShareButtonFragment on Shareable{id url __typename}fragment TopicPagePostListFragment on Topic{name slug posts(first:20 after:$cursor query:$query subtopic:$subtopic order:$order){edges{node{id ...PostItem __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}__typename}fragment PostItem on Post{id commentsCount name shortenedUrl slug tagline updatedAt pricingType topics(first:1){edges{node{id name slug __typename}__typename}__typename}redirectToProduct{id slug __typename}...PostThumbnail ...PostVoteButton __typename}fragment PostVoteButton on Post{id featuredAt updatedAt createdAt disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}"}' \
+  --compressed
