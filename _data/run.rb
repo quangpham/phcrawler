@@ -261,6 +261,89 @@ end
 
 
 
+# Buoc 20
+# Tao file crawl contribuitors
+# Crawl Voters
+init_tmp()
+p_ids = Post.where("((old_votes is null) OR (old_votes is not null and votes!=old_votes)) AND votes < 13000").collect {|p| p.slug}
+
+run_content_str = ""
+p_ids.each_slice(p_ids.count/10).to_a.each_with_index do |arr, i|
+  str = ""
+  arr.each {|id| str= str + "./ContributorsByPost.sh #{id} 100000\n"}
+  File.open("tmp/run/#{i}.sh", 'w') { |file| file.write(str) }
+  system "chmod u+x tmp/run/#{i}.sh"
+  run_content_str += "\n./#{i}.sh & \n"
+end
+File.open("tmp/run/run.sh", 'w') { |file| file.write(run_content_str) }
+
+# Buoc 21
+# Sync len server de chay
+# Sync results ve local
+
+# Buoc 22
+# Import Voters
+def import_voters json_path="tmp/run/tmp/"
+  Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
+    puts fn
+    begin
+      data = JSON.parse(File.read(fn))
+      
+      post = Post.find_by(id: data["data"]["post"]["id"].to_i)
+      post.hunter_ids = [] if post.hunter_ids.nil?
+      post.maker_ids = [] if post.maker_ids.nil?
+      post.commenter_ids = [] if post.commenter_ids.nil?
+      post.upvoter_ids = [] if post.upvoter_ids.nil?
+      
+      data["data"]["post"]["contributors"].each do |n|
+        u = n["user"]
+        user_id = n["user"]["id"].to_i
+        user = User.find_or_initialize_by(id: user_id)
+        user.name = u["name"] || user.name
+        user.username = u["username"] || user.username
+        user.headline = u["headline"] || user.headline
+        user.website = u["websiteUrl"] || user.website
+        user.twitter = u["twitterUsername"] || user.twitter
+        user.is_maker = u["isMaker"]
+        user.is_trashed = u["isTrashed"]
+        user.badges = [u["badgesCount"].to_i, u["badgesUniqueCount"].to_i].max
+        user.followers = u["followersCount"]
+        user.following = u["followingsCount"] 
+        user.score = u["karmaBadge"]["score"] 
+        user.s_created_at = u["createdAt"]    
+        post.hunter_ids.push(user_id) if !n["role"].index("hunter").nil?
+        post.maker_ids.push(user_id) if !n["role"].index("maker").nil?
+        post.commenter_ids.push(user_id) if !n["role"].index("commenter").nil?
+        post.upvoter_ids.push(user_id) if !n["role"].index("upvoter").nil?
+        user.save
+      end
+    
+      if data["data"]["post"]["contributors"].count > 0
+        post.hunter_ids = post.hunter_ids.uniq.compact.sort
+        post.hunter_ids = nil if post.hunter_ids.empty?
+        post.maker_ids = post.maker_ids.uniq.compact.sort
+        post.maker_ids = nil if post.maker_ids.empty?
+        post.commenter_ids = post.commenter_ids.uniq.compact.sort
+        post.commenter_ids = nil if post.commenter_ids.empty?
+        post.upvoter_ids = post.upvoter_ids.uniq.compact.sort
+        post.upvoter_ids = nil if post.upvoter_ids.empty?
+        post.version = 1
+        post.save
+        system "rm #{fn}"
+        # system "mv #{fn} #{fn.gsub(".json",".rone")}"
+      end
+    rescue
+    end
+  end
+end
+
+# import_voters "/Users/quang/Downloads/done/"
+
+
+
+####
+
+
 
 
 
@@ -390,86 +473,7 @@ end
 ####
 
 
-# Crawl Voters
-init_tmp()
-p_ids = Post.where("((old_votes is null) OR (old_votes is not null and votes!=old_votes)) AND votes < 13000").collect {|p| p.slug}
 
-run_content_str = ""
-p_ids.each_slice(p_ids.count/10).to_a.each_with_index do |arr, i|
-  str = ""
-  arr.each {|id| str= str + "./ContributorsByPost.sh #{id} 100000\n"}
-  File.open("tmp/run/#{i}.sh", 'w') { |file| file.write(str) }
-  system "chmod u+x tmp/run/#{i}.sh"
-  run_content_str += "\n./#{i}.sh & \n"
-end
-File.open("tmp/run/run.sh", 'w') { |file| file.write(run_content_str) }
-
-
-
-
-###
-
-# Import Voters
-# {
-#   "data": {
-#     "post": {
-#       "id": "14306",
-#       "contributors": [
-#         {
-#           "role": "hunter",
-
-
-def import_voters json_path="tmp/run/tmp/"
-  Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
-    puts fn
-    begin
-      data = JSON.parse(File.read(fn))
-      post_id = data["data"]["post"]["id"].to_i
-      hunter_ids = []
-      maker_ids = []
-      commenter_ids = []
-      upvoter_ids = []
-      data["data"]["post"]["contributors"].each do |n|
-        u = n["user"]
-        user_id = n["user"]["id"].to_i
-        user = User.find_or_initialize_by(id: user_id)
-        user.name = u["name"] || user.name
-        user.username = u["username"] || user.username
-        user.headline = u["headline"] || user.headline
-        user.website = u["websiteUrl"] || user.website
-        user.twitter = u["twitterUsername"] || user.twitter
-        user.is_maker = u["isMaker"]
-        user.is_trashed = u["isTrashed"]
-        user.badges = [u["badgesCount"].to_i, u["badgesUniqueCount"].to_i].max
-        user.followers = u["followersCount"]
-        user.following = u["followingsCount"] 
-        user.score = u["karmaBadge"]["score"] 
-        user.created_at = u["createdAt"]    
-        hunter_ids.push(user_id) if !n["role"].index("hunter").nil?
-        maker_ids.push(user_id) if !n["role"].index("maker").nil?
-        commenter_ids.push(user_id) if !n["role"].index("commenter").nil?
-        upvoter_ids.push(user_id) if !n["role"].index("upvoter").nil?
-        user.save
-      end
-    
-      if data["data"]["post"]["contributors"].count > 0
-        if post = Post.find_by(id: post_id)
-          post.old_votes = post.votes
-          post.hunter_ids = ([] + [post.hunter_ids] + hunter_ids).flatten.uniq.compact.sort
-          post.maker_ids = ([] + [post.maker_ids] + maker_ids).flatten.uniq.compact.sort
-          post.commenter_ids = ([] + [post.commenter_ids] + commenter_ids).flatten.uniq.compact.sort
-          post.upvoter_ids = ([] + [post.upvoter_ids] + upvoter_ids).flatten.uniq.compact.sort
-          post.save
-        end
-        system "rm #{fn}"
-        # system "mv #{fn} #{fn.gsub(".json",".rone")}"
-      end
-    rescue
-    end
-  end
-end
-
-####
 
 
 

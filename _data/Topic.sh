@@ -32,7 +32,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     "variables":{"query":null,"cursor":"'$3'","order":"'$2'"},
     "query":"query TopicsPage($cursor:String$query:String$order:String)
     {
-      topics(query:$query first:20 after:$cursor order:$order)
+      topics(query:$query first:200 after:$cursor order:$order)
       {
         edges
         {
