@@ -1,7 +1,10 @@
+# Buoc 1 
 # Init tmp
 def init_tmp
   system "mkdir -p tmp/run/ && rm -R tmp/run/ && mkdir -p tmp/run/"
-  system "cp _data/PostByTopic.sh tmp/run/PostByTopic.sh"
+  system "cp _data/GetTopicDetail.sh tmp/run/GetTopicDetail.sh"
+  system "cp _data/GetProductsByTopicFull.sh tmp/run/GetProductsByTopicFull.sh"
+
   system "cp _data/ContributorsByPost.sh tmp/run/ContributorsByPost.sh"
   system "touch tmp/run/run.sh && chmod u+x tmp/run/run.sh"
 end
@@ -28,6 +31,7 @@ for i in 2..10000 # Khoang 21 page / "endCursor": "NDIw",
 end
 ###
 
+# Buoc 2
 # IMPORT TOPICS
 Dir["tmp/_r.*.json"].sort.each do |fn|
   begin
@@ -54,6 +58,168 @@ Dir["tmp/_r.*.json"].sort.each do |fn|
   end
 end
 
+# Buoc 3
+# Crawl them thong tin cho Topic
+# Lay duoc tong products_count, subscribers_count, recent_stacks_count
+# / Crawl lay thong tin chung, bang cach crawl page dau tien (20 cai)
+init_tmp
+str = ""
+Topic.order(:slug).each {|t| str += "./GetTopicDetail.sh 1001 #{t.slug} most_recent \n"}
+File.open("tmp/run/run.sh", 'w') { |file| file.write(str) }
+
+
+
+# Buoc 4
+# Cap nhat lai thong tin topic
+# tinh toan cac page cursors tiep theo dua theo totalCount (cua products)
+# tong so page = totalCount / 20
+
+def update_topics json_path="tmp/run/tmp/"
+  Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
+    begin
+      data = JSON.parse(File.read(fn))
+      t = data["data"]["topic"]
+      topic = Topic.find_by(id: t["id"].to_i)
+      topic.posts_count = t["postsCount"]
+      topic.followers_count = t["followersCount"]
+      
+      if t["parent"]
+        parent = Topic.find_or_create_by(id: t["parent"]["id"].to_i)
+        topic.parent_id = parent.id
+      end
+      
+      if t["products"]
+        topic.products_count = t["products"]["totalCount"]
+      end
+      
+      if t["subscribers"]
+        topic.subscribers_count = t["subscribers"]["totalCount"]
+      end
+
+      if t["recentStacks"]
+        topic.recent_stacks_count = t["recentStacks"]["totalCount"]
+      end
+      
+      topic.save
+      system "mv #{fn} #{fn.gsub(".json",".done")}"
+    rescue
+    end
+  end
+end
+
+# Buoc 5
+# Tao file crawl products theo topic voi page cursor
+# SPlit file ra thanh 10 files
+
+init_tmp
+cursors = File.read("_data/cursors.txt").split(",")
+commands = []
+Topic.where("products_count > 0").each do |t|
+  cursors[..(t.products_count/20+1)].each_with_index do |cursor, i|
+    commands.push "./GetProductsByTopicFull.sh #{1000+i} #{t.slug} most_recent #{cursor}"
+  end
+end
+
+number_split_files = 15
+content_arr = []
+number_split_files.times {content_arr.push([])}
+
+File.open("tmp/run/run.sh", 'w') { |file| file.write( number_split_files.times.collect {|i| "./#{i}.sh &" }.join("\n") ) }
+
+commands.each_with_index do |c,i|
+  content_arr[i%number_split_files].push(c)
+end
+
+content_arr.each_with_index do |arr,i|
+  File.open("tmp/run/#{i}.sh", 'w') { |file| file.write(arr.join(" \n")) }
+  system "chmod u+x tmp/run/#{i}.sh"
+end
+
+# Buoc 6
+# Sync len server de xu ly
+# Sync nguoc file results ve local
+
+# Buoc 7
+# Import Products
+# 
+
+# IMPORT PRODUCT 
+def import_products json_path="tmp/run/tmp/"
+  Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
+    begin
+      data = JSON.parse(File.read(fn))
+      data["data"]["topic"]["products"]["edges"].each do |pen|
+        n = pen["node"]
+        product_id = n["id"].to_i
+        product = Product.find_or_initialize_by(id: product_id)
+        product.slug = n["slug"]
+        product.name = n["name"]
+        product.tagline = n["tagline"]
+        product.followers_count = n["followersCount"]
+        product.reviews_count = n["reviewsCount"]
+        product.reviews_rating = n["reviewsRating"]
+        product.logo_uuid = n["logoUuid"]
+        product.created_at = n["createdAt"]
+        
+        if n["topics"]
+          product.topic_ids = ([product.topic_ids] + []).flatten.compact
+          n["topics"]["edges"].each do |t|
+            tn = t["node"]
+            topic = Topic.find_or_initialize_by(id: tn["id"].to_i, slug: tn["slug"])
+            if tn["parent"]
+              topic.parent_id = tn["parent"]["id"].to_i
+            end
+            topic.save
+            product.topic_ids.push(topic.id)
+          end
+          product.topic_ids = product.topic_ids.compact
+          product.topics_count = n["topics"]["totalCount"].to_i
+        end
+
+        if n["posts"]
+          product.post_ids = ([product.post_ids] + []).flatten.compact
+          n["posts"]["edges"].each do |p|
+            pn = p["node"]
+            post = Post.find_or_initialize_by(id: pn["id"].to_i)
+            post.product_id = product_id
+            post.name = pn["name"]
+            post.slug = pn["slug"]
+            post.tagline = pn["tagline"]
+            post.comments_count = pn["commentsCount"]
+            post.s_created_at = pn["createdAt"]
+            post.s_updated_at = pn["updatedAt"]
+            post.s_featured_at = pn["featuredAt"]
+            post.pricing_type = pn["pricingType"]
+            post.votes_count = pn["votesCount"]
+            if pn["topics"]
+              post.topic_ids = ([post.topic_ids] + []).flatten.compact
+              post.topics_count = pn["topics"]["totalCount"]
+              pn["topics"]["edges"].each do |tt|
+                post.topic_ids.push(tt["node"]["id"].to_i)
+              end
+              post.topic_ids = post.topic_ids.compact
+            end
+            post.save
+            product.post_ids.push(post.id)
+          end
+          product.post_ids = product.post_ids.compact
+          product.posts_count = n["posts"]["totalCount"].to_i
+        end
+        
+        product.save
+      end
+
+      if data["data"]["topic"]["products"]["edges"].count > 0
+        system "rm #{fn}"
+      end
+
+    end
+  end
+end
+
+# import_products "/Users/quang/Downloads/done_1/"
+
+
 
 
 
@@ -66,7 +232,7 @@ end
 def crawl_posts(_topic)
   topic = _topic || "task-management" # "productivity"
   tmp_file = "tmp/_r.json"
-  order = "by-date" # "most-upvoted"
+  order = "most_recent" # "most-upvoted" "best_rated", "most_followed", "most_recent"
   
   system "_data/PostByTopic.sh 1001 #{topic} #{order}"
   

@@ -1,0 +1,10 @@
+          fragment ProductExtra on Product{
+            slug name tagline followersCount reviewsCount
+            reviewsRating reviewsWithBodyCount reviewsWithRatingCount  
+            isSubscribed isMaker
+            logoUuid isNoLongerOnline
+            createdAt
+            __typename
+          }
+
+          fragment UserInfo on User{id name username avatarUrl twitterUsername websiteUrl headline createdAt isTrashed isMaker __typename}
