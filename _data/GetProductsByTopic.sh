@@ -1,6 +1,6 @@
 # Lay toan products theo topic
-# ./GetProductsByTopicFull.sh so-thu-tu topic-name order-name paging-cursor
-# ./GetProductsByTopicFull.sh 1 task-management most_recent NjA 
+# ./GetProductsByTopic.sh so-thu-tu topic-name order-name paging-cursor
+# ./GetProductsByTopic.sh 1 task-management most_recent NjA(or blank)
 # stt, name, order ("best_rated", "most_followed", "most_recent","#by-date", "#most-upvoted") , cursor
 
 mkdir -p tmp/
@@ -30,40 +30,29 @@ curl 'https://www.producthunt.com/frontend/graphql' \
           {
             topic(slug:$slug)
               {
-                id slug name description postsCount followersCount parent{id name slug}
-                
-                products(first:10 after:$cursor order:$order excludeHidden:false) {
+                id 
+
+                products(first:20 after:$cursor order:$order excludeHidden:false) {
                   edges {
                     node {
-                      id slug name tagline followersCount logoUuid createdAt
-                      reviewsRating reviewsCount
+                      id slug name tagline logoUuid followersCount reviewsRating createdAt
 
-                      reviews(first:50){
-                        edges{node{id user{id name username twitterUsername} }}
+                      reviews(first:200){
+                        edges{ node {id user{
+                          id name username twitterUsername websiteUrl followersCount followingsCount 
+                          badgesCount karmaBadge{score} isTrashed createdAt 
+                        } } }
                         totalCount
                       }
-                      
-                      topics(first:100) {
-                        edges{node{id slug parent{id}}}
-                        totalCount
-                      }
-                      
-                      posts(first:100) {
-                        edges{node{id ...PostItemFragment}}
-                        totalCount
-                      }
+
+                      topics(first:100) { edges{node{id}} }
+                      posts(first:100) { edges{node{id}} totalCount }
                     }
                   }
                   totalCount pageInfo {endCursor hasNextPage}
                 }
 
-                posts(first:1){totalCount}
               }
-          }
-
-          fragment PostItemFragment on Post{
-            id commentsCount name slug tagline updatedAt createdAt featuredAt pricingType votesCount
-            topics(first:1){edges{node{id }} totalCount }
           }
 
           "
