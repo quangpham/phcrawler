@@ -1,6 +1,6 @@
 # Lay toan products theo topic
 # ./GetProductsByTopicFull.sh so-thu-tu topic-name order-name paging-cursor
-# ./GetProductsByTopicFull.sh 1 task-management by-date NjA 
+# ./GetProductsByTopicFull.sh 1 task-management most_recent NjA 
 # stt, name, order ("best_rated", "most_followed", "most_recent","#by-date", "#most-upvoted") , cursor
 
 mkdir -p tmp/
@@ -56,6 +56,8 @@ curl 'https://www.producthunt.com/frontend/graphql' \
                   }
                   totalCount pageInfo {endCursor hasNextPage}
                 }
+
+                posts(first:1){totalCount}
               }
           }
 

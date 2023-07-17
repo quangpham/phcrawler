@@ -1,10 +1,9 @@
-# ./Topic.sh 1 name NjA 
+# ./Topic.sh 1 NjA(or blank)
 # stt, order ("posts_count", "name", "trending") , cursor
 
-printf "tmp/_r.toptic.$1.$2.$3.json\n"
 
 mkdir -p tmp/
-rm tmp/_r.json*
+rm tmp/topics.json*
 
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
@@ -29,26 +28,26 @@ curl 'https://www.producthunt.com/frontend/graphql' \
   --data-raw '
   {
     "operationName":"TopicsPage",
-    "variables":{"query":null,"cursor":"'$3'","order":"'$2'"},
+    "variables":{"query":null,"cursor":"","order":"name"},
     "query":"query TopicsPage($cursor:String$query:String$order:String)
     {
-      topics(query:$query first:200 after:$cursor order:$order)
+      topics(query:$query first:5000 after:$cursor order:$order)
       {
         edges
         {
           node
             {
-              id name slug parent{id name slug} followersCount
+              id name slug parent{id name slug} followersCount postsCount 
+              recentStacks(first:1){totalCount}
               products(first:1){totalCount}
               posts(first:1){totalCount}
-              subscribers(first:1){totalCount}
-              recentStacks(first:1){totalCount}
             }
         }
         totalCount pageInfo{endCursor hasNextPage}
       }
     }"
   }' \
-  --compressed > tmp/_r.json
+  --compressed > tmp/topics.json
 
-cp tmp/_r.json "tmp/_r.toptic.$1.$2.$3.json"
+# topics(query:$query first:2 after:$cursor order:$order)
+# subscribers(first:1){totalCount} // vi subscribers tuong duong followersCount

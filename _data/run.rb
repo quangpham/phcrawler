@@ -1,3 +1,7 @@
+# TODO
+# Crawl subcribers qua TopicPage
+# Crawl recentStacks qua TopicPage
+
 # Buoc 1 
 # Init tmp
 def init_tmp
@@ -9,114 +13,55 @@ def init_tmp
   system "touch tmp/run/run.sh && chmod u+x tmp/run/run.sh"
 end
 
-# CRAWL TOPICS
-tmp_file = "tmp/_r.json"
-order = "name" # "trending"
-
-system "_data/Topic.sh 1001 #{order}"
-
-for i in 2..10000 # Khoang 21 page / "endCursor": "NDIw",
-  if File.exist?(tmp_file)
-    raw_data = File.read(tmp_file)
-    data = JSON.parse(raw_data)
-    next_cursor = data["data"]["topics"]["pageInfo"]["endCursor"]
-    if !next_cursor.blank?
-      system "_data/Topic.sh #{1000+i} #{order} #{next_cursor}"
-    else
-      break
-    end
-  else 
-    break
-  end
-end
-###
 
 # Buoc 2
-# IMPORT TOPICS
-Dir["tmp/_r.*.json"].sort.each do |fn|
-  begin
-    data = JSON.parse(File.read(fn))
-    
-    data["data"]["topics"]["edges"].each do |n|
-      t = n["node"]
-      topic = Topic.find_or_initialize_by(id: t["id"].to_i)
-      topic.name = t["name"]
-      topic.slug = t["slug"]
-      topic.followers_count = t["followersCount"]
-      if t["parent"]
-        parent = Topic.find_or_create_by(id: t["parent"]["id"].to_i)
-        topic.parent_id = parent.id
-      end
-      if t["posts"]
-        topic.posts_count =t["posts"]["totalCount"]
-      end
-      if t["products"]
-        topic.products_count =t["products"]["totalCount"]
-      end
-      if t["subscribers"]
-        topic.subscribers_count =t["subscribers"]["totalCount"]
-      end
-      if t["recentStacks"]
-        topic.recent_stacks_count =t["recentStacks"]["totalCount"]
-      end
-      topic.save
-      if data["data"]["topics"]["edges"].count > 0
-        system "mv #{fn} #{fn.gsub(".json",".done")}"
-      end
-  rescue
-  end
+# CRAWL & IMPORT TOPICS
 
+system "_data/Topic.sh"
+
+fn = "tmp/topics.json"
+data = JSON.parse(File.read(fn))
+    
+data["data"]["topics"]["edges"].each do |n|
+  t = n["node"]
+  topic = Topic.find_or_initialize_by(id: t["id"].to_i)
+  topic.name = t["name"]
+  topic.slug = t["slug"]
+  topic.followers_count = t["followersCount"]
+  topic.posts_count = t["postsCount"]
+  if t["parent"]
+    parent = Topic.find_or_create_by(id: t["parent"]["id"].to_i)
+    topic.parent_id = parent.id
   end
+  if t["posts"]
+    topic.real_posts_count = t["posts"]["totalCount"]
+  end
+  if t["products"]
+    topic.products_count =t["products"]["totalCount"]
+  end
+  if t["recentStacks"]
+    topic.recent_stacks_count =t["recentStacks"]["totalCount"]
+  end
+  topic.version = 1
+  topic.save
 end
+
 
 # Buoc 3
-# Crawl them thong tin cho Topic
-# Lay duoc tong products_count, subscribers_count, recent_stacks_count
-# / Crawl lay thong tin chung, bang cach crawl page dau tien (20 cai)
-init_tmp
-str = ""
-Topic.order(:slug).each {|t| str += "./GetTopicDetail.sh 1001 #{t.slug} most_recent \n"}
-File.open("tmp/run/run.sh", 'w') { |file| file.write(str) }
-
-
+# Tao file crawl posts theo topic
+# Chi can tao cho topic parent la duoc
+# Crawl luon upvoters (max 200) | Thang nao >200, thi crawl post detail de lay upvoters
+# Crawl upn topic_ids cua post
+# Khong product_id, created_at, featured_at, pricing_type, rating, tagline, topics_count
+# Nho them version cho posts, va thay version cho users
+# Split files de chay tren server
 
 # Buoc 4
-# Cap nhat lai thong tin topic
-# tinh toan cac page cursors tiep theo dua theo totalCount (cua products)
-# tong so page = totalCount / 20
+# Sync results posts-by-topic
+# Tao/Update posts moi
+# Tao/Upbase users moi
 
-def update_topics json_path="tmp/run/tmp/"
-  Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
-    begin
-      data = JSON.parse(File.read(fn))
-      t = data["data"]["topic"]
-      topic = Topic.find_by(id: t["id"].to_i)
-      topic.posts_count = t["postsCount"]
-      topic.followers_count = t["followersCount"]
-      
-      if t["parent"]
-        parent = Topic.find_or_create_by(id: t["parent"]["id"].to_i)
-        topic.parent_id = parent.id
-      end
-      
-      if t["products"]
-        topic.products_count = t["products"]["totalCount"]
-      end
-      
-      if t["subscribers"]
-        topic.subscribers_count = t["subscribers"]["totalCount"]
-      end
 
-      if t["recentStacks"]
-        topic.recent_stacks_count = t["recentStacks"]["totalCount"]
-      end
-      
-      topic.save
-      system "mv #{fn} #{fn.gsub(".json",".done")}"
-    rescue
-    end
-  end
-end
 
 # Buoc 5
 # Tao file crawl products theo topic voi page cursor
@@ -158,6 +103,7 @@ end
 def import_products json_path="tmp/run/tmp/"
   Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
     begin
+      next if !File.exist?(fn)
       next if File.zero?(fn)
       data = JSON.parse(File.read(fn))
       data["data"]["topic"]["products"]["edges"].each do |pen|
@@ -249,7 +195,7 @@ def import_products json_path="tmp/run/tmp/"
   end
 end
 
-# import_products "/Users/quang/Downloads/done_1/"
+# import_products "/Users/quang/Downloads/done_4/"
 
 # Buoc 8
 # Manual check lai reviews(50), topics(100), posts(100)
@@ -266,9 +212,11 @@ end
 # Crawl Voters
 init_tmp()
 p_ids = Post.where("((old_votes is null) OR (old_votes is not null and votes!=old_votes)) AND votes < 13000").collect {|p| p.slug}
-
+p_ids = Post.where("votes_count < 100000 OR votes_count IS NULL").collect {|p| p.slug}
 run_content_str = ""
-p_ids.each_slice(p_ids.count/10).to_a.each_with_index do |arr, i|
+number_split_files = 15
+p_ids.each_slice(p_ids.count/number_split_files = 15
+).to_a.each_with_index do |arr, i|
   str = ""
   arr.each {|id| str= str + "./ContributorsByPost.sh #{id} 100000\n"}
   File.open("tmp/run/#{i}.sh", 'w') { |file| file.write(str) }
@@ -283,19 +231,37 @@ File.open("tmp/run/run.sh", 'w') { |file| file.write(run_content_str) }
 
 # Buoc 22
 # Import Voters
+# Lam them phan topic_ids, votesCount commentsCount updatedAt
 def import_voters json_path="tmp/run/tmp/"
-  Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
-    puts fn
+  Dir["#{json_path}/_r.*.json".gsub("//","/")].shuffle.each do |fn|
+
     begin
-      data = JSON.parse(File.read(fn))
-      
-      post = Post.find_by(id: data["data"]["post"]["id"].to_i)
+      next if !File.exist?(fn)
+      next if File.zero?(fn)
+      fn2 = fn.gsub(".json",".ongoing")
+      system "mv #{fn} #{fn2}"
+
+      _data = JSON.parse(File.read(fn2))
+      data = _data["data"]["post"]
+      post = Post.find_by(id: data["id"].to_i)
       post.hunter_ids = [] if post.hunter_ids.nil?
       post.maker_ids = [] if post.maker_ids.nil?
       post.commenter_ids = [] if post.commenter_ids.nil?
       post.upvoter_ids = [] if post.upvoter_ids.nil?
+      post.votes_count = data["votesCount"] || post.votes_count
+      post.comments_count = data["commentsCount"] || post.comments_count
+      post.s_updated_at = data["updatedAt"] || post.s_updated_at
       
-      data["data"]["post"]["contributors"].each do |n|
+      if data["topics"]
+        post.topic_ids = [] if post.topic_ids.nil?
+        data["topics"]["edges"].each do |n|
+          post.topic_ids.push(n["node"]["id"].to_i)
+        end
+        post.topic_ids = post.topic_ids.uniq.compact.sort
+        post.topic_ids = nil if post.topic_ids.empty?
+      end
+
+      data["contributors"].each do |n|
         u = n["user"]
         user_id = n["user"]["id"].to_i
         user = User.find_or_initialize_by(id: user_id)
@@ -318,7 +284,7 @@ def import_voters json_path="tmp/run/tmp/"
         user.save
       end
     
-      if data["data"]["post"]["contributors"].count > 0
+      if data["contributors"].count > 0
         post.hunter_ids = post.hunter_ids.uniq.compact.sort
         post.hunter_ids = nil if post.hunter_ids.empty?
         post.maker_ids = post.maker_ids.uniq.compact.sort
@@ -327,17 +293,16 @@ def import_voters json_path="tmp/run/tmp/"
         post.commenter_ids = nil if post.commenter_ids.empty?
         post.upvoter_ids = post.upvoter_ids.uniq.compact.sort
         post.upvoter_ids = nil if post.upvoter_ids.empty?
-        post.version = 1
+        post.version = 2
         post.save
-        system "rm #{fn}"
-        # system "mv #{fn} #{fn.gsub(".json",".rone")}"
+        system "rm #{fn2}"
       end
     rescue
     end
   end
 end
 
-# import_voters "/Users/quang/Downloads/done/"
+# import_voters "/Users/quang/Downloads/done_3/"
 
 
 

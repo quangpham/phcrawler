@@ -36,7 +36,9 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     {
       post(id:$postId)
       {
-        id contributors(limit:$limit)
+        id votesCount commentsCount updatedAt
+        topics(first:100){ edges{node{id}} }
+        contributors(limit:$limit)
         {
           role 
           user {
