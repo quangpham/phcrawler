@@ -1,7 +1,12 @@
 # Lay toan products theo topic
-# ./GetProductsByTopic.sh so-thu-tu topic-name order-name paging-cursor
+
+# ./GetProductsByTopic.sh so-thu-tu $topic-name $order $cursor
 # ./GetProductsByTopic.sh 1 task-management most_recent NjA(or blank)
-# stt, name, order ("best_rated", "most_followed", "most_recent","#by-date", "#most-upvoted") , cursor
+# ./GetProductsByTopic.sh 1 task-management best_rated NjA(or blank)
+
+# order: most_recent, oldest, posts_count, most_followed, best_rated, tech_stacks_count, used_by_products_count
+# postsorder: DATE, VOTES
+# reviewssorder: BEST, LATEST, FAVORABLE, CRITICAL
 
 mkdir -p tmp/
 
@@ -25,28 +30,27 @@ curl 'https://www.producthunt.com/frontend/graphql' \
   --data-raw $'
       {
         "operationName":"TopicPage",
-        "variables":{"slug":"'$2'","order":"'$3'","cursor":"'$4'","includeLayout":false},
-        "query":"query TopicPage($slug:String\u0021$cursor:String$order:ProductsOrder\u0021)
+        "variables":{"slug":"'$2'","order":"'$3'","cursor":"'$4'","includeLayout":false,"postsorder":"DATE","reviewssorder":"LATEST"},
+        "query":"query TopicPage($slug:String\u0021$cursor:String$order:ProductsOrder\u0021$postsorder:ProductsPostsOrder\u0021$reviewssorder:ReviewsOrder\u0021)
           {
             topic(slug:$slug)
               {
                 id 
-
                 products(first:20 after:$cursor order:$order excludeHidden:false) {
                   edges {
                     node {
                       id slug name tagline logoUuid followersCount reviewsRating createdAt
 
-                      reviews(first:200){
+                      reviews(first:20 order:$reviewssorder){
                         edges{ node {id user{
                           id name username twitterUsername websiteUrl followersCount followingsCount 
-                          badgesCount karmaBadge{score} isTrashed createdAt 
+                          badgesCount karmaBadge{score} isTrashed createdAt
                         } } }
                         totalCount
                       }
 
                       topics(first:100) { edges{node{id}} }
-                      posts(first:100) { edges{node{id}} totalCount }
+                      posts(first:100 order:$postsorder) { edges{node{id slug}} totalCount }
                     }
                   }
                   totalCount pageInfo {endCursor hasNextPage}
@@ -59,7 +63,8 @@ curl 'https://www.producthunt.com/frontend/graphql' \
       }' \
   --compressed> "tmp/_r.product-by-topic.$1.$2.$3.$4.ongoing"
 
-  mv "tmp/_r.product-by-topic.$1.$2.$3.$4.ongoing" "tmp/_r.product-by-topic.$1.$2.$3.$4.json"
+mv "tmp/_r.product-by-topic.$1.$2.$3.$4.ongoing" "tmp/_r.product-by-topic.$1.$2.$3.$4.json"
+
 
 # RAW 16/07/2023
   # curl 'https://www.producthunt.com/frontend/graphql' \

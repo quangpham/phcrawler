@@ -33,7 +33,8 @@ curl 'https://www.producthunt.com/frontend/graphql' \
                 posts(first:20 after:$cursor) {
                   edges {
                     node {
-                      id commentsCount votesCount name slug updatedAt
+                      id name slug commentsCount votesCount
+                      updatedAt
                       topics(first:100) {edges{node{id}}}
                       contributors(limit:200) {
                         role 

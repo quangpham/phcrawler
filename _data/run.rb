@@ -8,14 +8,55 @@ def init_tmp
   system "mkdir -p tmp/run/ && rm -R tmp/run/ && mkdir -p tmp/run/"
   system "cp _data/GetTopicDetail.sh tmp/run/GetTopicDetail.sh"
   system "cp _data/GetProductsByTopic.sh tmp/run/GetProductsByTopic.sh"
-
   system "cp _data/ContributorsByPost.sh tmp/run/ContributorsByPost.sh"
+  system "cp _data/GetPostsByProduct.sh tmp/run/GetPostsByProduct.sh"
   system "touch tmp/run/run.sh && chmod u+x tmp/run/run.sh"
 end
+
+cursors = File.read("_data/cursors.txt").split(",")
+
+def topic_version obj
+  return obj.id.nil? ? 0 : 4
+end
+
+def post_version obj
+  return obj.id.nil? ? 0 : 1
+end
+
+def products_by_topic_version obj
+  return obj.id.nil? ? nil : "topic_1"
+end
+
+def slipt_commands_to_files commands, number_split_files = 15, cursors
+  init_tmp()
+  content_arr = []
+  number_split_files.times {content_arr.push([])}
+  
+  File.open("tmp/run/run.sh", 'w') { |file| file.write( number_split_files.times.collect {|i| "./#{i}.sh &" }.join("\n") ) }
+  
+  commands.each_with_index do |c,i|
+    content_arr[i%number_split_files].push(c)
+  end
+  
+  content_arr.each_with_index do |arr,i|
+    File.open("tmp/run/#{i}.sh", 'w') { |file| file.write(arr.join(" \n")) }
+    system "chmod u+x tmp/run/#{i}.sh"
+  end
+
+  system "cd tmp/ && zip -r run.zip run/"
+end
+
+
 
 
 # Buoc 2
 # CRAWL & IMPORT TOPICS
+
+sql  = "update topics set old_followers_count=followers_count, old_products_count=products_count, old_real_posts_count=real_posts_count;"
+sql += "update topics set followers_count=null, products_count=null, real_posts_count=null;"
+ActiveRecord::Base.connection.execute(sql)
+
+###
 
 system "_data/Topic.sh"
 
@@ -42,7 +83,7 @@ data["data"]["topics"]["edges"].each do |n|
   if t["recentStacks"]
     topic.recent_stacks_count =t["recentStacks"]["totalCount"]
   end
-  topic.version = 1
+  topic.version = topic_version(topic)
   topic.save
 end
 
@@ -56,6 +97,8 @@ end
 # Nho them version cho posts, va thay version cho users
 # Split files de chay tren server
 
+
+
 # Buoc 4
 # Sync results posts-by-topic
 # Tao/Update posts moi
@@ -63,80 +106,31 @@ end
 
 
 # Buoc 5
-# Tao file Crawl GetProductsByTopic
-# Muc dich la crawl them reviewers (max 200), post_ids (max 100). Thang nao vuot qua con so nay, phai crawl lai tu trang detail
-# Chi can crawl Topic parent
-# Moi lan crawl duoc 20 products 1 lan
-init_tmp
-cursors = File.read("_data/cursors.txt").split(",")
+# Tao file Crawl products theo topic
+# Muc dich 
+# - crawl them reviewers (max 20)
+# - crawl them posts (not-detail) (max 100) tu products
+# Notes:
+# - Chi can crawl root topic
+# - Moi lan crawl duoc 20 products/lan
+# Extra:
+# - product co posts_count > 100 => crawl lai trang product detail
+# - product co reviews_count > 20 => tim cach crawl them
+
 commands = []
+
 Topic.where("parent_id is null and products_count is not null").each do |t|
-  cursors[..(t.products_count/20+1)].each_with_index do |cursor, i|
+  cursors[..(t.products_count/20+2)].each_with_index do |cursor, i|
     commands.push "./GetProductsByTopic.sh #{1000+i} #{t.slug} most_recent #{cursor}"
   end
 end
 
-number_split_files = 15
-content_arr = []
-number_split_files.times {content_arr.push([])}
+slipt_commands_to_files(commands, 15, cursors)
 
-File.open("tmp/run/run.sh", 'w') { |file| file.write( number_split_files.times.collect {|i| "./#{i}.sh &" }.join("\n") ) }
-
-commands.each_with_index do |c,i|
-  content_arr[i%number_split_files].push(c)
-end
-
-content_arr.each_with_index do |arr,i|
-  File.open("tmp/run/#{i}.sh", 'w') { |file| file.write(arr.join(" \n")) }
-  system "chmod u+x tmp/run/#{i}.sh"
-end
 
 # Buoc 6
-# Sync data
-
-# Buoc 7
+# Sync data + server
 # Import products
-
-
-
-
-# Buoc 6
-# Tao file crawl products theo topic voi page cursor
-# SPlit file ra thanh 10 files
-
-init_tmp
-cursors = File.read("_data/cursors.txt").split(",")
-commands = []
-Topic.where("products_count > 0").each do |t|
-  cursors[..(t.products_count/10+1)].each_with_index do |cursor, i|
-    commands.push "./GetProductsByTopicFull.sh #{1000+i} #{t.slug} most_recent #{cursor}"
-  end
-end
-
-number_split_files = 15
-content_arr = []
-number_split_files.times {content_arr.push([])}
-
-File.open("tmp/run/run.sh", 'w') { |file| file.write( number_split_files.times.collect {|i| "./#{i}.sh &" }.join("\n") ) }
-
-commands.each_with_index do |c,i|
-  content_arr[i%number_split_files].push(c)
-end
-
-content_arr.each_with_index do |arr,i|
-  File.open("tmp/run/#{i}.sh", 'w') { |file| file.write(arr.join(" \n")) }
-  system "chmod u+x tmp/run/#{i}.sh"
-end
-
-# Buoc 6
-# Sync len server de xu ly
-# Sync nguoc file results ve local
-
-# Buoc 7
-# Import Products
-# 
-
-# IMPORT PRODUCT 
 def import_products json_path="tmp/run/tmp/"
   Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
     begin
@@ -168,38 +162,58 @@ def import_products json_path="tmp/run/tmp/"
         end
 
         if n["posts"]
-          product.post_ids = ([product.post_ids] + []).flatten.compact
-          n["posts"]["edges"].each do |t|
-            product.post_ids.push(t["node"]["id"].to_i)
-          end
-          product.post_ids = product.post_ids.uniq.compact.sort
-          product.post_ids = nil if product.post_ids.empty?
+          edges_count = n["posts"]["edges"].count
           product.posts_count = n["posts"]["totalCount"]
+          # if product.posts_count > edges_count
+          #   product.note = "#{product.note}|p #{edges_count}-#{product.posts_count}"
+          # end
+          if edges_count > 0
+            product.post_ids = ([product.post_ids] + []).flatten.compact
+            n["posts"]["edges"].each do |t|
+              ppost = Post.find_or_initialize_by(id: t["node"]["id"].to_i)
+              ppost.slug = t["node"]["slug"]
+              ppost.product_id = product_id
+              ppost.save
+              product.post_ids.push(ppost.id)
+            end
+            product.post_ids = product.post_ids.uniq.compact.sort
+            product.post_ids = nil if product.post_ids.empty?
+          end
         end
         
         if n["reviews"]
-          product.reviewers_ids = ([product.reviewers_ids] + []).flatten.compact
-          n["reviews"]["edges"].each do |r|
-            un = r["node"]["user"]
-            user = User.find_or_initialize_by(id: un["id"].to_i)
-            user.name = un["name"]
-            user.username = un["username"] || user.username
-            user.twitter = un["twitterUsername"] || user.twitter
-            user.website = un["websiteUrl"] || user.website
-            user.followers = un["followersCount"]
-            user.following = un["followingsCount"]
-            user.badges = un["badgesCount"]
-            user.score = un["karmaBadge"]["score"]
-            user.is_trashed = un["isTrashed"]
-            user.s_created_at = un["createdAt"]
-            user.save
-            product.reviewers_ids.push(user.id)
-          end
-          product.reviewers_ids = product.reviewers_ids.uniq.compact
-          product.reviewers_ids = nil if product.reviewers_ids.empty?
+          edges_count = n["reviews"]["edges"].count
           product.reviews_count = n["reviews"]["totalCount"]
+          # if product.reviews_count > edges_count
+          #   product.note = "#{product.note}|r #{edges_count}-#{product.reviews_count}"
+          # end
+          if edges_count > 0
+            product.reviewers_ids = ([product.reviewers_ids] + []).flatten.compact
+            n["reviews"]["edges"].each do |r|
+              un = r["node"]["user"]
+              user = User.find_or_initialize_by(id: un["id"].to_i)
+              user.name = un["name"]
+              user.username = un["username"] || user.username
+              user.twitter = un["twitterUsername"] || user.twitter
+              user.website = un["websiteUrl"] || user.website
+              user.followers = un["followersCount"]
+              user.following = un["followingsCount"]
+              user.badges = un["badgesCount"]
+              user.score = un["karmaBadge"]["score"]
+              user.is_trashed = un["isTrashed"]
+              user.s_created_at = un["createdAt"]
+              user.save
+              product.reviewers_ids.push(user.id)
+            end
+            product.reviewers_ids = product.reviewers_ids.uniq.compact
+            product.reviewers_ids = nil if product.reviewers_ids.empty?
+          end
         end
-        product.version = 1
+
+        product.version = products_by_topic_version(product)
+        if product.note
+          product.note = (product.note.split("|") - [""]).uniq.sort.join("|")
+        end
         product.save
       end
 
@@ -212,6 +226,88 @@ def import_products json_path="tmp/run/tmp/"
     end
   end
 end
+
+# import_products "/Users/quang/Downloads/done_4"
+
+
+# Buoc 7
+# Tao file crawl them posts cho 1 product
+# Muc tieu:
+# - Lay het posts cua 1 product
+# - Lay them data cua posts duoc crawl (contributors, topic_ids, etc)
+# Note: 
+# - 10 posts/lan
+
+# SQL Query:
+# update products p set sys_posts_count=t.posts_count
+# from (
+# 	select product_id,count(id) as posts_count from posts
+# 	group by product_id
+# ) t
+# where p.id = t.product_id;
+
+commands = []
+Product.where("posts_count>sys_posts_count").each do |t|
+  cursors[..(t.posts_count/10+2)].each_with_index do |cursor, i|
+    commands.push "./GetPostsByProduct.sh #{1000+i} #{t.slug} #{cursor}"
+  end
+end
+
+slipt_commands_to_files(commands, 1, cursors)
+
+
+
+
+
+
+# Buoc 10
+# Tao file crawl them reviewers cua product
+
+# SQL Query truoc
+# update products p set sys_reviews_count=t.sys_reviews_count
+# from (
+# 	select product_id,count(user_id) as sys_reviews_count from product_reviewer
+# 	where product_id in (select id from products where reviews_count > 20)
+# 	group by product_id
+# ) t
+# where p.id = t.product_id;
+
+
+
+
+
+
+
+
+
+# Buoc 6
+# Tao file crawl products theo topic voi page cursor
+# SPlit file ra thanh 10 files
+
+commands = []
+Topic.where("products_count > 0").each do |t|
+  cursors[..(t.products_count/10+1)].each_with_index do |cursor, i|
+    commands.push "./GetProductsByTopicFull.sh #{1000+i} #{t.slug} most_recent #{cursor}"
+  end
+end
+
+slipt_commands_to_files(commands, 10, cursors)
+
+
+
+
+
+
+# Buoc 6
+# Sync len server de xu ly
+# Sync nguoc file results ve local
+
+# Buoc 7
+# Import Products
+# 
+
+# IMPORT PRODUCT 
+
 
 # import_products "/Users/quang/Downloads/done_4/"
 
@@ -368,7 +464,7 @@ File.open("tmp/run/run.sh", 'w') { |file| file.write(str) }
 # cursors = Dir["tmp/_r.*.json"].sort.collect {|fn| fn.split("by-date.").last.split(".").first}
 
 init_tmp
-cursors = File.read("_data/cursors.txt").split(",")
+
 commands = []
 Topic.where("real_posts > 19").each do |t|
   cursors[..(t.real_posts/20+1)].each_with_index do |cursor, i|
