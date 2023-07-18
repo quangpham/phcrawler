@@ -1,83 +1,18 @@
 # Lay toan posts theo product
-# ./GetPostsByProduct.sh so-thu-tu product-name cursor
-# ./GetPostsByProduct.sh 1 itch-io NjA(or blank)
+# ./GetReviewersByProduct.sh so-thu-tu product-name cursor
+# ./GetReviewersByProduct.sh 1 acorn-protocol-2 NjA(or blank)
 # Mot lan chi lan duoc max 20 posts / topic
 mkdir -p tmp/
-
-# curl 'https://www.producthunt.com/frontend/graphql' \
-#   -H 'authority: www.producthunt.com' \
-#   -H 'accept: */*' \
-#   -H 'accept-language: en,vi;q=0.9' \
-#   -H 'content-type: application/json' \
-#   -H 'cookie: first_visit=1689472725; first_referer=https://www.google.com/; _ga=GA1.1.521910990.1689472726; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221689472725565%22}}}; ajs_anonymous_id=8169299d-ab73-4fb4-97a1-11eff39d595c; visitor_id=a145b6c6-84d8-49ba-b565-5922df9bc8e8; track_code=81ad6b58d9; g_state={"i_p":1689479930148,"i_l":1}; agreed_cookie_policy=2023-07-15+18%3A58%3A53+-0700; _hjSessionUser_3508551=eyJpZCI6IjM5ZGEyNjY2LTY0YjItNTBjYS05MzUzLTNjNzA2N2VlMTcxNiIsImNyZWF0ZWQiOjE2ODk0NzI3MjYyNjYsImV4aXN0aW5nIjp0cnVlfQ==; _hjIncludedInSessionSample_3508551=1; _hjSession_3508551=eyJpZCI6Ijg1ZDE3NzhkLWVmNGUtNDQ4ZS1iZTk0LWFhNDdkMWVjZThiNSIsImNyZWF0ZWQiOjE2ODk1MDAwNTE0NDgsImluU2FtcGxlIjp0cnVlfQ==; _ga_WZ46833KH9=GS1.1.1689500051.5.1.1689500063.48.0.0; csrf_token=YTfwFKF6Tsfy6C--IrG7Dh_Km4VVl2vENIFiPkh8zIhdgga0HKTYzHpRHXsyp1cLlp41njH7bewiezDyXje1eg; _producthunt_session_production=LJMsfygRp9zicVCYr0GRsnnFuIBr7ct69IaqbVc1nCTQIKvzvZ95qjbB6UNsJep6EZuo0ckWOOnX1ggoAm6UC0joz%2BRdX%2BFGwr9kY7vrAwgTlnRbwEsuIrsrsXWSPNm0xxJK4CbebO8F2uixB7z%2BUeON3hR8owH5V5Yt9LBiPKLzpVphF82kOe24h%2ByRmP38KMw5To%2FecY8N6UQMEQVsBbg%2BsKDs0o8hk6X6gFIxY08EOri67CAg42H%2FGTstXcauQ9AEikgrXr%2BW16xIjzxTcVFELUpjDsmRtWr%2BZ8CK1HYVVT3DONiWAEc1r%2B%2FnwrgHfeBT1QSPSmwXWZLIcA%3D%3D--ncgV%2B3qhlEwC38%2Bo--XR4BJx%2B8dfRlkbUKuf%2FE3A%3D%3D' \
-#   -H 'dnt: 1' \
-#   -H 'origin: https://www.producthunt.com' \
-#   -H 'referer: https://www.producthunt.com/products/nfit-club-most-rewarding-way-to-get-fit' \
-#   -H 'sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"' \
-#   -H 'sec-ch-ua-mobile: ?0' \
-#   -H 'sec-ch-ua-platform: "macOS"' \
-#   -H 'sec-fetch-dest: empty' \
-#   -H 'sec-fetch-mode: cors' \
-#   -H 'sec-fetch-site: same-origin' \
-#   -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36' \
-#   -H 'x-requested-with: XMLHttpRequest' \
-#   --data-raw $'
-#     {
-#         "operationName":"ProductPageLaunches",
-#         "variables":{"slug":"'$2'","cursor":"'$3'","filter":"FEATURED","order":"DATE"},
-#         "query":"query ProductPageLaunches($slug:String\u0021$cursor:String$filter:ProductsPostsFilter$order:ProductsPostsOrder)
-#             {
-#                 product(slug:$slug)
-#                     {
-#                         id name slug 
-#                         posts(first:2000 after:$cursor filter:$filter order:$order)
-#                         {
-#                             edges
-#                                 {
-#                                     node{id slug __typename}
-
-#                                 }
-#                             pageInfo{endCursor hasNextPage __typename}
-#                             __typename
-#                         }
-#                         __typename
-#                     }
-#             }
-
-#             "}' \
-#   --compressed> "tmp/_r.topics-by-product.json"
-
-
-
-# curl 'https://www.producthunt.com/frontend/graphql' \
-#   -H 'authority: www.producthunt.com' \
-#   -H 'accept: */*' \
-#   -H 'accept-language: en,vi;q=0.9' \
-#   -H 'content-type: application/json' \
-#   -H 'cookie: first_visit=1689472725; first_referer=https://www.google.com/; _ga=GA1.1.521910990.1689472726; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221689472725565%22}}}; ajs_anonymous_id=8169299d-ab73-4fb4-97a1-11eff39d595c; visitor_id=a145b6c6-84d8-49ba-b565-5922df9bc8e8; track_code=81ad6b58d9; agreed_cookie_policy=2023-07-15+18%3A58%3A53+-0700; _hjSessionUser_3508551=eyJpZCI6IjM5ZGEyNjY2LTY0YjItNTBjYS05MzUzLTNjNzA2N2VlMTcxNiIsImNyZWF0ZWQiOjE2ODk0NzI3MjYyNjYsImV4aXN0aW5nIjp0cnVlfQ==; g_state={"i_p":1689677615026,"i_l":2}; _hjIncludedInSessionSample_3508551=0; _hjSession_3508551=eyJpZCI6IjcyYzcxYjkwLTc1Y2YtNDljNy05ZGNlLWU3NjJmMmY1YzBjNCIsImNyZWF0ZWQiOjE2ODk2NjIyMTE4ODQsImluU2FtcGxlIjpmYWxzZX0=; _ga_WZ46833KH9=GS1.1.1689661348.12.1.1689662257.14.0.0; csrf_token=RsVRxTZc8yNcaseGOA8gtt5jHdVwCLIIVy_ZJbFscuB6cKdli4JlKNTT9UMoGcyzVzezzhRktCBB1YvppycLEg; _producthunt_session_production=fMFA%2BNugIx4l06Xe%2FG%2FJUVwlcsIPYtwSw%2BNLql30xiJqYfLs%2BgF8nJ4W1GMTV%2FY%2B0Fdd7JVsMKl3rwH5dcIgnmc4ZJQwf%2FNu22kGOC0Ft7wv%2BsYL9nsemBJMLg9l0D%2FlBSYZP%2Fwzxfwa2K%2BF40dXx2zIeXwJTx8kBXLxAH1vl03HficUbEW20vsMaAEPCgrisDdLQaBWpW5juX%2B%2BLJc3uOigGY1jX8tXxiuzJuPxkRAzReZxVId4ldZ5uuBfKhcuV4BIpbbCXDXtw3QB7g%2FgpbLv%2Fhoj4ktlz%2FiApacPVSpqGyyUKYy2yafmp2S2E4shqmeMeLaUYuX2BnBq4w%3D%3D--rCYG1UZFc402ayM8--Lif3%2FGbFIpWbhXoI9j1vzA%3D%3D' \
-#   -H 'dnt: 1' \
-#   -H 'origin: https://www.producthunt.com' \
-#   -H 'referer: https://www.producthunt.com/products/twinr-app-builder' \
-#   -H 'sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"' \
-#   -H 'sec-ch-ua-mobile: ?0' \
-#   -H 'sec-ch-ua-platform: "macOS"' \
-#   -H 'sec-fetch-dest: empty' \
-#   -H 'sec-fetch-mode: cors' \
-#   -H 'sec-fetch-site: same-origin' \
-#   -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36' \
-#   -H 'x-requested-with: XMLHttpRequest' \
-#   --data-raw $'{"operationName":"ProductReviewsPage","variables":{"commentsListSubjectThreadsCursor":"","commentsThreadRepliesCursor":"","slug":"twinr-app-builder","query":null,"commentsListSubjectThreadsLimit":3,"includeThreadForCommentId":null,"reviewsLimit":10,"reviewsOrder":"BEST","includeReviewId":null,"rating":"0"},"query":"query ProductReviewsPage($slug:String\u0021$commentsListSubjectThreadsCursor:String=\\"\\"$commentsListSubjectThreadsLimit:Int\u0021$commentsThreadRepliesCursor:String=\\"\\"$commentsListSubjectFilter:ThreadFilter$order:ThreadOrder$includeThreadForCommentId:ID$excludeThreadForCommentId:ID$reviewsLimit:Int\u0021$reviewsCursor:String$reviewsOrder:ReviewsOrder$reviewsNoReplies:Boolean$includeReviewId:ID$query:String$rating:String){product(slug:$slug){id slug name reviewsWithBodyCount reviewsRating reviewsRecentRating reviewsCount reviewsRecentWithRatingCount isMaker isTrashed activeUpcomingEvent{id isFirstLaunch __typename}...ReviewsFiltersFragment ...ProductReviewsPageReviewsFeedFragment ...ProductReviewsPageAlternativeCardFragment ...ReviewCTAPromptFragment ...StructuredDataFromProduct ...MetaTags __typename}}fragment ProductReviewsPageReviewsFeedFragment on Product{id reviewsCount ...ReviewListFragment __typename}fragment ReviewListFragment on Reviewable{id reviews(first:$reviewsLimit after:$reviewsCursor order:$reviewsOrder includeReviewId:$includeReviewId query:$query rating:$rating noReplies:$reviewsNoReplies){edges{node{id sentiment comment{id bodyHtml __typename}...RatingReviewFragment __typename}__typename}totalCount pageInfo{hasNextPage endCursor __typename}__typename}__typename}fragment RatingReviewFragment on Review{id rating body sentiment user{id ...RatingReviewUserFragment __typename}comment{id body inputInfo{id failedChecks{kind title __typename}pastedIndex pastedValue __typename}__typename}post{id name slug __typename}productAnswers{id question{id title path __typename}__typename}...RatingReviewActionBarFragment ...CommentsSubjectFragment __typename}fragment CommentsSubjectFragment on Commentable{id canAddCommentReview ...CommentsListSubjectFragment __typename}fragment CommentsListSubjectFragment on Commentable{id threads(first:$commentsListSubjectThreadsLimit after:$commentsListSubjectThreadsCursor filter:$commentsListSubjectFilter order:$order includeCommentId:$includeThreadForCommentId excludeCommentId:$excludeThreadForCommentId){totalCount edges{node{id canAward ...CommentsThreadFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}__typename}fragment CommentsThreadFragment on Comment{id isSticky replies(first:5 after:$commentsThreadRepliesCursor focusCommentId:$includeThreadForCommentId){totalCount edges{node{id ...CommentFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}...CommentFragment __typename}fragment CommentFragment on Comment{id award badges body bodyHtml canEdit canViewReplyBtn canDestroy canAward createdAt isHidden path isSticky score inputInfo{id failedChecks{kind title __typename}pastedIndex pastedValue __typename}awardOptions{option __typename}repliesCount subject{id ...on Post{id commentAwardsCount __typename}...on Commentable{id __typename}__typename}user{id headline name firstName username headline ...ComingSoonUserBadgeFragment ...UserImage ...KarmaBadgeFragment ...TopReviewerBadgeFragment __typename}poll{...PollFragment __typename}review{id __typename}...CommentVoteButtonFragment ...FacebookShareButtonFragment __typename}fragment CommentVoteButtonFragment on Comment{id ...on Votable{id hasVoted votesCount __typename}__typename}fragment FacebookShareButtonFragment on Shareable{id url __typename}fragment UserImage on User{id name username avatarUrl __typename}fragment KarmaBadgeFragment on User{id karmaBadge{kind score __typename}__typename}fragment PollFragment on Poll{id answersCount hasAnswered options{id text imageUuid answersCount answersPercent hasAnswered __typename}__typename}fragment ComingSoonUserBadgeFragment on User{id promotableUpcomingEvent{id __typename}__typename}fragment TopReviewerBadgeFragment on User{id isTopReviewer __typename}fragment RatingReviewActionBarFragment on Review{id createdAt hasVoted votesCount ...ReviewDeleteButtonFragment ...RatingReviewShareButtonFragment ...RatingReviewEditButtonFragment ...RatingReviewReportButtonFragment ...RatingReviewReplyButtonFragment __typename}fragment ReviewDeleteButtonFragment on Review{id canDestroy rating __typename}fragment RatingReviewShareButtonFragment on Review{id url user{id name __typename}__typename}fragment RatingReviewEditButtonFragment on Review{id canUpdate product{id name slug __typename}__typename}fragment RatingReviewReportButtonFragment on Review{id __typename}fragment RatingReviewReplyButtonFragment on Review{id product{id isMaker __typename}__typename}fragment RatingReviewUserFragment on User{id name url username headline reviewsCount isAccountVerified ...UserImage ...JobTitleFragment ...UserFollowButtonFragment ...TopReviewerBadgeFragment __typename}fragment JobTitleFragment on User{id work{id jobTitle companyName product{id name slug __typename}__typename}__typename}fragment UserFollowButtonFragment on User{id followersCount isFollowed __typename}fragment ProductReviewsPageAlternativeCardFragment on Product{id slug alternativesCount alternativeAssociations(first:6){edges{node{id alternative:associatedProduct{id slug name tagline ...ProductThumbnailFragment __typename}__typename}__typename}__typename}__typename}fragment ProductThumbnailFragment on Product{id name logoUuid isNoLongerOnline __typename}fragment ReviewsFiltersFragment on Reviewable{id reviewsWithRatingCount ratingSpecificCount{rating count __typename}__typename}fragment StructuredDataFromProduct on Product{id structuredData __typename}fragment ReviewCTAPromptFragment on Product{id isMaker viewerReview{id __typename}...ReviewCTASharePromptFragment __typename}fragment ReviewCTASharePromptFragment on Product{id name tagline slug ...ProductThumbnailFragment ...FacebookShareButtonFragment __typename}fragment MetaTags on SEOInterface{id meta{canonicalUrl creator description image mobileAppUrl oembedUrl robots title type author authorUrl __typename}__typename}"}' \
-#   --compressed
 
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
   -H 'accept: */*' \
   -H 'accept-language: en,vi;q=0.9' \
   -H 'content-type: application/json' \
-  -H 'cookie: first_visit=1689472725; first_referer=https://www.google.com/; _ga=GA1.1.521910990.1689472726; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221689472725565%22}}}; ajs_anonymous_id=8169299d-ab73-4fb4-97a1-11eff39d595c; visitor_id=a145b6c6-84d8-49ba-b565-5922df9bc8e8; track_code=81ad6b58d9; agreed_cookie_policy=2023-07-15+18%3A58%3A53+-0700; _hjSessionUser_3508551=eyJpZCI6IjM5ZGEyNjY2LTY0YjItNTBjYS05MzUzLTNjNzA2N2VlMTcxNiIsImNyZWF0ZWQiOjE2ODk0NzI3MjYyNjYsImV4aXN0aW5nIjp0cnVlfQ==; g_state={"i_p":1689677615026,"i_l":2}; _hjIncludedInSessionSample_3508551=0; _hjSession_3508551=eyJpZCI6IjcyYzcxYjkwLTc1Y2YtNDljNy05ZGNlLWU3NjJmMmY1YzBjNCIsImNyZWF0ZWQiOjE2ODk2NjIyMTE4ODQsImluU2FtcGxlIjpmYWxzZX0=; csrf_token=CZvX4W1hud9I_zRw3QRsyNSBjtu_Zltt8VcpPBRDzhA1LiFB0L8v1MBGBrXNEoDNXdUgwNsKXUXnrXvwAgi34g; _producthunt_session_production=51%2Bb551xwwCjP6oTR9ev0jogeJjyfSLo73XT9QXqaq8e0DQ%2F3wwcKUbFYhbyzd93lXr3BUAzh4IcPqyIuyGmN7m7xRGqAliHWDD%2F0MK2VBnftqV8G4B%2BrtfOA482RpEHDkCCHCXIDlfHaGPu8SQoaTk844p77QMSYzLOoLLTNWn6VbMLg3x8R9Lk9DXMfM92ACfncuAgmCGsYAwztn32w552GRF%2FeABULaVOASKH4LRqVycgq4fR2AVqYyNPGttPYYOWdXSjTjCkFScCjd145EeybEGhzILsaIEi2YUsk2dfAs6cy7OgtSW7f4RdDdv8S8Qpu6%2BQsBciXE63fA%3D%3D--SAnlB0BYqnnxKboV--J9kr8X12Rc5354qvp5qP2w%3D%3D; _ga_WZ46833KH9=GS1.1.1689661348.12.1.1689662313.60.0.0' \
+  -H 'cookie: first_visit=1689472725; first_referer=https://www.google.com/; _ga=GA1.1.521910990.1689472726; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221689472725565%22}}}; ajs_anonymous_id=8169299d-ab73-4fb4-97a1-11eff39d595c; visitor_id=a145b6c6-84d8-49ba-b565-5922df9bc8e8; track_code=81ad6b58d9; g_state={"i_p":1689479930148,"i_l":1}; agreed_cookie_policy=2023-07-15+18%3A58%3A53+-0700; _hjSessionUser_3508551=eyJpZCI6IjM5ZGEyNjY2LTY0YjItNTBjYS05MzUzLTNjNzA2N2VlMTcxNiIsImNyZWF0ZWQiOjE2ODk0NzI3MjYyNjYsImV4aXN0aW5nIjp0cnVlfQ==; _hjIncludedInSessionSample_3508551=1; _hjSession_3508551=eyJpZCI6Ijg1ZDE3NzhkLWVmNGUtNDQ4ZS1iZTk0LWFhNDdkMWVjZThiNSIsImNyZWF0ZWQiOjE2ODk1MDAwNTE0NDgsImluU2FtcGxlIjp0cnVlfQ==; _ga_WZ46833KH9=GS1.1.1689500051.5.1.1689500063.48.0.0; csrf_token=YTfwFKF6Tsfy6C--IrG7Dh_Km4VVl2vENIFiPkh8zIhdgga0HKTYzHpRHXsyp1cLlp41njH7bewiezDyXje1eg; _producthunt_session_production=LJMsfygRp9zicVCYr0GRsnnFuIBr7ct69IaqbVc1nCTQIKvzvZ95qjbB6UNsJep6EZuo0ckWOOnX1ggoAm6UC0joz%2BRdX%2BFGwr9kY7vrAwgTlnRbwEsuIrsrsXWSPNm0xxJK4CbebO8F2uixB7z%2BUeON3hR8owH5V5Yt9LBiPKLzpVphF82kOe24h%2ByRmP38KMw5To%2FecY8N6UQMEQVsBbg%2BsKDs0o8hk6X6gFIxY08EOri67CAg42H%2FGTstXcauQ9AEikgrXr%2BW16xIjzxTcVFELUpjDsmRtWr%2BZ8CK1HYVVT3DONiWAEc1r%2B%2FnwrgHfeBT1QSPSmwXWZLIcA%3D%3D--ncgV%2B3qhlEwC38%2Bo--XR4BJx%2B8dfRlkbUKuf%2FE3A%3D%3D' \
   -H 'dnt: 1' \
   -H 'origin: https://www.producthunt.com' \
-  -H 'referer: https://www.producthunt.com/products/twinr-app-builder/reviews' \
+  -H 'referer: https://www.producthunt.com/products/nfit-club-most-rewarding-way-to-get-fit' \
   -H 'sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"' \
   -H 'sec-ch-ua-mobile: ?0' \
   -H 'sec-ch-ua-platform: "macOS"' \
@@ -87,9 +22,33 @@ curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36' \
   -H 'x-requested-with: XMLHttpRequest' \
   --data-raw $'
-  {
-    "operationName":"ProductReviewsPage",
-    "variables":{"commentsListSubjectThreadsCursor":"","commentsThreadRepliesCursor":"","slug":"twinr-app-builder","query":null,"commentsListSubjectThreadsLimit":0,"includeThreadForCommentId":null,"reviewsLimit":100,"reviewsOrder":"BEST","includeReviewId":null,"rating":"0","reviewsCursor":"MTA"},
-    "query":"query ProductReviewsPage($slug:String\u0021$commentsListSubjectThreadsCursor:String=\\"\\"$commentsListSubjectThreadsLimit:Int\u0021$commentsThreadRepliesCursor:String=\\"\\"$commentsListSubjectFilter:ThreadFilter$order:ThreadOrder$includeThreadForCommentId:ID$excludeThreadForCommentId:ID$reviewsLimit:Int\u0021$reviewsCursor:String$reviewsOrder:ReviewsOrder$reviewsNoReplies:Boolean$includeReviewId:ID$query:String$rating:String)
-    {product(slug:$slug){id slug name reviewsWithBodyCount reviewsRating reviewsRecentRating reviewsCount reviewsRecentWithRatingCount isMaker isTrashed activeUpcomingEvent{id isFirstLaunch __typename}...ReviewsFiltersFragment ...ProductReviewsPageReviewsFeedFragment ...ProductReviewsPageAlternativeCardFragment ...ReviewCTAPromptFragment ...StructuredDataFromProduct ...MetaTags __typename}}fragment ProductReviewsPageReviewsFeedFragment on Product{id reviewsCount ...ReviewListFragment __typename}fragment ReviewListFragment on Reviewable{id reviews(first:$reviewsLimit after:$reviewsCursor order:$reviewsOrder includeReviewId:$includeReviewId query:$query rating:$rating noReplies:$reviewsNoReplies){edges{node{id sentiment comment{id bodyHtml __typename}...RatingReviewFragment __typename}__typename}totalCount pageInfo{hasNextPage endCursor __typename}__typename}__typename}fragment RatingReviewFragment on Review{id rating body sentiment user{id ...RatingReviewUserFragment __typename}comment{id body inputInfo{id failedChecks{kind title __typename}pastedIndex pastedValue __typename}__typename}post{id name slug __typename}productAnswers{id question{id title path __typename}__typename}...RatingReviewActionBarFragment ...CommentsSubjectFragment __typename}fragment CommentsSubjectFragment on Commentable{id canAddCommentReview ...CommentsListSubjectFragment __typename}fragment CommentsListSubjectFragment on Commentable{id threads(first:$commentsListSubjectThreadsLimit after:$commentsListSubjectThreadsCursor filter:$commentsListSubjectFilter order:$order includeCommentId:$includeThreadForCommentId excludeCommentId:$excludeThreadForCommentId){totalCount edges{node{id canAward ...CommentsThreadFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}__typename}fragment CommentsThreadFragment on Comment{id isSticky replies(first:5 after:$commentsThreadRepliesCursor focusCommentId:$includeThreadForCommentId){totalCount edges{node{id ...CommentFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}...CommentFragment __typename}fragment CommentFragment on Comment{id award badges body bodyHtml canEdit canViewReplyBtn canDestroy canAward createdAt isHidden path isSticky score inputInfo{id failedChecks{kind title __typename}pastedIndex pastedValue __typename}awardOptions{option __typename}repliesCount subject{id ...on Post{id commentAwardsCount __typename}...on Commentable{id __typename}__typename}user{id headline name firstName username headline ...ComingSoonUserBadgeFragment ...UserImage ...KarmaBadgeFragment ...TopReviewerBadgeFragment __typename}poll{...PollFragment __typename}review{id __typename}...CommentVoteButtonFragment ...FacebookShareButtonFragment __typename}fragment CommentVoteButtonFragment on Comment{id ...on Votable{id hasVoted votesCount __typename}__typename}fragment FacebookShareButtonFragment on Shareable{id url __typename}fragment UserImage on User{id name username avatarUrl __typename}fragment KarmaBadgeFragment on User{id karmaBadge{kind score __typename}__typename}fragment PollFragment on Poll{id answersCount hasAnswered options{id text imageUuid answersCount answersPercent hasAnswered __typename}__typename}fragment ComingSoonUserBadgeFragment on User{id promotableUpcomingEvent{id __typename}__typename}fragment TopReviewerBadgeFragment on User{id isTopReviewer __typename}fragment RatingReviewActionBarFragment on Review{id createdAt hasVoted votesCount ...ReviewDeleteButtonFragment ...RatingReviewShareButtonFragment ...RatingReviewEditButtonFragment ...RatingReviewReportButtonFragment ...RatingReviewReplyButtonFragment __typename}fragment ReviewDeleteButtonFragment on Review{id canDestroy rating __typename}fragment RatingReviewShareButtonFragment on Review{id url user{id name __typename}__typename}fragment RatingReviewEditButtonFragment on Review{id canUpdate product{id name slug __typename}__typename}fragment RatingReviewReportButtonFragment on Review{id __typename}fragment RatingReviewReplyButtonFragment on Review{id product{id isMaker __typename}__typename}fragment RatingReviewUserFragment on User{id name url username headline reviewsCount isAccountVerified ...UserImage ...JobTitleFragment ...UserFollowButtonFragment ...TopReviewerBadgeFragment __typename}fragment JobTitleFragment on User{id work{id jobTitle companyName product{id name slug __typename}__typename}__typename}fragment UserFollowButtonFragment on User{id followersCount isFollowed __typename}fragment ProductReviewsPageAlternativeCardFragment on Product{id slug alternativesCount alternativeAssociations(first:6){edges{node{id alternative:associatedProduct{id slug name tagline ...ProductThumbnailFragment __typename}__typename}__typename}__typename}__typename}fragment ProductThumbnailFragment on Product{id name logoUuid isNoLongerOnline __typename}fragment ReviewsFiltersFragment on Reviewable{id reviewsWithRatingCount ratingSpecificCount{rating count __typename}__typename}fragment StructuredDataFromProduct on Product{id structuredData __typename}fragment ReviewCTAPromptFragment on Product{id isMaker viewerReview{id __typename}...ReviewCTASharePromptFragment __typename}fragment ReviewCTASharePromptFragment on Product{id name tagline slug ...ProductThumbnailFragment ...FacebookShareButtonFragment __typename}fragment MetaTags on SEOInterface{id meta{canonicalUrl creator description image mobileAppUrl oembedUrl robots title type author authorUrl __typename}__typename}"}' \
-  --compressed > "tmp/reviews.json"
+    {
+        "operationName":"ProductPageLaunches",
+        "variables":{"slug":"'$2'","cursor":"'$3'"},
+        "query":"query ProductPageLaunches($slug:String\u0021$cursor:String)
+        {
+          product(slug:$slug)
+          {
+            id slug name tagline logoUuid followersCount reviewsRating createdAt
+            reviews(first:20 after:$cursor)
+            {
+              edges { 
+                node {
+                  id 
+                  user {
+                    id name username headline twitterUsername 
+                    websiteUrl followersCount followingsCount 
+                    isMaker isTrashed badgesCount
+                    karmaBadge{score}  createdAt
+                  }
+                } 
+              }
+              totalCount pageInfo{endCursor hasNextPage}
+            }
+          }
+        }
+
+      "}' \
+  --compressed> "tmp/_r.reviewers-by-product.$1.$2.$3.ongoing"
+
+  mv "tmp/_r.reviewers-by-product.$1.$2.$3.ongoing" "tmp/_r.reviewers-by-product.$1.$2.$3.json"

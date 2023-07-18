@@ -39,16 +39,17 @@ curl 'https://www.producthunt.com/frontend/graphql' \
                         {
                             edges {
                                 node {
-                                id name slug commentsCount votesCount
-                                updatedAt
+                                id name slug tagline pricingType 
+                                commentsCount votesCount
+                                createdAt featuredAt updatedAt
                                 topics(first:100) {edges{node{id}}}
                                 contributors(limit:200) {
                                     role 
                                     user {
-                                    id name username headline twitterUsername 
-                                    websiteUrl followersCount followingsCount 
-                                    isMaker isTrashed badgesCount 
-                                    badgesUniqueCount karmaBadge{score} createdAt
+                                        id name username headline twitterUsername 
+                                        websiteUrl followersCount followingsCount 
+                                        isMaker isTrashed badgesCount 
+                                        badgesUniqueCount karmaBadge{score} createdAt
                                     }
                                 }
                                 }
@@ -62,6 +63,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
 
   mv "tmp/_r.posts-by-product.$1.$2.$3.ongoing" "tmp/_r.posts-by-product.$1.$2.$3.json"
 
+# fragment PostItem on Post{id commentsCount name shortenedUrl slug tagline updatedAt pricingType topics(first:1){edges{node{id name slug __typename}__typename}__typename}redirectToProduct{id slug __typename}...PostThumbnail ...PostVoteButton __typename}
 
 # curl 'https://www.producthunt.com/frontend/graphql' \
 #   -H 'authority: www.producthunt.com' \
