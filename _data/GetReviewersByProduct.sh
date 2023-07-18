@@ -32,16 +32,16 @@ curl 'https://www.producthunt.com/frontend/graphql' \
             id slug name tagline logoUuid followersCount reviewsRating createdAt
             reviews(first:20 after:$cursor)
             {
-              edges { 
+              edges {
                 node {
-                  id 
+                  id createdAt
                   user {
-                    id name username headline twitterUsername 
-                    websiteUrl followersCount followingsCount 
+                    id name username headline twitterUsername
+                    websiteUrl followersCount followingsCount
                     isMaker isTrashed badgesCount
                     karmaBadge{score}  createdAt
                   }
-                } 
+                }
               }
               totalCount pageInfo{endCursor hasNextPage}
             }

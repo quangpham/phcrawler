@@ -88,4 +88,11 @@ sql = '
   ) t
   where p.id = t.post_id;
 
+  update topics tp set sys_posts_count=t.posts_count
+  from (
+      select topic_id,count(post_id) as posts_count from post_topic
+      group by topic_id
+  ) t
+  where tp.id = t.topic_id;
+
 '

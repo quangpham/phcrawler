@@ -7,13 +7,16 @@
 
 
 # SQL QUERY
-# update topics set old_followers_count=followers_count, old_products_count=products_count, old_real_posts_count=real_posts_count;
-# update topics set followers_count=null, products_count=null, real_posts_count=null;
+sql = '
+  update topics set old_followers_count=followers_count, old_products_count=products_count, old_real_posts_count=real_posts_count;
+  update topics set followers_count=null, products_count=null, real_posts_count=null;
+'
+
 
 ###
 
 def topic_version obj
-    return obj.id.nil? ? 0 : 4
+    return obj.id.nil? ? 0 : 5
 end
 
 
@@ -21,7 +24,7 @@ system "_data/Topic.sh"
 
 fn = "tmp/topics.json"
 data = JSON.parse(File.read(fn))
-    
+
 data["data"]["topics"]["edges"].each do |n|
   t = n["node"]
   topic = Topic.find_or_initialize_by(id: t["id"].to_i)

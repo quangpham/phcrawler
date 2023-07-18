@@ -1,6 +1,6 @@
 # Buoc 5
 # Tao file Crawl products theo topic
-# Muc dich 
+# Muc dich
 # - crawl them reviewers (max 20)
 # - crawl them posts (not-detail) (max 100) tu products
 # Notes:
@@ -11,7 +11,6 @@
 # - product co reviews_count > 20 => tim cach crawl them
 
 commands = []
-
 Topic.where("parent_id is null and products_count is not null").each do |t|
   cursors[..(t.products_count/20+2)].each_with_index do |cursor, i|
     commands.push "./GetProductsByTopic.sh #{1000+i} #{t.slug} most_recent #{cursor}"
@@ -31,11 +30,7 @@ end
 def import_products json_path="tmp/run/tmp/"
   Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
     begin
-      next if !File.exist?(fn)
-      next if File.zero?(fn)
       data = JSON.parse(File.read(fn))
-      next unless data["data"]
-      next unless data["data"]["topic"]
       data["data"]["topic"]["products"]["edges"].each do |pen|
         n = pen["node"]
         product_id = n["id"].to_i
@@ -48,14 +43,16 @@ def import_products json_path="tmp/run/tmp/"
         product.followers_count = n["followersCount"]
         product.reviews_rating = n["reviewsRating"]
         product.s_created_at = n["createdAt"]
-        
+
         if n["topics"]
-          product.topic_ids = ([product.topic_ids] + []).flatten.compact
-          n["topics"]["edges"].each do |t|
-            product.topic_ids.push(t["node"]["id"].to_i)
+          if n["topics"]["edges"].count > 0
+            product.topic_ids = [] if product.topic_ids.nil?
+            n["topics"]["edges"].each do |t|
+              product.topic_ids.push(t["node"]["id"].to_i)
+            end
+            product.topic_ids = product.topic_ids.uniq.compact.sort
+            product.topic_ids = nil if product.topic_ids.empty?
           end
-          product.topic_ids = product.topic_ids.uniq.compact.sort
-          product.topic_ids = nil if product.topic_ids.empty?
         end
 
         if n["posts"]
@@ -65,10 +62,11 @@ def import_products json_path="tmp/run/tmp/"
           #   product.note = "#{product.note}|p #{edges_count}-#{product.posts_count}"
           # end
           if edges_count > 0
-            product.post_ids = ([product.post_ids] + []).flatten.compact
+            product.post_ids = [] if product.post_ids.nil?
             n["posts"]["edges"].each do |t|
               ppost = Post.find_or_initialize_by(id: t["node"]["id"].to_i)
               ppost.slug = t["node"]["slug"]
+              ppost.s_created_at = t["node"]["createdAt"]
               ppost.product_id = product_id
               ppost.save
               product.post_ids.push(ppost.id)
@@ -77,7 +75,7 @@ def import_products json_path="tmp/run/tmp/"
             product.post_ids = nil if product.post_ids.empty?
           end
         end
-        
+
         if n["reviews"]
           edges_count = n["reviews"]["edges"].count
           product.reviews_count = n["reviews"]["totalCount"]
@@ -85,7 +83,8 @@ def import_products json_path="tmp/run/tmp/"
           #   product.note = "#{product.note}|r #{edges_count}-#{product.reviews_count}"
           # end
           if edges_count > 0
-            product.reviewers_ids = ([product.reviewers_ids] + []).flatten.compact
+            raw_sql = ""
+            product.reviewers_ids = [] if product.reviewers_ids.nil?
             n["reviews"]["edges"].each do |r|
               un = r["node"]["user"]
               user = User.find_or_initialize_by(id: un["id"].to_i)
@@ -101,9 +100,11 @@ def import_products json_path="tmp/run/tmp/"
               user.s_created_at = un["createdAt"]
               user.save
               product.reviewers_ids.push(user.id)
+              raw_sql += "INSERT INTO product_reviewer (product_id, user_id, created_at) VALUES(#{product_id},#{user.id},'#{r["node"]["createdAt"]}') ON CONFLICT (product_id, user_id) DO NOTHING;"
             end
             product.reviewers_ids = product.reviewers_ids.uniq.compact
             product.reviewers_ids = nil if product.reviewers_ids.empty?
+            ActiveRecord::Base.connection.execute(raw_sql)
           end
         end
 

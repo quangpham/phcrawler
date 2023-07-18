@@ -35,22 +35,29 @@ curl 'https://www.producthunt.com/frontend/graphql' \
           {
             topic(slug:$slug)
               {
-                id 
+                id
                 products(first:20 after:$cursor order:$order excludeHidden:false) {
                   edges {
                     node {
-                      id slug name tagline logoUuid followersCount reviewsRating createdAt
+                      id slug name tagline logoUuid
+                      followersCount reviewsRating
+                      createdAt
 
                       reviews(first:20 order:$reviewssorder){
-                        edges{ node {id user{
-                          id name username twitterUsername websiteUrl followersCount followingsCount 
-                          badgesCount karmaBadge{score} isTrashed createdAt
-                        } } }
+                        edges{
+                          node {
+                            id createdAt
+                            user{
+                                id name username twitterUsername websiteUrl followersCount followingsCount
+                                badgesCount karmaBadge{score} isTrashed createdAt
+                            }
+                          }
+                        }
                         totalCount
                       }
 
                       topics(first:100) { edges{node{id}} }
-                      posts(first:100 order:$postsorder) { edges{node{id slug}} totalCount }
+                      posts(first:100 order:$postsorder) { edges{node{id slug createdAt}} totalCount }
                     }
                   }
                   totalCount pageInfo {endCursor hasNextPage}

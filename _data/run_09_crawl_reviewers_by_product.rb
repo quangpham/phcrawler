@@ -44,6 +44,7 @@ def import_reviewers json_path="tmp/run/tmp/"
             product.reviews_rating = n["reviewsRating"]
             product.s_created_at = n["createdAt"]
 
+            raw_sql = ""
             product.reviewers_ids = ([product.reviewers_ids] + []).flatten.compact
 
             n["reviews"]["edges"].each do |r|
@@ -61,11 +62,13 @@ def import_reviewers json_path="tmp/run/tmp/"
                 user.s_created_at = un["createdAt"]
                 user.save
                 product.reviewers_ids.push(user.id)
+                raw_sql += "INSERT INTO product_reviewer (product_id, user_id, created_at) VALUES(#{product_id},#{user.id},'#{r["node"]["createdAt"]}') ON CONFLICT (product_id, user_id) DO NOTHING;"
             end
 
             product.reviewers_ids = product.reviewers_ids.uniq.compact
             product.reviewers_ids = nil if product.reviewers_ids.empty?
             product.save
+            ActiveRecord::Base.connection.execute(raw_sql)
 
             if n["reviews"]["edges"].count > 0
                 system "rm #{fn}"
