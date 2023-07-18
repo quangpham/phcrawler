@@ -3,7 +3,7 @@
 # Muc tieu:
 # - Lay het posts cua 1 product
 # - Lay them data cua posts duoc crawl (contributors, topic_ids, etc)
-# Note: 
+# Note:
 # - 10 posts/lan
 
 # SQL Query:
@@ -68,7 +68,7 @@ def import_posts json_path="tmp/run/tmp/"
 
         if n["contributors"]
           if n["contributors"].count > 0
-            
+
             post.hunter_ids = [] if post.hunter_ids.nil?
             post.maker_ids = [] if post.maker_ids.nil?
             post.commenter_ids = [] if post.commenter_ids.nil?
@@ -87,11 +87,11 @@ def import_posts json_path="tmp/run/tmp/"
               user.is_trashed = u["isTrashed"]
               user.badges = [u["badgesCount"].to_i, u["badgesUniqueCount"].to_i].max
               user.followers = u["followersCount"]
-              user.following = u["followingsCount"] 
-              user.score = u["karmaBadge"]["score"] 
+              user.following = u["followingsCount"]
+              user.score = u["karmaBadge"]["score"]
               user.s_created_at = u["createdAt"]
               user.save
-              
+
               post.hunter_ids.push(user_id) if !cn["role"].index("hunter").nil?
               post.maker_ids.push(user_id) if !cn["role"].index("maker").nil?
               post.commenter_ids.push(user_id) if !cn["role"].index("commenter").nil?

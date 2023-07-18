@@ -1,4 +1,4 @@
-# Buoc 1 
+# Buoc 1
 # Init tmp
 
 def init_tmp
@@ -17,13 +17,13 @@ def slipt_commands_to_files commands, number_split_files = 15, cursors
   init_tmp()
   content_arr = []
   number_split_files.times {content_arr.push([])}
-  
+
   File.open("tmp/run/run.sh", 'w') { |file| file.write( number_split_files.times.collect {|i| "./#{i}.sh &" }.join("\n") ) }
-  
+
   commands.each_with_index do |c,i|
     content_arr[i%number_split_files].push(c)
   end
-  
+
   content_arr.each_with_index do |arr,i|
     File.open("tmp/run/#{i}.sh", 'w') { |file| file.write(arr.join(" \n")) }
     system "chmod u+x tmp/run/#{i}.sh"
@@ -66,5 +66,26 @@ sql = '
   insert into product_post(product_id, post_id)
   select id,unnest(post_ids) as post_id from products where post_ids is not null and post_ids != '{}'
   ON CONFLICT (product_id, post_id) DO NOTHING;
+
+  update products p set sys_posts_count=t.posts_count
+  from (
+    select product_id,count(id) as posts_count from posts
+    group by product_id
+  ) t
+  where p.id = t.product_id;
+
+  update products p set sys_reviews_count=t.reviews_count
+  from (
+      select product_id,count(user_id) as reviews_count from product_reviewer
+      group by product_id
+  ) t
+  where p.id = t.product_id;
+
+  update posts p set sys_votes_count=t.votes_count
+  from (
+      select post_id,count(user_id) as votes_count from post_upvoter
+      group by post_id
+  ) t
+  where p.id = t.post_id;
 
 '

@@ -2,7 +2,7 @@
 # Tao file crawl them reviewers cua product
 # Muc tieu:
 # - Lay het reviews, reviewers cua 1 product
-# Note: 
+# Note:
 # - 20 reviews/lan
 
 
@@ -43,7 +43,7 @@ def import_reviewers json_path="tmp/run/tmp/"
             product.followers_count = n["followersCount"]
             product.reviews_rating = n["reviewsRating"]
             product.s_created_at = n["createdAt"]
-            
+
             product.reviewers_ids = ([product.reviewers_ids] + []).flatten.compact
 
             n["reviews"]["edges"].each do |r|
@@ -62,7 +62,7 @@ def import_reviewers json_path="tmp/run/tmp/"
                 user.save
                 product.reviewers_ids.push(user.id)
             end
-            
+
             product.reviewers_ids = product.reviewers_ids.uniq.compact
             product.reviewers_ids = nil if product.reviewers_ids.empty?
             product.save
