@@ -42,7 +42,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         id name slug tagline pricingType
         commentsCount votesCount
         createdAt featuredAt updatedAt
-
+        redirectToProduct { id }
         contributors(limit:$limit)
         {
           role

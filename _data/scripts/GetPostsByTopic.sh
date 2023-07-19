@@ -29,20 +29,21 @@ curl 'https://www.producthunt.com/frontend/graphql' \
           {
             topic(slug:$slug)
               {
-                id 
+                id
                 posts(first:20 after:$cursor) {
                   edges {
                     node {
-                      id name slug tagline pricingType 
+                      id name slug tagline pricingType
                       commentsCount votesCount
                       createdAt featuredAt updatedAt
                       topics(first:100) {edges{node{id}}}
+                      redirectToProduct { id }
                       contributors(limit:200) {
-                        role 
+                        role
                         user {
-                          id name username headline twitterUsername 
-                          websiteUrl followersCount followingsCount 
-                          isMaker isTrashed badgesCount 
+                          id name username headline twitterUsername
+                          websiteUrl followersCount followingsCount
+                          isMaker isTrashed badgesCount
                           badgesUniqueCount karmaBadge{score} createdAt
                         }
                       }

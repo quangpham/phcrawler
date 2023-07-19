@@ -1,5 +1,5 @@
-# ./GetVotersByPost.sh post-slug limit
-# ./GetVotersByPost.sh startup-stash 100000
+# ./GetVotersByPostSuper.sh post-slug limit
+# ./GetVotersByPostSuper.sh startup-stash 100000
 
 # Get voters (contributors) thoai mai
 # Get them thong tin cho post: votesCount commentsCount updatedAt topic_ids
@@ -40,7 +40,6 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         commentsCount votesCount
         createdAt featuredAt updatedAt
         redirectToProduct { id }
-
         topics(first:100){ edges{node{id}} }
         contributors(limit:$limit)
         {
@@ -50,6 +49,10 @@ curl 'https://www.producthunt.com/frontend/graphql' \
             websiteUrl followersCount followingsCount
             isMaker isTrashed badgesCount
             karmaBadge{score} createdAt
+            work{id jobTitle companyName product{id name slug __typename}__typename}
+            links{id name url encodedUrl kind __typename __typename}
+            followedTopics{edges{node{id name slug __typename}__typename}__typename}
+            badgeGroups{awardKind badgesCount award{id name description imageUuid active __typename}__typename}
           }
         }
       }
@@ -61,3 +64,5 @@ curl 'https://www.producthunt.com/frontend/graphql' \
   --compressed > "tmp/_r.$1.ongoing"
 
 mv "tmp/_r.$1.ongoing" "tmp/_r.$1.json"
+
+# fragment JobTitleFragment on User{id __typename}
