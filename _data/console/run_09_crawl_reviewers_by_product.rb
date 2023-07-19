@@ -39,42 +39,9 @@ def import_reviewers json_path="tmp/run/tmp/"
         begin
             data = JSON.parse(File.read(fn))
             n = data["data"]["product"]
-            product_id = data["data"]["product"]["id"].to_i
-            product = Product.find_or_initialize_by(id: product_id)
-            product.slug = n["slug"]
-            product.name = n["name"]
-            product.tagline = n["tagline"]
-            product.logo_uuid = n["logoUuid"]
-            product.followers_count = n["followersCount"]
-            product.reviews_rating = n["reviewsRating"]
-            product.s_created_at = n["createdAt"]
 
+            product = helper_get_product_by_node_data(n)
             product.version = products_by_topic_version(product)
-            raw_sql = ""
-            product.reviewers_ids = ([product.reviewers_ids] + []).flatten.compact
-
-            n["reviews"]["edges"].each do |r|
-                un = r["node"]["user"]
-                user = User.find_or_initialize_by(id: un["id"].to_i)
-                user.name = un["name"]
-                user.username = un["username"] || user.username
-                user.twitter = un["twitterUsername"] || user.twitter
-                user.website = un["websiteUrl"] || user.website
-                user.followers = un["followersCount"]
-                user.following = un["followingsCount"]
-                user.badges = un["badgesCount"]
-                user.score = un["karmaBadge"]["score"]
-                user.is_trashed = un["isTrashed"]
-                user.s_created_at = un["createdAt"]
-                user.save
-                product.reviewers_ids.push(user.id)
-                raw_sql += "INSERT INTO product_reviewer (product_id, user_id, created_at) VALUES(#{product_id},#{user.id},'#{r["node"]["createdAt"]}') ON CONFLICT (product_id, user_id) DO NOTHING;"
-            end
-
-            product.reviewers_ids = product.reviewers_ids.uniq.compact
-            product.reviewers_ids = nil if product.reviewers_ids.empty?
-            product.save
-            ActiveRecord::Base.connection.execute(raw_sql)
 
             if n["reviews"]["edges"].count > 0
                 system "rm #{fn}"

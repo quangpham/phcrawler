@@ -32,73 +32,11 @@ def import_products json_path="tmp/run/tmp/"
     begin
       data = JSON.parse(File.read(fn))
       data["data"]["topic"]["products"]["edges"].each do |pen|
-        n = pen["node"]
-        product_id = n["id"].to_i
-        product = Product.find_or_initialize_by(id: product_id)
-        product.slug = n["slug"]
-        product.name = n["name"]
-        product.tagline = n["tagline"]
-        product.logo_uuid = n["logoUuid"]
-
-        product.followers_count = n["followersCount"]
-        product.reviews_rating = n["reviewsRating"]
-        product.s_created_at = n["createdAt"]
-
-        if n["topics"]
-          if n["topics"]["edges"].count > 0
-            product.topic_ids = [] if product.topic_ids.nil?
-            n["topics"]["edges"].each do |t|
-              product.topic_ids.push(t["node"]["id"].to_i)
-            end
-            product.topic_ids = product.topic_ids.uniq.compact.sort
-            product.topic_ids = nil if product.topic_ids.empty?
-          end
-        end
-
-        if n["posts"]
-          edges_count = n["posts"]["edges"].count
-          product.posts_count = n["posts"]["totalCount"]
-          # if product.posts_count > edges_count
-          #   product.note = "#{product.note}|p #{edges_count}-#{product.posts_count}"
-          # end
-          if edges_count > 0
-            product.post_ids = [] if product.post_ids.nil?
-            n["posts"]["edges"].each do |t|
-              ppost = helper_get_post_by_node_data(t["node"])
-              ppost.product_id = product_id
-              ppost.save
-              product.post_ids.push(ppost.id)
-            end
-            product.post_ids = product.post_ids.uniq.compact.sort
-            product.post_ids = nil if product.post_ids.empty?
-          end
-        end
-
-        if n["reviews"]
-          edges_count = n["reviews"]["edges"].count
-          product.reviews_count = n["reviews"]["totalCount"]
-          # if product.reviews_count > edges_count
-          #   product.note = "#{product.note}|r #{edges_count}-#{product.reviews_count}"
-          # end
-          if edges_count > 0
-            raw_sql = ""
-            product.reviewers_ids = [] if product.reviewers_ids.nil?
-            n["reviews"]["edges"].each do |r|
-              user = helper_get_user_by_node_data(r["node"]["user"])
-              user.save
-              product.reviewers_ids.push(user.id)
-              raw_sql += "INSERT INTO product_reviewer (product_id, user_id, created_at) VALUES(#{product_id},#{user.id},'#{r["node"]["createdAt"]}') ON CONFLICT (product_id, user_id) DO NOTHING;"
-            end
-            product.reviewers_ids = product.reviewers_ids.uniq.compact
-            product.reviewers_ids = nil if product.reviewers_ids.empty?
-            ActiveRecord::Base.connection.execute(raw_sql)
-          end
-        end
-
+        product = helper_get_product_by_node_data(pen["node"])
         product.version = products_by_topic_version(product)
-        if product.note
-          product.note = (product.note.split("|") - [""]).uniq.sort.join("|")
-        end
+        # if product.note
+        #   product.note = (product.note.split("|") - [""]).uniq.sort.join("|")
+        # end
         product.save
       end
 
