@@ -47,8 +47,9 @@ curl 'https://www.producthunt.com/frontend/graphql' \
                         edges{
                           node {
                             id createdAt
-                            user{
-                                id name username twitterUsername websiteUrl followersCount followingsCount
+                            user {
+                                id name username twitterUsername
+                                websiteUrl followersCount followingsCount
                                 badgesCount karmaBadge{score} isTrashed createdAt
                             }
                           }

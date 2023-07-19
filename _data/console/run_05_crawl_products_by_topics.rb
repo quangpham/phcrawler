@@ -64,9 +64,7 @@ def import_products json_path="tmp/run/tmp/"
           if edges_count > 0
             product.post_ids = [] if product.post_ids.nil?
             n["posts"]["edges"].each do |t|
-              ppost = Post.find_or_initialize_by(id: t["node"]["id"].to_i)
-              ppost.slug = t["node"]["slug"]
-              ppost.s_created_at = t["node"]["createdAt"]
+              ppost = helper_get_post_by_node_data(t["node"])
               ppost.product_id = product_id
               ppost.save
               product.post_ids.push(ppost.id)
@@ -86,18 +84,7 @@ def import_products json_path="tmp/run/tmp/"
             raw_sql = ""
             product.reviewers_ids = [] if product.reviewers_ids.nil?
             n["reviews"]["edges"].each do |r|
-              un = r["node"]["user"]
-              user = User.find_or_initialize_by(id: un["id"].to_i)
-              user.name = un["name"]
-              user.username = un["username"] || user.username
-              user.twitter = un["twitterUsername"] || user.twitter
-              user.website = un["websiteUrl"] || user.website
-              user.followers = un["followersCount"]
-              user.following = un["followingsCount"]
-              user.badges = un["badgesCount"]
-              user.score = un["karmaBadge"]["score"]
-              user.is_trashed = un["isTrashed"]
-              user.s_created_at = un["createdAt"]
+              user = helper_get_user_by_node_data(r["node"]["user"])
               user.save
               product.reviewers_ids.push(user.id)
               raw_sql += "INSERT INTO product_reviewer (product_id, user_id, created_at) VALUES(#{product_id},#{user.id},'#{r["node"]["createdAt"]}') ON CONFLICT (product_id, user_id) DO NOTHING;"

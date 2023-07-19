@@ -34,22 +34,22 @@ curl 'https://www.producthunt.com/frontend/graphql' \
             {
                 product(slug:$slug)
                     {
-                        id name slug 
+                        id name slug
                         posts(first:10 after:$cursor filter:$filter order:$order)
                         {
                             edges {
                                 node {
-                                id name slug tagline pricingType 
+                                id name slug tagline pricingType
                                 commentsCount votesCount
                                 createdAt featuredAt updatedAt
                                 topics(first:100) {edges{node{id}}}
                                 contributors(limit:200) {
-                                    role 
+                                    role
                                     user {
-                                        id name username headline twitterUsername 
-                                        websiteUrl followersCount followingsCount 
-                                        isMaker isTrashed badgesCount 
-                                        badgesUniqueCount karmaBadge{score} createdAt
+                                        id name username headline twitterUsername
+                                        websiteUrl followersCount followingsCount
+                                        isMaker isTrashed badgesCount
+                                        karmaBadge{score} createdAt
                                     }
                                 }
                                 }
@@ -90,7 +90,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
 #             {
 #                 product(slug:$slug)
 #                     {
-#                         id name slug 
+#                         id name slug
 #                         posts(first:20 after:$cursor filter:$filter order:$order)
 #                         {
 #                             edges
@@ -108,9 +108,8 @@ curl 'https://www.producthunt.com/frontend/graphql' \
 #             fragment PostThumbnail on Post{id name thumbnailImageUuid ...PostStatusIcons __typename}
 #             fragment PostStatusIcons on Post{id name productState __typename}
 #             fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt product{id isSubscribed __typename}disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}
-            
+
 #             "}' \
 #   --compressed> "tmp/_r.topics-by-product.json"
 
 
-  
