@@ -43,6 +43,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         commentsCount votesCount
         createdAt featuredAt updatedAt
         redirectToProduct { id }
+        topics(first:100){ edges{node{id}} }
         contributors(limit:$limit)
         {
           role

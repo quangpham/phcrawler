@@ -28,6 +28,8 @@ def slipt_commands_to_files commands, number_split_files = 15, cursors
   system "cd tmp/ && zip -r run.zip run/"
 end
 
+
+
 def helper_get_user_by_node_data u
   user = User.find_or_initialize_by(id: u["id"].to_i)
   user.name = u["name"] if !u["name"].nil?
@@ -62,6 +64,12 @@ def helper_get_post_by_node_data n
   post.s_created_at = n["createdAt"] if n["createdAt"]
   post.s_featured_at = n["featuredAt"] if n["featuredAt"]
   post.s_updated_at = n["updatedAt"] if n["updatedAt"]
+
+  if n["redirectToProduct"]
+    if n["redirectToProduct"]["id"]
+      post.product_id = n["redirectToProduct"]["id"].to_i
+    end
+  end
 
   if n["topics"]
     if n["topics"]["edges"]
@@ -211,6 +219,7 @@ sql = '
   insert into product_post(product_id, post_id)
   select id,unnest(post_ids) as post_id from products where post_ids is not null and post_ids != '{}'
   ON CONFLICT (product_id, post_id) DO NOTHING;
+
 
   update products p set sys_posts_count=t.posts_count
   from (

@@ -3,7 +3,6 @@
 # ./GetPostsByProduct.sh 1 itch-io NjA(or blank)
 # Mot lan chi lan duoc max 10 posts / product (cai nay lay thoai mai, nhung chi gioi han 10 de lam cho ki, vi data nay ko co nhieu)
 
-
 # filter: ALL, FEATURED, POSTED, SCHEDULED
 # order: DATE, VOTES
 
@@ -42,6 +41,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
                                 id name slug tagline pricingType
                                 commentsCount votesCount
                                 createdAt featuredAt updatedAt
+                                redirectToProduct { id }
                                 topics(first:100) {edges{node{id}}}
                                 contributors(limit:200) {
                                     role

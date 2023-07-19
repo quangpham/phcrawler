@@ -2,6 +2,8 @@
 # ./GetPostsByTopic.sh so-thu-tu topic-name cursor
 # ./GetPostsByTopic.sh 1 task-management NjA(or blank)
 # Mot lan chi lan duoc max 20 posts / topic
+# order: trending, by_date, most_commented, most_upvoted
+
 mkdir -p tmp/
 
 curl 'https://www.producthunt.com/frontend/graphql' \
@@ -24,27 +26,28 @@ curl 'https://www.producthunt.com/frontend/graphql' \
   --data-raw $'
       {
         "operationName":"TopicPage",
-        "variables":{"slug":"'$2'","cursor":"'$3'","includeLayout":false},
-        "query":"query TopicPage($slug:String\u0021$cursor:String)
+        "variables":{"slug":"'$2'","cursor":"'$3'","includeLayout":false,"order":"by_date"},
+        "query":"query TopicPage($slug:String\u0021$cursor:String$order:TopicPostsOrderEnum)
           {
             topic(slug:$slug)
               {
                 id
-                posts(first:20 after:$cursor) {
+                posts(first:20 after:$cursor order:$order)
+                {
                   edges {
                     node {
                       id name slug tagline pricingType
                       commentsCount votesCount
                       createdAt featuredAt updatedAt
-                      topics(first:100) {edges{node{id}}}
                       redirectToProduct { id }
+                      topics(first:100) {edges{node{id}}}
                       contributors(limit:200) {
                         role
                         user {
                           id name username headline twitterUsername
                           websiteUrl followersCount followingsCount
                           isMaker isTrashed badgesCount
-                          badgesUniqueCount karmaBadge{score} createdAt
+                          karmaBadge{score} createdAt
                         }
                       }
                     }
