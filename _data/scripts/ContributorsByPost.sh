@@ -40,20 +40,21 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         topics(first:100){ edges{node{id}} }
         contributors(limit:$limit)
         {
-          role 
+          role
+          createdAt
           user {
-            id name username headline twitterUsername 
-            websiteUrl followersCount followingsCount 
-            isMaker isTrashed badgesCount 
+            id name username headline twitterUsername
+            websiteUrl followersCount followingsCount
+            isMaker isTrashed badgesCount
             badgesUniqueCount karmaBadge{score} createdAt
           }
         }
       }
     }
-    
+
     "
   }
     ' \
   --compressed > "tmp/_r.$1.ongoing"
-  
+
 mv "tmp/_r.$1.ongoing" "tmp/_r.$1.json"

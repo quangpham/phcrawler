@@ -3,11 +3,7 @@
 
 def init_tmp
   system "mkdir -p tmp/run/ && rm -R tmp/run/ && mkdir -p tmp/run/"
-  system "cp _data/GetTopicDetail.sh tmp/run/GetTopicDetail.sh"
-  system "cp _data/GetProductsByTopic.sh tmp/run/GetProductsByTopic.sh"
-  system "cp _data/ContributorsByPost.sh tmp/run/ContributorsByPost.sh"
-  system "cp _data/GetPostsByProduct.sh tmp/run/GetPostsByProduct.sh"
-  system "cp _data/GetReviewersByProduct.sh tmp/run/GetReviewersByProduct.sh"
+  system "cp _data/*.sh tmp/run/"
   system "touch tmp/run/run.sh && chmod u+x tmp/run/run.sh"
 end
 
@@ -95,4 +91,13 @@ sql = '
   ) t
   where tp.id = t.topic_id;
 
+  --- update sys_posts_count cho post_archives
+  update post_archives set sys_posts_count=t2.posts_count, post_ids=t2.post_ids
+  from (
+    select sys_created_at,count(id) as posts_count, ARRAY_AGG(id) as post_ids from (
+      select id,DATE(s_created_at) sys_created_at from posts where s_created_at is not null
+    ) t
+    group by sys_created_at
+  ) t2
+  where post_archives.sys_created_at = t2.sys_created_at;
 '

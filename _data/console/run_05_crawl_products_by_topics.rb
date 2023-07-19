@@ -24,7 +24,7 @@ slipt_commands_to_files(commands, 15, cursors)
 # Sync data + server
 # Import products
 def products_by_topic_version obj
-    return obj.id.nil? ? nil : "topic_1"
+    return obj.id.nil? ? nil : "tp02"
 end
 
 def import_products json_path="tmp/run/tmp/"

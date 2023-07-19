@@ -1,0 +1,2 @@
+class PostArchive < ApplicationRecord
+end

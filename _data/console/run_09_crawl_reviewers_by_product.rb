@@ -28,6 +28,11 @@ slipt_commands_to_files(commands, 15, cursors)
 
 # Buoc 11
 # Import reviewers
+#
+
+def products_by_topic_version obj
+    return obj.id.nil? ? nil : "by-reviews-01|#{obj.version}"
+end
 
 def import_reviewers json_path="tmp/run/tmp/"
     Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
@@ -44,6 +49,7 @@ def import_reviewers json_path="tmp/run/tmp/"
             product.reviews_rating = n["reviewsRating"]
             product.s_created_at = n["createdAt"]
 
+            product.version = products_by_topic_version(product)
             raw_sql = ""
             product.reviewers_ids = ([product.reviewers_ids] + []).flatten.compact
 
