@@ -1,12 +1,11 @@
-# ./ContributorsByPost.sh 295691 100000
-# ./ContributorsByPost.sh post_id limit
+# ./GetVotersByPost.sh post-slug limit
+# ./GetVotersByPost.sh startup-stash 100000
 
-# mkdir -p _data/product_hunt/contributors/
-# echo "_data/product_hunt/contributors/_r.$1.json"
+# Get voters (contributors) thoai mai
+# Get them thong tin cho post: votesCount commentsCount updatedAt topic_ids
+# Chua lay duoc product_id
 
 mkdir -p tmp/
-
-# rm _data/product_hunt/contributors/_r.json*
 
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
@@ -36,17 +35,20 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     {
       post(id:$postId)
       {
-        id votesCount commentsCount updatedAt
+
+        id name slug tagline pricingType
+        commentsCount votesCount
+        createdAt featuredAt updatedAt
+
         topics(first:100){ edges{node{id}} }
         contributors(limit:$limit)
         {
           role
-          createdAt
           user {
             id name username headline twitterUsername
             websiteUrl followersCount followingsCount
             isMaker isTrashed badgesCount
-            badgesUniqueCount karmaBadge{score} createdAt
+            karmaBadge{score} createdAt
           }
         }
       }

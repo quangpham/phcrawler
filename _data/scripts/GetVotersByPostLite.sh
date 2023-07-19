@@ -1,8 +1,11 @@
-# ./GetVotersByPostLite.sh startup-stash 100000
 # ./GetVotersByPostLite.sh post-slug limit
+# ./GetVotersByPostLite.sh startup-stash 100000
 
-# mkdir -p _data/product_hunt/contributors/
-# echo "_data/product_hunt/contributors/_r.$1.json"
+# Get voters (contributors) thoai mai
+# Get them thong tin cho post: votesCount commentsCount updatedAt topic_ids
+# Chua lay duoc product_id
+# Lite de crawl duoc full contributors, nhung thieu fields
+# Users chi id username twitterUsername createdAt
 
 mkdir -p tmp/
 
@@ -36,7 +39,10 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     {
       post(id:$postId)
       {
-        id
+        id name slug tagline pricingType
+        commentsCount votesCount
+        createdAt featuredAt updatedAt
+
         contributors(limit:$limit)
         {
           role
@@ -50,15 +56,6 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     "
   }
     ' \
-  --compressed > "tmp/_r.$1.ongoing"
+  --compressed > "tmp/_r.lite.$1.ongoing"
 
-mv "tmp/_r.$1.ongoing" "tmp/_r.$1.json"
-
-
-        # "variables":{"slug":"'$2'","cursor":"'$3'"},
-        # "query":"query ProductPageLaunches($slug:String\u0021$cursor:String)
-        # {
-        #   product(slug:$slug)
-        #   {
-        #     id slug name tagline logoUuid followersCount reviewsRating createdAt
-        #     reviews(first:20 after:$cursor)
+mv "tmp/_r.lite.$1.ongoing" "tmp/_r.lite.$1.json"

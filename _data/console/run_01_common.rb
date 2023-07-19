@@ -3,7 +3,7 @@
 
 def init_tmp
   system "mkdir -p tmp/run/ && rm -R tmp/run/ && mkdir -p tmp/run/"
-  system "cp _data/*.sh tmp/run/"
+  system "cp _data/scripts/*.sh tmp/run/"
   system "touch tmp/run/run.sh && chmod u+x tmp/run/run.sh"
 end
 
@@ -26,6 +26,87 @@ def slipt_commands_to_files commands, number_split_files = 15, cursors
   end
 
   system "cd tmp/ && zip -r run.zip run/"
+end
+
+def helper_get_user_by_node_data u
+  user = User.find_or_initialize_by(id: u["id"].to_i)
+  user.name = u["name"] if !u["name"].nil?
+  user.username = u["username"] if !u["username"].nil?
+  user.headline = u["headline"] if !u["headline"].nil?
+  user.website = u["websiteUrl"] if !u["websiteUrl"].nil?
+  user.twitter = u["twitterUsername"] if !u["twitterUsername"].nil?
+  user.is_maker = u["isMaker"] if !u["isMaker"].nil?
+  user.is_trashed = u["isTrashed"] if !u["isTrashed"].nil?
+  user.followers = u["followersCount"] if !u["followersCount"].nil?
+  user.following = u["followingsCount"] if !u["followingsCount"].nil?
+  user.s_created_at = u["createdAt"] if !u["createdAt"].nil?
+  user.badges = u["badgesCount"].to_i if !u["badgesCount"].nil?
+
+  if u["karmaBadge"]
+     if u["karmaBadge"]["score"]
+      user.score = u["karmaBadge"]["score"]
+     end
+  end
+  return user
+end
+
+def helper_get_post_by_node_data n
+  post = Post.find_or_initialize_by(id: n["id"].to_i)
+
+  post.name = n["name"] if n["name"]
+  post.slug = n["slug"] if n["slug"]
+  post.tagline = n["tagline"] if n["tagline"]
+  post.pricing_type = n["pricingType"] if n["pricingType"]
+  post.comments_count = n["commentsCount"] if n["commentsCount"]
+  post.votes_count = n["votesCount"] if n["votesCount"]
+  post.s_created_at = n["createdAt"] if n["createdAt"]
+  post.s_featured_at = n["featuredAt"] if n["featuredAt"]
+  post.s_updated_at = n["updatedAt"] if n["updatedAt"]
+
+  if n["topics"]
+    if n["topics"]["edges"]
+      if n["topics"]["edges"].count > 0
+        post.topic_ids = [] if post.topic_ids.nil?
+        n["topics"]["edges"].each do |_n|
+          post.topic_ids.push(_n["node"]["id"].to_i)
+        end
+        post.topic_ids = post.topic_ids.uniq.compact.sort
+        post.topic_ids = nil if post.topic_ids.empty?
+      end
+    end
+  end
+
+  post.hunter_ids = [] if post.hunter_ids.nil?
+  post.maker_ids = [] if post.maker_ids.nil?
+  post.commenter_ids = [] if post.commenter_ids.nil?
+  post.upvoter_ids = [] if post.upvoter_ids.nil?
+
+  if n["contributors"]
+    if n["contributors"].count > 0
+      n["contributors"].each do |_n|
+        u = _n["user"]
+        user_id = u["id"].to_i
+        post.hunter_ids.push(user_id) if !_n["role"].index("hunter").nil?
+        post.maker_ids.push(user_id) if !_n["role"].index("maker").nil?
+        post.commenter_ids.push(user_id) if !_n["role"].index("commenter").nil?
+        post.upvoter_ids.push(user_id) if !_n["role"].index("upvoter").nil?
+
+        user = helper_get_user_by_node_data(u)
+        user.save
+      end
+    end
+  end
+
+  post.hunter_ids = post.hunter_ids.uniq.compact.sort
+  post.hunter_ids = nil if post.hunter_ids.empty?
+  post.maker_ids = post.maker_ids.uniq.compact.sort
+  post.maker_ids = nil if post.maker_ids.empty?
+  post.commenter_ids = post.commenter_ids.uniq.compact.sort
+  post.commenter_ids = nil if post.commenter_ids.empty?
+  post.upvoter_ids = post.upvoter_ids.uniq.compact.sort
+  post.upvoter_ids = nil if post.upvoter_ids.empty?
+
+  return post
 end
 
 
@@ -51,9 +132,9 @@ sql = '
   select id,unnest(topic_ids) as topic_id from posts where topic_ids is not null and topic_ids != '{}'
   ON CONFLICT (post_id, topic_id) DO NOTHING;
 
-  insert into product_reviewer(product_id, user_id)
-  select id,unnest(reviewers_ids) as user_id from products where reviewers_ids is not null and reviewers_ids != '{}'
-  ON CONFLICT (product_id, user_id) DO NOTHING;
+  # insert into product_reviewer(product_id, user_id)
+  # select id,unnest(reviewers_ids) as user_id from products where reviewers_ids is not null and reviewers_ids != '{}'
+  # ON CONFLICT (product_id, user_id) DO NOTHING;
 
   insert into product_topic(product_id, topic_id)
   select id,unnest(topic_ids) as topic_id from products where topic_ids is not null and topic_ids != '{}'
