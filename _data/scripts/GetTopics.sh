@@ -1,4 +1,4 @@
-# ./Topic.sh 1 NjA(or blank)
+# ./GetTopics.sh 1 NjA(or blank)
 # stt, order ("posts_count", "name", "trending") , cursor
 
 
@@ -37,7 +37,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         {
           node
             {
-              id name slug parent{id name slug} followersCount postsCount 
+              id name slug parent{id name slug} followersCount postsCount
               recentStacks(first:1){totalCount}
               products(first:1){totalCount}
               posts(first:1){totalCount}

@@ -20,7 +20,7 @@ def topic_version obj
 end
 
 
-system "_data/Topic.sh"
+system "_data/GetTopics.sh"
 
 fn = "tmp/topics.json"
 data = JSON.parse(File.read(fn))
