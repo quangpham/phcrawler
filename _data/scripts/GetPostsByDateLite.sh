@@ -1,6 +1,6 @@
 # Lay toan posts theo product
-# ./GetPostsByDate.sh year month day cursor
-# ./GetPostsByDate.sh 2016 6 6 NjA(or blank)
+# ./GetPostsByDateLite.sh year month day cursor
+# ./GetPostsByDateLite.sh 2016 6 6 NjA(or blank)
 # Mot lan chi lan duoc max 10 posts / product (cai nay lay thoai mai, nhung chi gioi han 10 de lam cho ki, vi data nay ko co nhieu)
 
 # order: DAILY_RANK, MONTHLY_RANK, VOTES
