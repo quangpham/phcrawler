@@ -15,29 +15,30 @@ slipt_commands_to_files(commands, 30, cursors)
 
 def import_profiles json_path="tmp/run/tmp/"
   Dir["#{json_path}/**/_r.*.json".gsub("//","/")].shuffle.each do |fn|
-  data = JSON.parse(File.read(fn))
-    if data["data"]
-      if data["data"]["profile"]
-        user = helper_get_user_by_node_data(data["data"]["profile"])
-        user.version = 2
-        user.save
-      else
-        username = fn.split("/").last.gsub("_r.profile.","").gsub(".json","")
-        if user = User.find_by(username: username)
-          user.update(is_trashed: true)
+    begin
+      data = JSON.parse(File.read(fn))
+      if data["data"]
+        if data["data"]["profile"]
+          user = helper_get_user_by_node_data(data["data"]["profile"])
+          user.version = 3
+          user.save
+        else
+          username = fn.split("/").last.gsub("_r.profile.","").gsub(".json","")
+          if user = User.find_by(username: username)
+            user.update(is_trashed: true)
+          end
         end
+        system "rm #{fn}"
       end
-      system "rm #{fn}"
+    rescue
     end
   end
 end
-import_profiles "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp"
 
 
 import_profiles "/Users/quang/Downloads/users"
-
+import_profiles "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp"
 import_profiles "/Users/quang/Projects/upbase/phcrawler/tmp/run/tmp"
-
 import_profiles "/Users/quang/Downloads/done_3"
 
 
