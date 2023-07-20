@@ -35,7 +35,7 @@ def helper_get_user_collection_by_node_data n
   c.description = n["description"]
   c.path = n["path"]
   c.products_count = n["productsCount"].to_i
-  c.s_created_at = n["createdAt"]
+  c.org_created_at = n["createdAt"]
 
   if n["products"]
     if n["products"]["edges"]
@@ -66,7 +66,7 @@ def helper_get_user_by_node_data u
     ["website","websiteUrl"],
     ["twitter","twitterUsername"],
     ["about","about"],
-    ["s_created_at","createdAt"]
+    ["org_created_at","createdAt"]
   ]
   string_map.each do |m|
     user[m[0]] = u[m[1]] if !u[m[1]].nil?
@@ -202,9 +202,9 @@ def helper_get_post_by_node_data n
   post.pricing_type = n["pricingType"] if n["pricingType"]
   post.comments_count = n["commentsCount"] if n["commentsCount"]
   post.votes_count = n["votesCount"] if n["votesCount"]
-  post.s_created_at = n["createdAt"] if n["createdAt"]
-  post.s_featured_at = n["featuredAt"] if n["featuredAt"]
-  post.s_updated_at = n["updatedAt"] if n["updatedAt"]
+  post.org_created_at = n["createdAt"] if n["createdAt"]
+  post.org_featured_at = n["featuredAt"] if n["featuredAt"]
+  post.org_updated_at = n["updatedAt"] if n["updatedAt"]
 
   if n["redirectToProduct"]
     if n["redirectToProduct"]["id"]
@@ -269,7 +269,7 @@ def helper_get_product_by_node_data n
 
   product.followers_count = n["followersCount"] if n["followersCount"]
   product.reviews_rating = n["reviewsRating"] if n["reviewsRating"]
-  product.s_created_at = n["createdAt"] if n["createdAt"]
+  product.org_created_at = n["createdAt"] if n["createdAt"]
 
   if n["topics"]
     if n["topics"]["edges"].count > 0
@@ -396,7 +396,7 @@ sql = '
   update post_archives set sys_posts_count=t2.posts_count, post_ids=t2.post_ids
   from (
     select sys_created_at,count(id) as posts_count, ARRAY_AGG(id) as post_ids from (
-      select id,DATE(s_created_at) sys_created_at from posts where s_created_at is not null
+      select id,DATE(org_created_at) sys_created_at from posts where org_created_at is not null
     ) t
     group by sys_created_at
   ) t2

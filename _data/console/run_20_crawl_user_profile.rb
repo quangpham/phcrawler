@@ -1,5 +1,5 @@
 commands = []
-User.where("badges > 0 and score > 1").select(:id, :username, :is_trashed).each do |u|
+User.where("badges > 0 and score > 1 and version!=2").select(:id, :username, :is_trashed).each do |u|
   if u.is_trashed == false || u.is_trashed.nil?
     commands.push "./GetUserProfile.sh #{u.username}"
   end

@@ -165,7 +165,7 @@ def import_posts json_path="tmp/run/tmp/"
           post = Post.create(
             id: p_id, name: p["name"], slug: p["slug"], tagline: p["tagline"], pricing_type: p["pricingType"],
             comments: p["commentsCount"], reviews: p["product"]["reviewsWithBodyCount"].to_i,
-            votes: p["votesCount"], product_id: product_id, s_created_at: p["createdAt"], topic_ids: topic_ids
+            votes: p["votesCount"], product_id: product_id, org_created_at: p["createdAt"], topic_ids: topic_ids
           )
 
           if Product.find_by(id: product_id).nil?
