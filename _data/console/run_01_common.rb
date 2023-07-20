@@ -74,7 +74,7 @@ def helper_get_user_by_node_data u
 
   bool_map = [
     ["is_maker","isMaker"],
-    ["is_trashed","is_trashed"]
+    ["is_trashed","isTrashed"]
   ]
   bool_map.each do |m|
     user[m[0]] = u[m[1]] if !u[m[1]].nil?
@@ -89,10 +89,19 @@ def helper_get_user_by_node_data u
     ["collections_count","collectionsCount"],
     ["votes_count","votesCount"],
     ["submitted_posts_count","submittedPostsCount"],
-    ["stacks_count","stacksCount"]
+    ["stacks_count","stacksCount"],
+    ["score","karmaBadge","score"]
   ]
   int_map.each do |m|
-    user[m[0]] = u[m[1]].to_i if !u[m[1]].nil?
+    if m.count == 2
+      user[m[0]] = u[m[1]].to_i if !u[m[1]].nil?
+    elsif m.count == 3
+      if u[m[1]]
+        if u[m[1]][m[2]]
+          user[m[0]] = u[m[1]][m[2]].to_i
+        end
+      end
+    end
     user[m[0]] = nil if user[m[0]] == 0
   end
 
@@ -105,12 +114,6 @@ def helper_get_user_by_node_data u
   ]
   arr_map.each do |m|
     user[m[0]] = [] if user[m[0]].nil?
-  end
-
-  if u["karmaBadge"]
-     if u["karmaBadge"]["score"]
-      user.score = u["karmaBadge"]["score"]
-     end
   end
 
   if u["visitStreak"]

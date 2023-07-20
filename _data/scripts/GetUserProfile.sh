@@ -39,7 +39,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         isMaker isTrashed
         followersCount followingsCount badgesCount
         productsCount votesCount collectionsCount submittedPostsCount stacksCount
-        createdAt
+        karmaBadge {score} createdAt
         submittedPosts { edges { node{id} } }
         collections
         {
