@@ -1,5 +1,8 @@
 commands = []
-User.where("badges > 0 and score > 1 and version!=2").select(:id, :username, :is_trashed).each do |u|
+where_str = "badges > 0 and score > 1 and version!=2"
+where_str = "version!=2 and followers > 10"
+where_str = "(version!=2 or version is null) and (followers > 50 or badges > 1 or score > 1 or is_maker=true)"
+User.where(where_str).select(:id, :username, :is_trashed).each do |u|
   if u.is_trashed == false || u.is_trashed.nil?
     commands.push "./GetUserProfile.sh #{u.username}"
   end
@@ -11,23 +14,19 @@ slipt_commands_to_files(commands, 30, cursors)
 
 def import_profiles json_path="tmp/run/tmp/"
   Dir["#{json_path}/**/_r.*.json".gsub("//","/")].shuffle.each do |fn|
-    begin
-      data = JSON.parse(File.read(fn))
-      if data["data"]
-        if data["data"]["profile"]
-          user = helper_get_user_by_node_data(data["data"]["profile"])
-          user.version = 2
-          user.save
-        else
-          username = fn.split("/").last.gsub("_r.profile.","").gsub(".json","")
-          if user = User.find_by(username: username)
-            user.update(is_trashed: true)
-          end
+  data = JSON.parse(File.read(fn))
+    if data["data"]
+      if data["data"]["profile"]
+        user = helper_get_user_by_node_data(data["data"]["profile"])
+        user.version = 2
+        user.save
+      else
+        username = fn.split("/").last.gsub("_r.profile.","").gsub(".json","")
+        if user = User.find_by(username: username)
+          user.update(is_trashed: true)
         end
-        system "rm #{fn}"
       end
-
-    rescue
+      system "rm #{fn}"
     end
   end
 end
