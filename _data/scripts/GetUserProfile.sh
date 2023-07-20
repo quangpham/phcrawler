@@ -52,7 +52,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
           {
             node
             {
-              id name title description path productsCount createdAt
+              id name slug title description path productsCount createdAt
               products { edges { node {id} } }
             }
           }
@@ -60,6 +60,16 @@ curl 'https://www.producthunt.com/frontend/graphql' \
 
         links { id name url kind }
         badgeGroups{ awardKind badgesCount }
+
+        activityEvents(first:1)
+        {
+          edges { node { id occurredAt } }
+          totalCount
+        }
+
+        followers { edges { node { id  } } }
+        following { edges { node { id  } } }
+
 
       }
     }

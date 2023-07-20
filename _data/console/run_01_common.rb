@@ -103,7 +103,8 @@ def helper_get_user_by_node_data u
     ["submitted_posts_count","submittedPostsCount"],
     ["stacks_count","stacksCount"],
     ["score","karmaBadge","score"],
-    ["work_product_id","work","product","id"]
+    ["work_product_id","work","product","id"],
+    ["activities_count","activityEvents","totalCount"]
   ]
 
   int_map.each do |m|
@@ -129,6 +130,8 @@ def helper_get_user_by_node_data u
 
   arr_map = [
     ["followed_topic_ids", "followed_topics_count"],
+    ["follower_ids"],
+    ["following_ids"],
     ["stack_product_ids"],
     ["submitted_post_ids"],
     ["collection_ids"],
@@ -148,6 +151,18 @@ def helper_get_user_by_node_data u
   if u["followedTopics"]
     if u["followedTopics"]["edges"]
       user.followed_topic_ids += u["followedTopics"]["edges"].collect { |e| e["node"]["id"].to_i }
+    end
+  end
+
+  if u["followers"]
+    if u["followers"]["edges"]
+      user.follower_ids += u["followers"]["edges"].collect { |e| e["node"]["id"].to_i }
+    end
+  end
+
+  if u["following"]
+    if u["following"]["edges"]
+      user.following_ids += u["following"]["edges"].collect { |e| e["node"]["id"].to_i }
     end
   end
 
@@ -188,6 +203,14 @@ def helper_get_user_by_node_data u
   if u["badgeGroups"]
     u["badgeGroups"].each do |b|
       user["#{b["awardKind"]}"]  = b["badgesCount"]
+    end
+  end
+
+  if u["activityEvents"]
+    if u["activityEvents"]["edges"]
+      if u["activityEvents"]["edges"].count > 0
+        user.last_activity_at = u["activityEvents"]["edges"][0]["node"]["occurredAt"]
+      end
     end
   end
 
