@@ -468,22 +468,96 @@
 #   --compressed > "test.json"
 
 
-curl 'https://www.producthunt.com/frontend/graphql' \
-  -H 'authority: www.producthunt.com' \
-  -H 'accept: */*' \
-  -H 'accept-language: en,vi;q=0.9' \
-  -H 'content-type: application/json' \
-  -H 'cookie: _ga=GA1.1.521910990.1689472726; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221689472725565%22}}}; ajs_anonymous_id=8169299d-ab73-4fb4-97a1-11eff39d595c; visitor_id=a145b6c6-84d8-49ba-b565-5922df9bc8e8; track_code=81ad6b58d9; agreed_cookie_policy=2023-07-15+18%3A58%3A53+-0700; _hjSessionUser_3508551=eyJpZCI6IjM5ZGEyNjY2LTY0YjItNTBjYS05MzUzLTNjNzA2N2VlMTcxNiIsImNyZWF0ZWQiOjE2ODk0NzI3MjYyNjYsImV4aXN0aW5nIjp0cnVlfQ==; first_visit=1689729091; first_referer=https://www.google.com/; g_state={"i_p":1690333897969,"i_l":3}; _hjSession_3508551=eyJpZCI6IjNiOWQ1ZTNiLTRlY2UtNGRmNy1iYmM3LWI4YTZmZmIwZDkzZSIsImNyZWF0ZWQiOjE2ODk4NTg5MjUxMzAsImluU2FtcGxlIjp0cnVlfQ==; _hjIncludedInSessionSample_3508551=0; csrf_token=KFk_yyRZvEiKGBlGyxsUGwqCtakVg4XzdC_yxcYf1i0U7MlrmYcqQwKhK4PbDfgeg9YbsnHvg9ti1aAJ0FSv3w; _producthunt_session_production=Dj9WbzYc%2B1ip7ATfFhdREBjNGs9QoD%2F7m4qC6Ig%2FrWV7ZGw%2Fix8uU5T4u5RbfHQ%2BB6RO00tgwDHTR8843E7Oo8jGhhVmxGJm8FY%2FN566ahLgTcPG9oRezZhNi9b%2BsXtssXIE8vL3VN5OalH8MjM7%2BvKB2gefSvAf88mbD7WkZe%2BONFideE%2FLpllcvwxHYII1U1ZOpelTC%2B7zNUMKG6e5Lr0P98OfSpyLSapbsS49RCth9AdCIIOV8Jyo5y0SsCxCEWtdS2gq8blNQofE60ZMZKUJJOkry8a0HOfDYRvrnhT4AF4fle8BG3DU7kSm9pIIJHfK6j%2Bncvlz7l5oWg%3D%3D--1snX7rbHVessLbTT--mOnfxj3gTTLb6GQM5B9Ojg%3D%3D; _ga_WZ46833KH9=GS1.1.1689861561.27.1.1689862414.60.0.0' \
-  -H 'dnt: 1' \
-  -H 'origin: https://www.producthunt.com' \
-  -H 'referer: https://www.producthunt.com/@shaanvp/followers' \
-  -H 'sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"' \
-  -H 'sec-ch-ua-mobile: ?0' \
-  -H 'sec-ch-ua-platform: "macOS"' \
-  -H 'sec-fetch-dest: empty' \
-  -H 'sec-fetch-mode: cors' \
-  -H 'sec-fetch-site: same-origin' \
-  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36' \
-  -H 'x-requested-with: XMLHttpRequest' \
-  --data-raw $'{"operationName":"ProfileFollowingQuery","variables":{"username":"shaanvp","cursor":null,"query":""},"query":"query ProfileFollowingQuery($username:String\u0021$cursor:String){profile:user(username:$username){id isTrashed followingsCount following(first:20 after:$cursor){edges{node{id ...UserItemFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}...MetaTags __typename}}fragment MetaTags on SEOInterface{id meta{canonicalUrl creator description image mobileAppUrl oembedUrl robots title type author authorUrl __typename}__typename}fragment UserItemFragment on User{id name headline username followersCount ...UserImage ...UserFollowButtonFragment __typename}fragment UserFollowButtonFragment on User{id followersCount isFollowed __typename}fragment UserImage on User{id name username avatarUrl __typename}"}' \
-  --compressed
+# curl 'https://www.producthunt.com/frontend/graphql' \
+#   -H 'authority: www.producthunt.com' \
+#   -H 'accept: */*' \
+#   -H 'accept-language: en,vi;q=0.9' \
+#   -H 'content-type: application/json' \
+#   -H 'cookie: _ga=GA1.1.521910990.1689472726; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221689472725565%22}}}; ajs_anonymous_id=8169299d-ab73-4fb4-97a1-11eff39d595c; visitor_id=a145b6c6-84d8-49ba-b565-5922df9bc8e8; track_code=81ad6b58d9; agreed_cookie_policy=2023-07-15+18%3A58%3A53+-0700; _hjSessionUser_3508551=eyJpZCI6IjM5ZGEyNjY2LTY0YjItNTBjYS05MzUzLTNjNzA2N2VlMTcxNiIsImNyZWF0ZWQiOjE2ODk0NzI3MjYyNjYsImV4aXN0aW5nIjp0cnVlfQ==; first_visit=1689729091; first_referer=https://www.google.com/; g_state={"i_p":1690333897969,"i_l":3}; _hjSession_3508551=eyJpZCI6IjNiOWQ1ZTNiLTRlY2UtNGRmNy1iYmM3LWI4YTZmZmIwZDkzZSIsImNyZWF0ZWQiOjE2ODk4NTg5MjUxMzAsImluU2FtcGxlIjp0cnVlfQ==; _hjIncludedInSessionSample_3508551=0; csrf_token=KFk_yyRZvEiKGBlGyxsUGwqCtakVg4XzdC_yxcYf1i0U7MlrmYcqQwKhK4PbDfgeg9YbsnHvg9ti1aAJ0FSv3w; _producthunt_session_production=Dj9WbzYc%2B1ip7ATfFhdREBjNGs9QoD%2F7m4qC6Ig%2FrWV7ZGw%2Fix8uU5T4u5RbfHQ%2BB6RO00tgwDHTR8843E7Oo8jGhhVmxGJm8FY%2FN566ahLgTcPG9oRezZhNi9b%2BsXtssXIE8vL3VN5OalH8MjM7%2BvKB2gefSvAf88mbD7WkZe%2BONFideE%2FLpllcvwxHYII1U1ZOpelTC%2B7zNUMKG6e5Lr0P98OfSpyLSapbsS49RCth9AdCIIOV8Jyo5y0SsCxCEWtdS2gq8blNQofE60ZMZKUJJOkry8a0HOfDYRvrnhT4AF4fle8BG3DU7kSm9pIIJHfK6j%2Bncvlz7l5oWg%3D%3D--1snX7rbHVessLbTT--mOnfxj3gTTLb6GQM5B9Ojg%3D%3D; _ga_WZ46833KH9=GS1.1.1689861561.27.1.1689862414.60.0.0' \
+#   -H 'dnt: 1' \
+#   -H 'origin: https://www.producthunt.com' \
+#   -H 'referer: https://www.producthunt.com/@shaanvp/followers' \
+#   -H 'sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"' \
+#   -H 'sec-ch-ua-mobile: ?0' \
+#   -H 'sec-ch-ua-platform: "macOS"' \
+#   -H 'sec-fetch-dest: empty' \
+#   -H 'sec-fetch-mode: cors' \
+#   -H 'sec-fetch-site: same-origin' \
+#   -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36' \
+#   -H 'x-requested-with: XMLHttpRequest' \
+#   --data-raw $'{"operationName":"ProfileFollowingQuery","variables":{"username":"shaanvp","cursor":null,"query":""},"query":"query ProfileFollowingQuery($username:String\u0021$cursor:String){profile:user(username:$username){id isTrashed followingsCount following(first:20 after:$cursor){edges{node{id ...UserItemFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}...MetaTags __typename}}fragment MetaTags on SEOInterface{id meta{canonicalUrl creator description image mobileAppUrl oembedUrl robots title type author authorUrl __typename}__typename}fragment UserItemFragment on User{id name headline username followersCount ...UserImage ...UserFollowButtonFragment __typename}fragment UserFollowButtonFragment on User{id followersCount isFollowed __typename}fragment UserImage on User{id name username avatarUrl __typename}"}' \
+#   --compressed
+
+
+# curl 'https://www.producthunt.com/frontend/graphql' \
+#   -H 'authority: www.producthunt.com' \
+#   -H 'accept: */*' \
+#   -H 'accept-language: en,vi;q=0.9' \
+#   -H 'content-type: application/json' \
+#   -H 'cookie: _ga=GA1.1.521910990.1689472726; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221689472725565%22}}}; ajs_anonymous_id=8169299d-ab73-4fb4-97a1-11eff39d595c; visitor_id=a145b6c6-84d8-49ba-b565-5922df9bc8e8; track_code=81ad6b58d9; agreed_cookie_policy=2023-07-15+18%3A58%3A53+-0700; _hjSessionUser_3508551=eyJpZCI6IjM5ZGEyNjY2LTY0YjItNTBjYS05MzUzLTNjNzA2N2VlMTcxNiIsImNyZWF0ZWQiOjE2ODk0NzI3MjYyNjYsImV4aXN0aW5nIjp0cnVlfQ==; first_visit=1689729091; first_referer=https://www.google.com/; g_state={"i_p":1690333897969,"i_l":3}; _ga_WZ46833KH9=GS1.1.1689868314.28.0.1689868314.60.0.0; csrf_token=eHJ0tkepVy5gcM9TTCi-ze__z3jbDBNiDM4JkUIL6v1Ex4IW-nfBJejJ_ZZcPlLIZqthY79gFUoaNFtdVECTDw; _producthunt_session_production=k6z64f%2FinMITbtlyw5iZJtpV8wepoCklrgxU3dx5cQoGxbn1xUiVvfWwfZGMyBizBA%2FPANRkrxAS7sSHp098C16mvmrHs4ZYy6febKF9jxAm9VtpYcJ4MOVrLLkRhrJXFk5LiInWmo%2FqsZ5WyoRYN7rFfZpVM9t4bXBqSv1ltorWqpo0jwfAskXoY38%2FJv06sbh%2BaI131AttcoBbe5vsv6NyFRp3RrpfiIh5lfU5AAjUxF9MLYbnrLyZLsp8LSLnHmTyH%2FTKn8TwA5MrcD85%2FY%2B8hD1Bs5O0StzdU0o%2Bs8V3IR2oVK%2BZ6SfR%2FDQALnIl5kN4hc1JFJUduH3YMw%3D%3D--u9ahz5AB8FmCICX0--3TwkdBXE4oWAcCb3BEqdWg%3D%3D' \
+#   -H 'dnt: 1' \
+#   -H 'origin: https://www.producthunt.com' \
+#   -H 'referer: https://www.producthunt.com/categories/calendars' \
+#   -H 'sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"' \
+#   -H 'sec-ch-ua-mobile: ?0' \
+#   -H 'sec-ch-ua-platform: "macOS"' \
+#   -H 'sec-fetch-dest: empty' \
+#   -H 'sec-fetch-mode: cors' \
+#   -H 'sec-fetch-site: same-origin' \
+#   -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36' \
+#   -H 'x-requested-with: XMLHttpRequest' \
+#   --data-raw $'
+#   {
+#     "operationName":"ProductCategoryPage",
+#     "variables":{"slug":"calendars","cursor":"MjA","order":"best_rated"},
+#     "query":"query ProductCategoryPage($slug:String\u0021$cursor:String$order:CategoryProductsOrder\u0021)
+#     {
+#       productCategory(slug:$slug)
+#       {
+#         id description displayName name path parent{id name path __typename}
+#         meta{title description __typename}
+#         topProducts:products(first:8 order:best_rated){edges{node{id name ...ProductThumbnailFragment __typename}__typename}__typename}
+#         targetedAd(kind:\\"feed\\"){id ...AdFragment __typename}
+#         ...ProductCategoryPageProductListFragment
+#         ...CategorySidebarCategoryListFragment
+#         ...CategorySidebarNewestProductsFragment __typename
+#       }
+#       sidebarAd:ad(kind:\\"sidebar\\"){id ...AdFragment __typename}
+#     }
+#     fragment ProductCategoryPageProductListFragment on ProductCategory
+#     {
+#       id products(first:10 after:$cursor order:$order)
+#       {
+#         edges
+#         {
+#           node
+#           {
+#             id description reviewsCount reviewsRating slug
+#             stackers(first:3)
+#             {
+#               edges
+#               {
+#                 node{id ...UserCircleListFragment __typename}__typename
+#               }
+#               totalCount __typename
+#             }
+#             websiteUrl
+#             ...ProductThumbnailFragment
+#             ...ProductStackButtonFragment __typename
+#           }__typename
+#         }
+#         pageInfo{endCursor hasNextPage __typename}__typename
+#       }__typename
+#     }
+#     fragment ProductThumbnailFragment on Product{id name logoUuid isNoLongerOnline __typename}
+#     fragment ProductStackButtonFragment on Product{id name isStacked stacksCount __typename}
+#     fragment UserCircleListFragment on User{id ...UserImage __typename}
+#     fragment UserImage on User{id name username avatarUrl __typename}
+#     fragment CategorySidebarCategoryListFragment on ProductCategory{id name displayName parent{id ...CategorySidebarCategoryListItemFragment subCategories(first:20){edges{node{id ...CategorySidebarCategoryListItemFragment __typename}__typename}__typename}__typename}subCategories(first:20){edges{node{id ...CategorySidebarCategoryListItemFragment __typename}__typename}__typename}__typename}
+#     fragment CategorySidebarCategoryListItemFragment on ProductCategory{id name displayName path __typename}
+#     fragment CategorySidebarNewestProductsFragment on ProductCategory{id name displayName newestProducts:products(first:3 order:most_recent){edges{node{id name tagline reviewsRating slug ...ProductThumbnailFragment __typename}__typename}__typename}__typename}
+#     fragment AdFragment on Ad{id subject post{id slug name updatedAt commentsCount topics(first:1){edges{node{id name __typename}__typename}__typename}...PostVoteButtonFragment __typename}ctaText name tagline thumbnailUuid url __typename}
+#     fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt product{id isSubscribed __typename}disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}
+
+#   "}' \
+#   --compressed  > "test.json"

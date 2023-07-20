@@ -49,3 +49,53 @@ data["data"]["topics"]["edges"].each do |n|
   topic.save
 end
 
+
+
+
+# Get catergory
+#
+#
+
+system "_data/scripts/GetCategories.sh"
+
+def helper_get_category_by_node_data n
+  c = Category.find_or_initialize_by(id: n["id"].to_i)
+
+  if n["path"]
+    c.path = n["path"].gsub("/categories/","")
+  end
+
+  if n["products"]
+    if n["products"]["totalCount"]
+      c.products_count = n["products"]["totalCount"].to_i
+    end
+  end
+
+  if n["parent"]
+    if n["parent"]["id"]
+      c.parent_id = n["parent"]["id"].to_i
+    end
+  end
+
+  if n["subCategories"]
+    if n["subCategories"]["totalCount"]
+      c.subs_count = n["subCategories"]["totalCount"].to_i
+    end
+    c.sub_ids = [] if c.sub_ids.nil?
+    c.sub_ids += n["subCategories"]["edges"].collect {|_e| _e["node"]["id"].to_i}
+    c.sub_ids = c.sub_ids.uniq.compact.sort
+    c.sub_ids = nil if c.sub_ids.empty?
+
+    n["subCategories"]["edges"].each {|_e| helper_get_category_by_node_data(_e["node"]).save }
+  end
+
+  return c
+end
+
+["tmp/_.r_categories.first.json","tmp/_.r_categories.last.json"].each do |fn|
+  data = JSON.parse(File.read(fn))
+
+  data["data"]["productCategories"]["edges"].each do |e|
+    c =helper_get_category_by_node_data(e["node"]).save
+  end
+end
