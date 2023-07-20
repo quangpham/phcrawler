@@ -96,9 +96,15 @@ def helper_get_user_by_node_data u
     user[m[0]] = nil if user[m[0]] == 0
   end
 
-  arr_map = ["followed_topic_ids", "stack_product_ids", "submitted_post_ids", "collection_ids", "links"]
+  arr_map = [
+    ["followed_topic_ids", "followed_topics_count"],
+    ["stack_product_ids"],
+    ["submitted_post_ids"],
+    ["collection_ids"],
+    ["links", "links_count"]
+  ]
   arr_map.each do |m|
-    user[m] = [] if user[m].nil?
+    user[m[0]] = [] if user[m[0]].nil?
   end
 
   if u["karmaBadge"]
@@ -171,10 +177,15 @@ def helper_get_user_by_node_data u
   end
 
   arr_map.each do |m|
-    if user[m]
-      user[m] = user[m].uniq.compact.sort
-      if user[m].empty?
-        user[m] = nil
+    if user[m[0]]
+      user[m[0]] = user[m[0]].uniq.compact.sort
+      if user[m[0]].empty?
+        user[m[0]] = nil
+      end
+      if m[1]
+         if user[m[0]]
+          user[m[1]] = user[m[0]].count
+         end
       end
     end
   end

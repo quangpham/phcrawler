@@ -34,11 +34,13 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     {
       profile:user(username:$username)
       {
-        id name username headline twitterUsername
-        websiteUrl followersCount followingsCount
-        isMaker isTrashed badgesCount createdAt
-        about productsCount votesCount collectionsCount submittedPostsCount stacksCount
-        submittedPosts {edges{node{id} } }
+        id name about username headline
+        twitterUsername websiteUrl
+        isMaker isTrashed
+        followersCount followingsCount badgesCount
+        productsCount votesCount collectionsCount submittedPostsCount stacksCount
+        createdAt
+        submittedPosts { edges { node{id} } }
         collections
         {
           edges
@@ -50,16 +52,13 @@ curl 'https://www.producthunt.com/frontend/graphql' \
             }
           }
         }
-
         links { id name url kind }
         stacks { edges {node { id product { id slug } } } }
-        badgeGroups{ awardKind badgesCount}
+        badgeGroups{ awardKind badgesCount }
         followedTopics { edges {node { id } } }
-        visitStreak{duration}
+        visitStreak { duration }
       }
     }
-
-
 
   "}' \
   --compressed > "tmp/_r.profile.$1.ongoing"
