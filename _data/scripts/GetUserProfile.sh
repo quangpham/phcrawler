@@ -34,13 +34,18 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     {
       profile:user(username:$username)
       {
-        id name about username headline
-        twitterUsername websiteUrl
+        id username
+        name headline websiteUrl twitterUsername about createdAt
         isMaker isTrashed
-        followersCount followingsCount badgesCount
-        productsCount votesCount collectionsCount submittedPostsCount stacksCount
-        karmaBadge {score} createdAt
+        followersCount followingsCount badgesCount productsCount collectionsCount votesCount submittedPostsCount stacksCount
+
+        karmaBadge {score}
+        visitStreak { duration }
+        work {id jobTitle companyName product{id} }
+        followedTopics { edges {node { id } } }
+        stacks { edges {node { id product { id slug } } } }
         submittedPosts { edges { node{id} } }
+
         collections
         {
           edges
@@ -52,11 +57,10 @@ curl 'https://www.producthunt.com/frontend/graphql' \
             }
           }
         }
+
         links { id name url kind }
-        stacks { edges {node { id product { id slug } } } }
         badgeGroups{ awardKind badgesCount }
-        followedTopics { edges {node { id } } }
-        visitStreak { duration }
+
       }
     }
 

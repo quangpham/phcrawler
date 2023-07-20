@@ -1,7 +1,8 @@
 commands = []
 where_str = "badges > 0 and score > 1 and version!=2"
 where_str = "version!=2 and followers > 10"
-where_str = "(version!=2 or version is null) and (followers > 50 or badges > 1 or score > 1 or is_maker=true)"
+where_str =  "(version!=2 or version is null) and (followers > 50 or badges > 1 or score > 1 or is_maker=true)"
+where_str = "followers > 50 or badges > 1 or score > 1 or is_maker=true or version=2"
 User.where(where_str).select(:id, :username, :is_trashed).each do |u|
   if u.is_trashed == false || u.is_trashed.nil?
     commands.push "./GetUserProfile.sh #{u.username}"
@@ -30,11 +31,13 @@ def import_profiles json_path="tmp/run/tmp/"
     end
   end
 end
+import_profiles "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp"
+
 
 import_profiles "/Users/quang/Downloads/users"
 
 import_profiles "/Users/quang/Projects/upbase/phcrawler/tmp/run/tmp"
-import_profiles "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp"
+
 import_profiles "/Users/quang/Downloads/done_3"
 
 

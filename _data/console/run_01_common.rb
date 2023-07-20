@@ -66,16 +66,28 @@ def helper_get_user_by_node_data u
     ["website","websiteUrl"],
     ["twitter","twitterUsername"],
     ["about","about"],
-    ["org_created_at","createdAt"]
+    ["org_created_at","createdAt"],
+    ["job_title","work","jobTitle"],
+    ["company_name","work","companyName"]
   ]
   string_map.each do |m|
-    user[m[0]] = u[m[1]] if !u[m[1]].nil?
+    if m.count == 2
+      user[m[0]] = u[m[1]] if !u[m[1]].nil?
+    elsif m.count == 3
+      if u[m[1]]
+        if u[m[1]][m[2]]
+          user[m[0]] = u[m[1]][m[2]]
+        end
+      end
+    end
+    user[m[0]] = nil if user[m[0]] == ""
   end
 
   bool_map = [
     ["is_maker","isMaker"],
     ["is_trashed","isTrashed"]
   ]
+
   bool_map.each do |m|
     user[m[0]] = u[m[1]] if !u[m[1]].nil?
     user[m[0]] = nil if user[m[0]] == false
@@ -90,8 +102,10 @@ def helper_get_user_by_node_data u
     ["votes_count","votesCount"],
     ["submitted_posts_count","submittedPostsCount"],
     ["stacks_count","stacksCount"],
-    ["score","karmaBadge","score"]
+    ["score","karmaBadge","score"],
+    ["work_product_id","work","product","id"]
   ]
+
   int_map.each do |m|
     if m.count == 2
       user[m[0]] = u[m[1]].to_i if !u[m[1]].nil?
@@ -99,6 +113,14 @@ def helper_get_user_by_node_data u
       if u[m[1]]
         if u[m[1]][m[2]]
           user[m[0]] = u[m[1]][m[2]].to_i
+        end
+      end
+    elsif m.count == 4
+      if u[m[1]]
+        if u[m[1]][m[2]]
+          if u[m[1]][m[2]][m[3]]
+            user[m[0]] = u[m[1]][m[2]][m[3]].to_i
+          end
         end
       end
     end
@@ -120,16 +142,6 @@ def helper_get_user_by_node_data u
     if u["visitStreak"]["duration"]
       user.max_streak = [user.max_streak.to_i, u["visitStreak"]["duration"].to_i].max
       user.max_streak = nil if user.max_streak == 0
-    end
-  end
-
-  if u["work"]
-    if u["work"]["jobTitle"]
-      user.job_title =  u["work"]["jobTitle"]
-      user.company_name = u["work"]["companyName"]
-      if u["work"]["product"]
-        user.work_product_id = u["work"]["product"]["id"].to_i
-      end
     end
   end
 
