@@ -209,7 +209,11 @@ def helper_get_user_by_node_data u
   if u["activityEvents"]
     if u["activityEvents"]["edges"]
       if u["activityEvents"]["edges"].count > 0
-        user.last_activity_at = u["activityEvents"]["edges"][0]["node"]["occurredAt"]
+        if user.last_active_at.nil?
+          user.last_active_at = u["activityEvents"]["edges"][0]["node"]["occurredAt"]
+        else
+          user.last_active_at = [user.last_active_at, u["activityEvents"]["edges"][0]["node"]["occurredAt"]].max
+        end
       end
     end
   end
@@ -439,4 +443,25 @@ sql = '
     group by sys_created_at
   ) t2
   where post_archives.sys_created_at = t2.sys_created_at;
+'
+
+
+update_last_active_at = '
+
+update users t1 set last_active_at=GREATEST(t1.last_active_at, t2.last_active_at)
+from (
+	select user_id,max(org_created_at) as last_active_at
+	from user_collections
+	group by user_id
+) t2
+where t1.id = t2.user_id;
+
+update users t1 set last_active_at=GREATEST(t1.last_active_at, t2.last_active_at)
+from (
+	select user_id,max(created_at) as last_active_at
+	from product_reviewer
+	group by user_id
+) t2
+where t1.id = t2.user_id;
+
 '

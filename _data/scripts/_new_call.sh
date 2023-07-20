@@ -1,3 +1,18 @@
+# scp root@146.190.93.2:/root/run/done_7.zip /Users/quang/Downloads/users/1
+# scp root@157.245.145.254:/root/run/done_6.zip /Users/quang/Downloads/users/2
+
+# scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@146.190.93.2:/root/
+# scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.145.254:/root/
+
+# ssh root@146.190.93.2 'ls -1 /root/run/tmp/ | wc -l'
+# ssh root@146.190.93.2 "cd /root/run/ && mkdir done_8 && find tmp/ -name '*.json' -exec mv -t done_8/ {} + && zip -r done_8.zip done_8/"
+# scp root@146.190.93.2:/root/run/done_8.zip /Users/quang/Downloads/users/1
+
+# ssh root@157.245.145.254 'ls -1 /root/run/tmp/ | wc -l'
+# ssh root@157.245.145.254 "cd /root/run/ && mkdir done_8 && find tmp/ -name '*.json' -exec mv -t done_8/ {} + && zip -r done_8.zip done_8/"
+# scp root@157.245.145.254:/root/run/done_8.zip /Users/quang/Downloads/users/2
+
+
 # Product Categories / ProductCategoryConnection
 # Trang chu, menu category
 

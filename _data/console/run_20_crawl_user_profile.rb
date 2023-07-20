@@ -3,6 +3,7 @@ commands = []
 # where_str = "version!=2 and followers > 10"
 # where_str =  "(version!=2 or version is null) and (followers > 50 or badges > 1 or score > 1 or is_maker=true)"
 where_str = "followers > 50 or badges > 1 or score > 1 or is_maker=true or version=2 or version=3 or version=4"
+where_str = "(followers > 3 or badges > 1 or score > 1 or is_maker=true) and (version!=5 or version is null) and (is_trashed is null or is_trashed=false)"
 User.where(where_str).select(:id, :username, :is_trashed).each do |u|
   if u.is_trashed == false || u.is_trashed.nil?
     commands.push "./GetUserProfile.sh #{u.username}"
@@ -37,6 +38,7 @@ end
 
 
 import_profiles "/Users/quang/Downloads/users"
+
 import_profiles "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp"
 import_profiles "/Users/quang/Projects/upbase/phcrawler/tmp/run/tmp"
 import_profiles "/Users/quang/Downloads/done_3"
