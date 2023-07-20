@@ -230,3 +230,139 @@
 #   -H 'x-requested-with: XMLHttpRequest' \
 #   --data-raw $'{"operationName":"ProfileAboutPage","variables":{"username":"jesv","newProductsCursor":null},"query":"query ProfileAboutPage($username:String\u0021$newProductsCursor:String){profile:user(username:$username){id name username about badgesCount badgesUniqueCount productsCount votesCount createdAt links{...ProfileAboutUserLinkFragment __typename}followedTopics{edges{node{id name slug __typename}__typename}__typename}badgeGroups{awardKind badgesCount award{id name description imageUuid active __typename}__typename}votedPosts(first:8){edges{node{id ...PostItemFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}newProducts(first:5 after:$newProductsCursor){edges{node{id ...MakerHistoryItemFragment __typename}__typename}pageInfo{startCursor endCursor hasNextPage __typename}__typename}...JobTitleFragment ...MetaTags __typename}}fragment MetaTags on SEOInterface{id meta{canonicalUrl creator description image mobileAppUrl oembedUrl robots title type author authorUrl __typename}__typename}fragment PostItemFragment on Post{id commentsCount name shortenedUrl slug tagline updatedAt pricingType topics(first:1){edges{node{id name slug __typename}__typename}__typename}redirectToProduct{id slug __typename}...PostThumbnail ...PostVoteButtonFragment __typename}fragment PostThumbnail on Post{id name thumbnailImageUuid ...PostStatusIcons __typename}fragment PostStatusIcons on Post{id name productState __typename}fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt product{id isSubscribed __typename}disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}fragment ProfileAboutUserLinkFragment on UserLink{id name encodedUrl kind __typename}fragment MakerHistoryItemFragment on Product{id name createdAt tagline createdAt slug ...ProductThumbnailFragment makerPosts(madeBy:$username){edges{node{id name tagline thumbnailImageUuid createdAt slug __typename}__typename}__typename}__typename}fragment ProductThumbnailFragment on Product{id name logoUuid isNoLongerOnline __typename}fragment JobTitleFragment on User{id work{id jobTitle companyName product{id name slug __typename}__typename}__typename}"}' \
 #   --compressed
+
+
+# Get User Collections
+
+curl 'https://www.producthunt.com/frontend/graphql' \
+  -H 'authority: www.producthunt.com' \
+  -H 'accept: */*' \
+  -H 'accept-language: en,vi;q=0.9' \
+  -H 'content-type: application/json' \
+  -H 'cookie: _ga=GA1.1.521910990.1689472726; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221689472725565%22}}}; ajs_anonymous_id=8169299d-ab73-4fb4-97a1-11eff39d595c; visitor_id=a145b6c6-84d8-49ba-b565-5922df9bc8e8; track_code=81ad6b58d9; agreed_cookie_policy=2023-07-15+18%3A58%3A53+-0700; _hjSessionUser_3508551=eyJpZCI6IjM5ZGEyNjY2LTY0YjItNTBjYS05MzUzLTNjNzA2N2VlMTcxNiIsImNyZWF0ZWQiOjE2ODk0NzI3MjYyNjYsImV4aXN0aW5nIjp0cnVlfQ==; first_visit=1689729091; first_referer=https://www.google.com/; g_state={"i_p":1690333897969,"i_l":3}; _hjSession_3508551=eyJpZCI6ImRkOWI4ZDBjLWJjZGUtNDlhNC04MmFmLTg0ZTgwOWM0MWI5ZCIsImNyZWF0ZWQiOjE2ODk4MjEwNDMyMTcsImluU2FtcGxlIjpmYWxzZX0=; csrf_token=llHqAN8rnmDSeJihUkiHSixydLEvYX3CR0bHhB1FgS2q5BygYvUIa1rBqmRCXmtPpSbaqksNe-pRvJVICw743w; _producthunt_session_production=jzhHNZF6ClzAgKc7W16guXkH35mTXUiodauCZoIDppP%2BbsoOXzsq%2BKJHs6qkjw7gsa2NOC%2BUeDTue32w77LhcXcj70wzChrwPtrQ8jy3BfjllCGoUzpG9zBw4nW5Xz2o7qoJWLRn4t4unVJkkMODDnsJDoZo75dXNUJDQE%2FMHxGSwg81mUXrroq7UfGiwtgI9wrPlpZ93XQdVGh5Vy%2BSKBfQOBlw8B1rWUmJjclvUUwd1sYi%2FqX9E%2BdKQt5%2FbBo5q9BuhDCzMWDcnyW%2B8culsdl4I2SASPl9RU7OyXNPn2FS2tvnTxJwm5ZiheKuG2ecM0uVmTQjNQBy6yMH1A%3D%3D--vWaRE15KtNJqi4Wf--udy2Abty%2FVt%2F9F53znRxaw%3D%3D; _ga_WZ46833KH9=GS1.1.1689821043.20.1.1689822106.17.0.0' \
+  -H 'dnt: 1' \
+  -H 'origin: https://www.producthunt.com' \
+  -H 'referer: https://www.producthunt.com/@tinaciousz/collections' \
+  -H 'sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36' \
+  -H 'x-requested-with: XMLHttpRequest' \
+  --data-raw $'
+  {
+    "operationName":"ProfileHuntedPage",
+    "variables":{"username":"tinaciousz"},
+    "query":"query ProfileHuntedPage($cursor:String$username:String\u0021$query:String)
+    {
+      profile:user(username:$username)
+      {
+        id submittedPosts(first:20 after:$cursor query:$query){edges{node{id ...PostItemFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}...MetaTags __typename}}fragment MetaTags on SEOInterface{id meta{canonicalUrl creator description image mobileAppUrl oembedUrl robots title type author authorUrl __typename}__typename}fragment PostItemFragment on Post{id commentsCount name shortenedUrl slug tagline updatedAt pricingType topics(first:1){edges{node{id name slug __typename}__typename}__typename}redirectToProduct{id slug __typename}...PostThumbnail ...PostVoteButtonFragment __typename}fragment PostThumbnail on Post{id name thumbnailImageUuid ...PostStatusIcons __typename}fragment PostStatusIcons on Post{id name productState __typename}fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt product{id isSubscribed __typename}disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}"}' \
+  --compressed
+
+
+# curl 'https://www.producthunt.com/frontend/graphql' \
+#   -H 'authority: www.producthunt.com' \
+#   -H 'accept: */*' \
+#   -H 'accept-language: en,vi;q=0.9' \
+#   -H 'content-type: application/json' \
+#   -H 'cookie: _ga=GA1.1.521910990.1689472726; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221689472725565%22}}}; ajs_anonymous_id=8169299d-ab73-4fb4-97a1-11eff39d595c; visitor_id=a145b6c6-84d8-49ba-b565-5922df9bc8e8; track_code=81ad6b58d9; agreed_cookie_policy=2023-07-15+18%3A58%3A53+-0700; _hjSessionUser_3508551=eyJpZCI6IjM5ZGEyNjY2LTY0YjItNTBjYS05MzUzLTNjNzA2N2VlMTcxNiIsImNyZWF0ZWQiOjE2ODk0NzI3MjYyNjYsImV4aXN0aW5nIjp0cnVlfQ==; first_visit=1689729091; first_referer=https://www.google.com/; g_state={"i_p":1690333897969,"i_l":3}; _hjSession_3508551=eyJpZCI6ImRkOWI4ZDBjLWJjZGUtNDlhNC04MmFmLTg0ZTgwOWM0MWI5ZCIsImNyZWF0ZWQiOjE2ODk4MjEwNDMyMTcsImluU2FtcGxlIjpmYWxzZX0=; _hjIncludedInSessionSample_3508551=0; _ga_WZ46833KH9=GS1.1.1689821043.20.1.1689822085.38.0.0; csrf_token=PPNm0LrOFd259Qpk_EyBJb6mQ0ZWVtcCbaLMSpQKeRwARpBwBxCD1jFMOKHsWm0gN_LtXTI60Sp7WJ6GgkEA7g; _producthunt_session_production=Jwq%2BKll%2B%2Biew8yO2fC33maM3abFmUrYsU9tUf%2BhBuyhv6IiWoG%2BwlAjFGkaBrGCbcb7V8hrlOnoJpz%2BDUZpm7Zu18Ua1oP9%2BD1UgBN3hGrj6Z%2B4VuQzHkuY8%2B30KWMhwmJ64qgXYgJhO3D9W2iM5yqQvmgdvGjEsi6EYju%2B7qh3pqrhctEAjg4GhsXRnmDXcwBhC4VGkvwXn9MVMU%2BmS%2BLYkyugmsyk%2BrC7PnPyY4B%2B33vF%2FeWBnF42OvVM8mPPYy1qKT2JAMqcoIOU6e5gcA%2B2jlj2Eak5KQi%2F9N%2FAWH8Gc42FDq51rpLGOVvX8pSx3BTdWUHgUB4yETANQtA%3D%3D--2hGxjhljhDEao3j2--OYE2MB200Aq3FaDmEGBeIg%3D%3D' \
+#   -H 'dnt: 1' \
+#   -H 'origin: https://www.producthunt.com' \
+#   -H 'referer: https://www.producthunt.com/@tinaciousz/collections/10-useful-linkedin-tools' \
+#   -H 'sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"' \
+#   -H 'sec-ch-ua-mobile: ?0' \
+#   -H 'sec-ch-ua-platform: "macOS"' \
+#   -H 'sec-fetch-dest: empty' \
+#   -H 'sec-fetch-mode: cors' \
+#   -H 'sec-fetch-site: same-origin' \
+#   -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36' \
+#   -H 'x-requested-with: XMLHttpRequest' \
+#   --data-raw $'
+#   {
+#     "operationName":"ProfileCollectionsIndexPage",
+#     "variables":{"username":"tinaciousz"},
+#     "query":"query ProfileCollectionsIndexPage($username:String\u0021$cursor:String)
+#     {
+#       profile:user(username:$username)
+#       {
+#         id
+#         collections(first:6 after:$cursor)
+#         {
+#           ...CollectionsGridFragment __typename
+#         }
+#         ...MetaTags __typename
+#       }
+#     }
+
+#   fragment MetaTags on SEOInterface{id meta{canonicalUrl creator description image mobileAppUrl oembedUrl robots title type author authorUrl __typename}__typename}
+
+
+#   fragment CollectionsGridFragment on CollectionConnection
+#   {
+#     edges
+#     {
+#       node {  id ...CollectionCardFragment __typename}__typename
+
+#     }
+#     pageInfo {endCursor hasNextPage}
+#   }
+
+#   fragment CollectionCardFragment on Collection
+#   {
+#     id name title description path productsCount
+#     products(first:3){
+#       edges{node{id name ...ProductThumbnailFragment __typename}__typename}__typename}user{id name username ...UserImage __typename}__typename}
+
+#   fragment UserImage on User{id name username avatarUrl __typename}
+#   fragment ProductThumbnailFragment on Product{id name logoUuid isNoLongerOnline __typename}"}' \
+#   --compressed > "test.json"
+
+
+# curl 'https://www.producthunt.com/frontend/graphql' \
+#   -H 'authority: www.producthunt.com' \
+#   -H 'accept: */*' \
+#   -H 'accept-language: en,vi;q=0.9' \
+#   -H 'content-type: application/json' \
+#   -H 'cookie: _ga=GA1.1.521910990.1689472726; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221689472725565%22}}}; ajs_anonymous_id=8169299d-ab73-4fb4-97a1-11eff39d595c; visitor_id=a145b6c6-84d8-49ba-b565-5922df9bc8e8; track_code=81ad6b58d9; agreed_cookie_policy=2023-07-15+18%3A58%3A53+-0700; _hjSessionUser_3508551=eyJpZCI6IjM5ZGEyNjY2LTY0YjItNTBjYS05MzUzLTNjNzA2N2VlMTcxNiIsImNyZWF0ZWQiOjE2ODk0NzI3MjYyNjYsImV4aXN0aW5nIjp0cnVlfQ==; first_visit=1689729091; first_referer=https://www.google.com/; g_state={"i_p":1690333897969,"i_l":3}; _hjSession_3508551=eyJpZCI6ImRkOWI4ZDBjLWJjZGUtNDlhNC04MmFmLTg0ZTgwOWM0MWI5ZCIsImNyZWF0ZWQiOjE2ODk4MjEwNDMyMTcsImluU2FtcGxlIjpmYWxzZX0=; _hjIncludedInSessionSample_3508551=0; _ga_WZ46833KH9=GS1.1.1689821043.20.1.1689822085.38.0.0; csrf_token=ccTDTXmubZaJgHnsDFKBfTmV-fA-k8WAGPGMk8IzM2dNcTXtxHD7nQE5SykcRG14sMFX61r_w6gOC95f1HhKlQ; _producthunt_session_production=ifAErzs%2FrrKcvBQIqdVq3DO8v5ztTnaGOW6oqHXJFyQY%2BvXidWmetiOJoB8ugnmFTvekBpb1%2FSN%2FqD2WU%2BUwpRmZeUkiuKCYiUp3DaAclMUUTsgwKP12rUZTnmwspTsAEjWmrGjRMAXtjLAykDnJTxLwOMSluUQzHIf9lXGMzxVe4su13aeuJWPS%2Bdt8wsD0DJr%2B4OgyqHADOFw9fQMLC2VPnA%2F0FFuUcxeUxjiTLcmix5Zy%2FHid1LNcB7ccda4XXOiX%2BOvoGVgV3sghgsE7YDJltNOGy89aOdjaslzRmvjnoewOeCeDh0Jcf%2BVoJ3xZfcyeTutqqYS5YrnPTg%3D%3D--LN44ikYnA5UiD9Bg--IhKHphFE%2BrQ8%2FwyiRtdCJA%3D%3D' \
+#   -H 'dnt: 1' \
+#   -H 'origin: https://www.producthunt.com' \
+#   -H 'referer: https://www.producthunt.com/@tinaciousz/collections/10-useful-linkedin-tools' \
+#   -H 'sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"' \
+#   -H 'sec-ch-ua-mobile: ?0' \
+#   -H 'sec-ch-ua-platform: "macOS"' \
+#   -H 'sec-fetch-dest: empty' \
+#   -H 'sec-fetch-mode: cors' \
+#   -H 'sec-fetch-site: same-origin' \
+#   -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36' \
+#   -H 'x-requested-with: XMLHttpRequest' \
+#   --data-raw $'
+#   {
+#     "operationName":"ProfileLayoutQuery",
+#     "variables":{"username":"tinaciousz"},
+#     "query":"query ProfileLayoutQuery($username:String\u0021)
+#     {
+#         profile:user(username:$username)
+#         {
+#             id isTrashed productsCount submittedPostsCount
+#             collectionsCount followersCount followingsCount
+#             collectionsCount username
+#             ...ProfileLayoutHeaderFragment __typename
+#         }
+#     }
+#     fragment ProfileLayoutHeaderFragment on User{id headline headerUuid isFollowingViewer isMaker isViewer name twitterUsername username visitStreak{emoji duration __typename}  ...UserStackPreviewFragment __typename}
+
+
+
+#     fragment UserStackPreviewFragment on User{id username stacksCount
+#       stacks(first:20)
+#       {
+#         edges
+#         {
+#           node
+#           {
+#             id product{id slug ...ProductThumbnailFragment __typename}__typename}__typename}__typename}__typename}
+#     fragment ProductThumbnailFragment on Product{id name logoUuid isNoLongerOnline __typename}"}' \
+#   --compressed  > "test.json"

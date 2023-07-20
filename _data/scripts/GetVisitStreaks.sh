@@ -42,6 +42,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
               id name username headline twitterUsername
               websiteUrl followersCount followingsCount
               isMaker isTrashed badgesCount
+              about productsCount
 
               karmaBadge{score} createdAt
               work { id jobTitle companyName product { id } }

@@ -2,6 +2,13 @@
 # https://www.producthunt.com/@jesv
 # co the lay linkedin => Nam trong links
 
+# ./GetUserProfile.sh username
+# ./GetUserProfile.sh jesv
+# collections duoc max 100
+# submittedPosts duoc max 20
+
+mkdir -p tmp/
+
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
   -H 'accept: */*' \
@@ -22,37 +29,64 @@ curl 'https://www.producthunt.com/frontend/graphql' \
   --data-raw $'
   {
     "operationName":"ProfileAboutPage",
-    "variables":{"username":"jesv","newProductsCursor":null},
-    "query":"query ProfileAboutPage($username:String\u0021$newProductsCursor:String)
+    "variables":{"username":"'$1'"},
+    "query":"query ProfileAboutPage($username:String\u0021)
     {
       profile:user(username:$username)
       {
-        id name username about badgesCount badgesUniqueCount productsCount votesCount createdAt
-        links{...ProfileAboutUserLinkFragment __typename}
-        followedTopics{edges{node{id name slug __typename}__typename}__typename}
-        badgeGroups{awardKind badgesCount award{id name description imageUuid active __typename}__typename}
-        votedPosts(first:8){
-          edges{node{id ...PostItemFragment __typename}__typename}
-          pageInfo{endCursor hasNextPage __typename}__typename
+        id name username headline twitterUsername
+        websiteUrl followersCount followingsCount
+        isMaker isTrashed badgesCount createdAt
+        about productsCount votesCount collectionsCount submittedPostsCount stacksCount
+        submittedPosts {edges{node{id} } }
+        collections
+        {
+          edges
+          {
+            node
+            {
+              id name title description path productsCount createdAt
+              products { edges { node {id} } }
+            }
+          }
         }
-        newProducts(first:5 after:$newProductsCursor){
-          edges{node{id ...MakerHistoryItemFragment __typename}__typename}
-          pageInfo{startCursor endCursor hasNextPage __typename}__typename
-        }
-        ...JobTitleFragment
-        __typename
+
+        links { id name url kind }
+        stacks { edges {node { id product { id slug } } } }
+        badgeGroups{ awardKind badgesCount}
+        followedTopics { edges {node { id } } }
+        visitStreak{duration}
       }
     }
 
 
-    fragment PostItemFragment on Post{id commentsCount name shortenedUrl slug tagline updatedAt pricingType topics(first:1){edges{node{id name slug __typename}__typename}__typename}redirectToProduct{id slug __typename}...PostThumbnail ...PostVoteButtonFragment __typename}
-    fragment PostThumbnail on Post{id name thumbnailImageUuid ...PostStatusIcons __typename}
-    fragment PostStatusIcons on Post{id name productState __typename}
-    fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt product{id isSubscribed __typename}disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}
-    fragment ProfileAboutUserLinkFragment on UserLink{id name encodedUrl kind __typename}
-    fragment MakerHistoryItemFragment on Product{id name createdAt tagline createdAt slug ...ProductThumbnailFragment makerPosts(madeBy:$username){edges{node{id name tagline thumbnailImageUuid createdAt slug __typename}__typename}__typename}__typename}
-    fragment ProductThumbnailFragment on Product{id name logoUuid isNoLongerOnline __typename}
-    fragment JobTitleFragment on User{id work{id jobTitle companyName product{id name slug __typename}__typename}__typename}
 
   "}' \
-  --compressed > "tmp/_r.profile.json"
+  --compressed > "tmp/_r.profile.$1.ongoing"
+
+mv "tmp/_r.profile.$1.ongoing" "tmp/_r.profile.$1.json"
+
+
+
+
+# stacks(first:20) { { node {id product { id } } } }
+    #     votedPosts(first:8){
+    #       edges{node{id ...PostItemFragment __typename}__typename}
+    #       pageInfo{endCursor hasNextPage __typename}__typename
+    #     }
+    #     newProducts(first:5 after:$newProductsCursor){
+    #       edges{node{id ...MakerHistoryItemFragment __typename}__typename}
+    #       pageInfo{startCursor endCursor hasNextPage __typename}__typename
+    #     }
+    #     ...JobTitleFragment
+    #     __typename
+
+
+    # fragment PostItemFragment on Post{id commentsCount name shortenedUrl slug tagline updatedAt pricingType topics(first:1){edges{node{id name slug __typename}__typename}__typename}redirectToProduct{id slug __typename}...PostThumbnail ...PostVoteButtonFragment __typename}
+    # fragment PostThumbnail on Post{id name thumbnailImageUuid ...PostStatusIcons __typename}
+    # fragment PostStatusIcons on Post{id name productState __typename}
+    # fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt product{id isSubscribed __typename}disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}
+    # fragment ProfileAboutUserLinkFragment on UserLink{id name encodedUrl kind __typename}
+    # fragment MakerHistoryItemFragment on Product{id name createdAt tagline createdAt slug ...ProductThumbnailFragment makerPosts(madeBy:$username){edges{node{id name tagline thumbnailImageUuid createdAt slug __typename}__typename}__typename}__typename}
+    # fragment ProductThumbnailFragment on Product{id name logoUuid isNoLongerOnline __typename}
+    # fragment JobTitleFragment on User{id work{id jobTitle companyName product{id name slug __typename}__typename}__typename}

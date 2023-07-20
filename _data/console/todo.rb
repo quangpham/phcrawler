@@ -2,32 +2,31 @@
 redirectToProduct {id }
 
 # Nhung thang User muon lay them thong tin cong ty
-
-work {
-  id jobTitle companyName
-  product {id name slug __typename}
-  __typename
-}
-
-links {
-  id name url encodedUrl kind
-  __typename
-}
-
-followedTopics {
-  edges
+profile:user(username:$username)
+{
+  id name username headline twitterUsername
+  websiteUrl followersCount followingsCount
+  isMaker isTrashed badgesCount createdAt
+  about productsCount votesCount collectionsCount submittedPostsCount stacksCount
+  submittedPosts {edges{node{id} } }
+  collections
   {
-    node
+    edges
     {
-      id name slug __typename
+      node
+      {
+        id name title description path productsCount createdAt
+        products { edges { node {id} } }
+      }
     }
-    __typename
   }
-  __typename
+
+  links { id name url kind }
+  stacks { edges {node { id product { id slug } } } }
+  badgeGroups{ awardKind badgesCount}
+  followedTopics { edges {node { id } } }
+  visitStreak{duration}
 }
-
-badgeGroups{awardKind badgesCount award{id name description imageUuid active __typename}__typename}
-
 
 
 

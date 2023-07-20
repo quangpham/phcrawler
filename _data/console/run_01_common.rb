@@ -28,27 +28,157 @@ def slipt_commands_to_files commands, number_split_files = 15, cursors
   system "cd tmp/ && zip -r run.zip run/"
 end
 
+def helper_get_user_collection_by_node_data n
+  c = UserCollection.find_or_initialize_by(id: n["id"].to_i)
+  c.name = n["name"]
+  c.title = n["title"]
+  c.description = n["description"]
+  c.path = n["path"]
+  c.products_count = n["productsCount"].to_i
+  c.s_created_at = n["createdAt"]
 
+  if n["products"]
+    if n["products"]["edges"]
+      c.product_ids = n["products"]["edges"].collect { |e| e["node"]["id"].to_i }
+    end
+  end
+
+  return c
+end
+
+def helper_get_user_link_by_node_data ln
+  l = UserLink.find_or_initialize_by(id: ln["id"].to_i)
+  l.name = ln["name"]
+  l.url = ln["url"]
+  l.kind = ln["kind"]
+  return l
+end
 
 def helper_get_user_by_node_data u
-  user = User.find_or_initialize_by(id: u["id"].to_i)
-  user.name = u["name"] if !u["name"].nil?
-  user.username = u["username"] if !u["username"].nil?
-  user.headline = u["headline"] if !u["headline"].nil?
-  user.website = u["websiteUrl"] if !u["websiteUrl"].nil?
-  user.twitter = u["twitterUsername"] if !u["twitterUsername"].nil?
-  user.is_maker = u["isMaker"] if !u["isMaker"].nil?
-  user.is_trashed = u["isTrashed"] if !u["isTrashed"].nil?
-  user.followers = u["followersCount"] if !u["followersCount"].nil?
-  user.following = u["followingsCount"] if !u["followingsCount"].nil?
-  user.s_created_at = u["createdAt"] if !u["createdAt"].nil?
-  user.badges = u["badgesCount"].to_i if !u["badgesCount"].nil?
+  user_id = u["id"].to_i
+
+  user = User.find_or_initialize_by(id: user_id)
+  user.username = u["username"] if !u["username"].nil? && !u["isTrashed"]
+
+  string_map = [
+    ["name","name"],
+    ["headline","headline"],
+    ["website","websiteUrl"],
+    ["twitter","twitterUsername"],
+    ["about","about"],
+    ["s_created_at","createdAt"]
+  ]
+  string_map.each do |m|
+    user[m[0]] = u[m[1]] if !u[m[1]].nil?
+  end
+
+  bool_map = [
+    ["is_maker","isMaker"],
+    ["is_trashed","is_trashed"]
+  ]
+  bool_map.each do |m|
+    user[m[0]] = u[m[1]] if !u[m[1]].nil?
+    user[m[0]] = nil if user[m[0]] == false
+  end
+
+  int_map = [
+    ["followers","followersCount"],
+    ["following","followingsCount"],
+    ["badges","badgesCount"],
+    ["products_count","productsCount"],
+    ["collections_count","collectionsCount"],
+    ["votes_count","votesCount"],
+    ["submitted_posts_count","submittedPostsCount"],
+    ["stacks_count","stacksCount"]
+  ]
+  int_map.each do |m|
+    user[m[0]] = u[m[1]].to_i if !u[m[1]].nil?
+    user[m[0]] = nil if user[m[0]] == 0
+  end
+
+  arr_map = ["followed_topic_ids", "stack_product_ids", "submitted_post_ids", "collection_ids", "links"]
+  arr_map.each do |m|
+    user[m] = [] if user[m].nil?
+  end
 
   if u["karmaBadge"]
      if u["karmaBadge"]["score"]
       user.score = u["karmaBadge"]["score"]
      end
   end
+
+  if u["visitStreak"]
+    if u["visitStreak"]["duration"]
+      user.max_streak = [user.max_streak.to_i, u["visitStreak"]["duration"].to_i].max
+      user.max_streak = nil if user.max_streak == 0
+    end
+  end
+
+  if u["work"]
+    if u["work"]["jobTitle"]
+      user.job_title =  u["work"]["jobTitle"]
+      user.company_name = u["work"]["companyName"]
+      if u["work"]["product"]
+        user.work_product_id = u["work"]["product"]["id"].to_i
+      end
+    end
+  end
+
+  if u["followedTopics"]
+    if u["followedTopics"]["edges"]
+      user.followed_topic_ids += u["followedTopics"]["edges"].collect { |e| e["node"]["id"].to_i }
+    end
+  end
+
+  if u["stacks"]
+    if u["stacks"]["edges"]
+      user.stack_product_ids += u["stacks"]["edges"].collect { |e| e["node"]["product"]["id"].to_i }
+    end
+  end
+
+  # submittedPosts
+  if u["submittedPosts"]
+    if u["submittedPosts"]["edges"]
+      user.submitted_post_ids += u["submittedPosts"]["edges"].collect { |e| e["node"]["id"].to_i }
+    end
+  end
+
+  # collections
+  if u["collections"]
+    if u["collections"]["edges"]
+      u["collections"]["edges"].each do |ce|
+        c = helper_get_user_collection_by_node_data(ce["node"])
+        c.user_id = user_id
+        c.save
+        user.collection_ids.push(c.id)
+      end
+    end
+  end
+
+  if u["links"]
+    u["links"].each do |ln|
+      l = helper_get_user_link_by_node_data(ln)
+      l.user_id = user_id
+      l.save
+      user.links.push(l.id)
+    end
+  end
+
+  if u["badgeGroups"]
+    u["badgeGroups"].each do |b|
+      user["#{b["awardKind"]}"]  = b["badgesCount"]
+    end
+  end
+
+  arr_map.each do |m|
+    if user[m]
+      user[m] = user[m].uniq.compact.sort
+      if user[m].empty?
+        user[m] = nil
+      end
+    end
+  end
+
   return user
 end
 
@@ -208,10 +338,6 @@ sql = '
   select id,unnest(topic_ids) as topic_id from posts where topic_ids is not null and topic_ids != '{}'
   ON CONFLICT (post_id, topic_id) DO NOTHING;
 
-  # insert into product_reviewer(product_id, user_id)
-  # select id,unnest(reviewers_ids) as user_id from products where reviewers_ids is not null and reviewers_ids != '{}'
-  # ON CONFLICT (product_id, user_id) DO NOTHING;
-
   insert into product_topic(product_id, topic_id)
   select id,unnest(topic_ids) as topic_id from products where topic_ids is not null and topic_ids != '{}'
   ON CONFLICT (product_id, topic_id) DO NOTHING;
@@ -219,6 +345,12 @@ sql = '
   insert into product_post(product_id, post_id)
   select id,unnest(post_ids) as post_id from products where post_ids is not null and post_ids != '{}'
   ON CONFLICT (product_id, post_id) DO NOTHING;
+
+  # insert into product_reviewer(product_id, user_id)
+  # select id,unnest(reviewers_ids) as user_id from products where reviewers_ids is not null and reviewers_ids != '{}'
+  # ON CONFLICT (product_id, user_id) DO NOTHING;
+
+
 
 
   update products p set sys_posts_count=t.posts_count
