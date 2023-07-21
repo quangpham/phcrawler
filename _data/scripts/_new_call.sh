@@ -1,16 +1,88 @@
-# scp root@146.190.93.2:/root/run/done_7.zip /Users/quang/Downloads/users/1
-# scp root@157.245.145.254:/root/run/done_6.zip /Users/quang/Downloads/users/2
 
 # scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@146.190.93.2:/root/
 # scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.145.254:/root/
 
-# ssh root@146.190.93.2 'ls -1 /root/run/tmp/ | wc -l'
-# ssh root@146.190.93.2 "cd /root/run/ && mkdir done_8 && find tmp/ -name '*.json' -exec mv -t done_8/ {} + && zip -r done_8.zip done_8/"
-# scp root@146.190.93.2:/root/run/done_8.zip /Users/quang/Downloads/users/1
+ssh root@146.190.93.2 'ls -1 /root/run/tmp/ | wc -l'
+ssh root@157.245.145.254 'ls -1 /root/run/tmp/ | wc -l'
 
-# ssh root@157.245.145.254 'ls -1 /root/run/tmp/ | wc -l'
-# ssh root@157.245.145.254 "cd /root/run/ && mkdir done_8 && find tmp/ -name '*.json' -exec mv -t done_8/ {} + && zip -r done_8.zip done_8/"
-# scp root@157.245.145.254:/root/run/done_8.zip /Users/quang/Downloads/users/2
+# ssh root@146.190.93.2    "cd /root/run/ && mkdir done_04a && find tmp/ -name '*.json' -exec mv -t done_04a/ {} + && zip -r done_04a.zip done_04a/"
+# scp root@146.190.93.2:/root/run/done_04a.zip /Users/quang/Downloads/users
+
+# ssh root@157.245.145.254 "cd /root/run/ && mkdir done_04b && find tmp/ -name '*.json' -exec mv -t done_04b/ {} + && zip -r done_04b.zip done_04b/"
+# scp root@157.245.145.254:/root/run/done_04b.zip /Users/quang/Downloads/users
+
+
+
+# Lay thong tin cua topic
+# Trong do co thong tin cua subscribers
+
+mkdir tmp/
+
+curl 'https://www.producthunt.com/frontend/graphql' \
+  -H 'authority: www.producthunt.com' \
+  -H 'accept: */*' \
+  -H 'accept-language: en,vi;q=0.9' \
+  -H 'content-type: application/json' \
+  -H 'cookie: _ga=GA1.1.521910990.1689472726; _delighted_web={%2271AaKmxD4TpPsjYW%22:{%22_delighted_fst%22:{%22t%22:%221689472725565%22}}}; ajs_anonymous_id=8169299d-ab73-4fb4-97a1-11eff39d595c; visitor_id=a145b6c6-84d8-49ba-b565-5922df9bc8e8; track_code=81ad6b58d9; agreed_cookie_policy=2023-07-15+18%3A58%3A53+-0700; _hjSessionUser_3508551=eyJpZCI6IjM5ZGEyNjY2LTY0YjItNTBjYS05MzUzLTNjNzA2N2VlMTcxNiIsImNyZWF0ZWQiOjE2ODk0NzI3MjYyNjYsImV4aXN0aW5nIjp0cnVlfQ==; g_state={"i_p":1690333897969,"i_l":3}; first_visit=1689900073; first_referer=; _hjIncludedInSessionSample_3508551=1; _hjSession_3508551=eyJpZCI6ImQ5MDRlYmYzLTgwZWMtNDA1Ny04YWY0LWQ2ZDU4NGYyODVlZCIsImNyZWF0ZWQiOjE2ODk5MDAwNzM0MTgsImluU2FtcGxlIjp0cnVlfQ==; analytics_session_id=1689900073443; _ga_WZ46833KH9=GS1.1.1689900073.31.1.1689900640.60.0.0; analytics_session_id.last_access=1689900641386; csrf_token=JcB6gn1G5L-lK42IulZey97so9v7PtqBP0M4waUvJK0ZdYwiwJhytC2Sv02qQLLOV7gNwJ9S3KkpuWoNs2RdXw; _producthunt_session_production=YbLfDowB1w7uN4n6AbB0QH7mKRAiv2VGw8H4HKMET4uqiZ7fpEd4f8qi6Q4TRv6p5psbOQzFgzcpzsSTjpxE1dCtGN45jyKfuylnGRIe9b%2BSA6%2Bs4RTLE35M6bPIi9Oxht%2FKcAuuBGoEkbXqWeGdMyOmrv4CZ1l%2B3qpqk4NcFyfM%2FpYdHafkqS7Dty1f5Gw4GeeAuZscWfWNlD9Dl0B6gXR3NY%2FQxH37lfrlS4ADFruyaizsGvkY4XmJUlRp8EC2XFTpuN1h2JcO0hBRcpucnx82rF53%2FmusbkQtzCSVf%2BLjljrJktGIu0kwlwObAG8FrSVPmDy3tZxP5IB1ag%3D%3D--4%2BblpKkNbjnBDVOT--AzI5SnUuKdciPVRXuBnC0A%3D%3D' \
+  -H 'dnt: 1' \
+  -H 'origin: https://www.producthunt.com' \
+  -H 'referer: https://www.producthunt.com/topics/calendar' \
+  -H 'sec-ch-ua: "Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36' \
+  -H 'x-requested-with: XMLHttpRequest' \
+  --data-raw $'
+  {
+    "operationName":"TopicPage",
+    "variables":{"slug":"productivity","cursor":null,"topPostsVariant":"THIS_WEEK","order":"best_rated"},
+    "query":"query TopicPage($slug:String\u0021$cursor:String$order:ProductsOrder\u0021){topic(slug:$slug)
+    {
+        id slug parent{id name slug __typename}
+        ...MetaTags
+        ...TopicPageHeaderFragment
+        ...TopicPageProductListFragment
+        ...TopicPageProductQuestionsFragment
+        ...TopReviewedProductsCardFragment
+        targetedAd(kind:\\"feed\\"){...AdFragment __typename}
+        subscribers(first:50){edges{node{id ...UserGridCardFragment __typename}__typename}__typename}
+        recentStacks(first:3){edges{node{id ...TopicPageRecentStackFragment __typename}__typename}__typename}__typename
+    }
+    viewer{id ...TopicsNewsletterCardFragment __typename}
+    }
+    fragment MetaTags on SEOInterface{id meta{canonicalUrl creator description image mobileAppUrl oembedUrl robots title type author authorUrl __typename}__typename}
+    fragment AdFragment on Ad{id subject post{id slug name updatedAt commentsCount topics(first:1){edges{node{id name __typename}__typename}__typename}...PostVoteButtonFragment __typename}ctaText name tagline thumbnailUuid url __typename}
+    fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt product{id isSubscribed __typename}disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}
+    fragment TopicPageHeaderFragment on Topic{id name description parent{id name slug __typename}...TopicFollowButtonFragment __typename}
+    fragment TopicFollowButtonFragment on Topic{id slug name isFollowed followersCount ...TopicImage __typename}
+    fragment TopicImage on Topic{name imageUuid __typename}
+    fragment TopicPageProductListFragment on Topic{id name slug products(first:10 after:$cursor order:$order excludeHidden:true){edges{node{id ...ReviewCTAPromptFragment ...ProductItemFragment __typename}__typename}pageInfo{endCursor hasNextPage __typename}__typename}__typename}
+    fragment ProductItemFragment on Product{id slug name tagline followersCount reviewsCount topics(first:2){edges{node{id slug name __typename}__typename}__typename}...ProductFollowButtonFragment ...ProductThumbnailFragment ...ProductMuteButtonFragment ...FacebookShareButtonV6Fragment ...ReviewStarRatingCTAFragment __typename}
+    fragment ProductThumbnailFragment on Product{id name logoUuid isNoLongerOnline __typename}
+    fragment ProductFollowButtonFragment on Product{id followersCount isSubscribed __typename}
+    fragment ProductMuteButtonFragment on Product{id isMuted __typename}
+    fragment FacebookShareButtonV6Fragment on Shareable{id url __typename}
+    fragment ReviewStarRatingCTAFragment on Product{id slug name isMaker reviewsRating __typename}
+    fragment ReviewCTAPromptFragment on Product{id isMaker viewerReview{id __typename}...ReviewCTASharePromptFragment __typename}
+    fragment ReviewCTASharePromptFragment on Product{id name tagline slug ...ProductThumbnailFragment ...FacebookShareButtonFragment __typename}
+    fragment FacebookShareButtonFragment on Shareable{id url __typename}
+    fragment TopReviewedProductsCardFragment on Topic{id topReviewedProducts(first:4){edges{node{id name tagline reviewsRating slug path ...ProductThumbnailFragment ...ReviewStarRatingCTAFragment reviewSnippet{id overallExperience user{id ...UserImage __typename}__typename}__typename}__typename}__typename}__typename}
+    fragment UserImage on User{id name username avatarUrl __typename}
+    fragment UserGridCardFragment on User{id ...UserImage __typename}
+    fragment TopicsNewsletterCardFragment on Viewer{id settings{sendAiEmail sendProductivityEmail __typename}__typename}
+    fragment TopicPageRecentStackFragment on ProductStack{id user{id name username isTrashed ...UserImage __typename}product{id name tagline slug ...ProductThumbnailFragment __typename}__typename}
+    fragment TopicPageProductQuestionsFragment on Topic{productQuestions(first:1 filter:NOT_ANSWERED excludeSkipped:true){edges{node{id path title ...ProductQuestionAnswerFlowFragment ...ProductQuestionAnswerPromptFragment ...ProductQuestionShareButtonFragment ...ProductQuestionReviewFlowFragment __typename}__typename}__typename}__typename}
+    fragment ProductQuestionAnswerFlowFragment on ProductQuestion{id slug path viewerAnswer{id product{id isMaker viewerReview{id __typename}...ReviewFormProductFragment __typename}__typename}__typename}
+    fragment ReviewFormProductFragment on Product{id name slug isMaker isSubscribed isStacked reviewsRating reviewsCount reviewsWithBodyCount reviewsWithRatingCount ratingSpecificCount{rating count __typename}viewerReview{id __typename}__typename}
+    fragment ProductQuestionReviewFlowFragment on ProductQuestion{id placeholder viewerAnswer{id product{id name viewerReview{id __typename}__typename}__typename}__typename}
+    fragment ProductQuestionAnswerPromptFragment on ProductQuestion{id path canViewAnswers answerAuthors(first:3){edges{node{id ...UserCircleListFragment __typename}__typename}totalCount __typename}__typename}
+    fragment UserCircleListFragment on User{id ...UserImage __typename}
+    fragment ProductQuestionShareButtonFragment on ProductQuestion{id ...FacebookShareButtonV6Fragment __typename}
+"}' \
+  --compressed > tmp/TopicPage.json
 
 
 # Product Categories / ProductCategoryConnection

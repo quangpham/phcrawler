@@ -39,7 +39,11 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         id path parent{ id }
         products(first:20 after:$cursor order:$order)
         {
-            edges { node { id } }
+            edges {
+              node {
+                id
+              }
+            }
             totalCount
         }
       }
