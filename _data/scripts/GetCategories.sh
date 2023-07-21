@@ -1,6 +1,7 @@
-# ./GetTopics.sh 1 NjA(or blank)
-# stt, order ("posts_count", "name", "trending") , cursor
-
+# ./GetCategories.sh
+# chi lay duoc 20 sub cats
+# subCategories(first:20)
+# Ko dung duoc cursor, nen phai crawl "tmp/_.r_categories.first.json" va "tmp/_.r_categories.last.json" :)
 
 mkdir -p tmp/
 rm tmp/_.r_categories*

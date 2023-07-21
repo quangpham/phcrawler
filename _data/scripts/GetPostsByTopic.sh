@@ -2,6 +2,7 @@
 # ./GetPostsByTopic.sh so-thu-tu topic-name cursor
 # ./GetPostsByTopic.sh 1 task-management NjA(or blank)
 # Mot lan chi lan duoc max 20 posts / topic
+# posts(first:20 after:$cursor order:$order)
 # order: trending, by_date, most_commented, most_upvoted
 
 mkdir -p tmp/

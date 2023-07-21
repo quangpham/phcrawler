@@ -3,6 +3,7 @@
 # ./GetFollowersByTopic.sh so-thu-tu $topic-name $order $cursor
 # ./GetFollowersByTopic.sh 1 task-management NjA(or blank)
 # Lay max duoc 100 subs
+# subscribers(first:100 after:$cursor)
 # Lay lite info
 
 

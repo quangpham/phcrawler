@@ -1,8 +1,10 @@
 # Lay toan posts theo product
 # ./GetPostsByProduct.sh so-thu-tu product-name cursor
 # ./GetPostsByProduct.sh 1 itch-io NjA(or blank)
-# Mot lan chi lan duoc max 10 posts / product (cai nay lay thoai mai, nhung chi gioi han 10 de lam cho ki, vi data nay ko co nhieu)
+# Mot lan chi lan duoc max 20 posts/product
 
+# posts(first:20 after:$cursor filter:$filter order:$order)
+# Cai nay lay thoai mai, nhung chi gioi han 20 de lam cho ki, contributors(limit:200) => consider lite hay full, vi du lieu nhieu
 # filter: ALL, FEATURED, POSTED, SCHEDULED
 # order: DATE, VOTES
 
@@ -34,7 +36,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
                 product(slug:$slug)
                     {
                         id name slug
-                        posts(first:10 after:$cursor filter:$filter order:$order)
+                        posts(first:20 after:$cursor filter:$filter order:$order)
                         {
                             edges {
                                 node {

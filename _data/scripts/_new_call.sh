@@ -2,16 +2,21 @@
 # scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@146.190.93.2:/root/
 # scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.145.254:/root/
 
-ssh root@146.190.93.2 'ls -1 /root/run/tmp/ | wc -l'
-ssh root@157.245.145.254 'ls -1 /root/run/tmp/ | wc -l'
+# ssh root@146.190.93.2 'ls -1 /root/run/tmp/ | wc -l'
+# ssh root@157.245.145.254 'ls -1 /root/run/tmp/ | wc -l'
 
-# ssh root@146.190.93.2    "cd /root/run/ && mkdir done_04a && find tmp/ -name '*.json' -exec mv -t done_04a/ {} + && zip -r done_04a.zip done_04a/"
-# scp root@146.190.93.2:/root/run/done_04a.zip /Users/quang/Downloads/users
+# ssh root@146.190.93.2 "cd /root/run/ && mkdir topic_followers_02_a && find tmp/ -name '*.json' -exec mv -t topic_followers_02_a/ {} + && zip -r topic_followers_02_a.zip topic_followers_02_a/"
+# scp root@146.190.93.2:/root/run/topic_followers_02_a.zip /Users/quang/Downloads/users
 
-# ssh root@157.245.145.254 "cd /root/run/ && mkdir done_04b && find tmp/ -name '*.json' -exec mv -t done_04b/ {} + && zip -r done_04b.zip done_04b/"
-# scp root@157.245.145.254:/root/run/done_04b.zip /Users/quang/Downloads/users
+ssh root@157.245.145.254 "cd /root/run/ && mkdir done_06b && find tmp/ -name '*.json' -exec mv -t done_06b/ {} + && zip -r done_06b.zip done_06b/"
+scp root@157.245.145.254:/root/run/done_06b.zip /Users/quang/Downloads/users
+scp root@157.245.145.254:/root/followers/tmp.zip /Users/quang/Downloads/users
 
+# scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@146.190.93.2:/root/a.zip
+# ssh root@146.190.93.2 'cd /root/ && rm -rf run* && unzip a.zip && cd run/ && ./run.sh > pf14000.out &'
 
+# scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.145.254:/root/a.zip
+# ssh root@157.245.145.254 'cd /root/ && rm -rf run* && unzip a.zip'
 
 # Lay thong tin cua topic
 # Trong do co thong tin cua subscribers

@@ -1,11 +1,8 @@
 # Lay toan posts theo product
 # ./GetPostsByProduct.sh so-thu-tu product-name cursor
 # ./GetPostsByProduct.sh 1 itch-io NjA(or blank)
-# Mot lan chi lan duoc max 10 posts / product (cai nay lay thoai mai, nhung chi gioi han 10 de lam cho ki, vi data nay ko co nhieu)
-
-# filter: ALL, FEATURED, POSTED, SCHEDULED
-
-
+# Mot lan chi lan duoc max 10 products
+# products(first:20 after:$cursor order:$order)
 # order: most_recent, most_followed, best_rated
 
 mkdir -p tmp/

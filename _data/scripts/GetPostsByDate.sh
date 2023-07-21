@@ -1,8 +1,10 @@
 # Lay toan posts theo product
 # ./GetPostsByDate.sh year month day cursor
 # ./GetPostsByDate.sh 2016 6 6 NjA(or blank)
-# Mot lan chi lan duoc max 10 posts / product (cai nay lay thoai mai, nhung chi gioi han 10 de lam cho ki, vi data nay ko co nhieu)
+# Mot lan chi lan duoc max 20 posts/lan
+# Cai nay lay thoai mai, nhung chi gioi han 20 de lam cho ki, contributors(limit:200) => consider lite hay full, vi du lieu nhieu
 
+# posts(first:20 year:$year month:$month day:$day order:$order after:$cursor)
 # order: DAILY_RANK, MONTHLY_RANK, VOTES
 
 mkdir -p tmp/
