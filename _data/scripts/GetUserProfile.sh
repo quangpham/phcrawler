@@ -34,6 +34,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     {
       profile:user(username:$username)
       {
+
         id username
         name headline websiteUrl twitterUsername about createdAt
         isMaker isTrashed

@@ -42,43 +42,14 @@ curl 'https://www.producthunt.com/frontend/graphql' \
           {
             node
             {
-
-              id username
-              name headline websiteUrl twitterUsername about createdAt
+              id username twitterUsername
+              followersCount followingsCount badgesCount
+              productsCount collectionsCount votesCount
+              submittedPostsCount stacksCount
               isMaker isTrashed
-              followersCount followingsCount badgesCount productsCount collectionsCount votesCount submittedPostsCount stacksCount
-
+              createdAt
               karmaBadge {score}
               visitStreak { duration }
-              work {id jobTitle companyName product{id} }
-              followedTopics { edges {node { id } } }
-              stacks { edges {node { id product { id slug } } } }
-              submittedPosts { edges { node{id} } }
-
-              collections
-              {
-                edges
-                {
-                  node
-                  {
-                    id name slug title description path productsCount createdAt
-                    products { edges { node {id} } }
-                  }
-                }
-              }
-
-              links { id name url kind }
-              badgeGroups{ awardKind badgesCount }
-
-              activityEvents(first:1)
-              {
-                edges { node { id occurredAt } }
-                totalCount
-              }
-
-              followers { edges { node { id  } } }
-              following { edges { node { id  } } }
-
             }
           }
           totalCount pageInfo{endCursor hasNextPage}
