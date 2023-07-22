@@ -7,9 +7,8 @@ def init_tmp
   system "touch tmp/run/run.sh && chmod u+x tmp/run/run.sh"
 end
 
-cursors = File.read("_data/cursors.txt").split(",")
 
-def slipt_commands_to_files commands, number_split_files = 15, cursors
+def slipt_commands_to_files commands, number_split_files = 15
   init_tmp()
   content_arr = []
   number_split_files.times {content_arr.push([])}

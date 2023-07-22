@@ -1,13 +1,13 @@
 # Lay toan subs theo topic
 
-# ./GetFollowersByTopic.sh so-thu-tu $topic-name $order $cursor
-# ./GetFollowersByTopic.sh 1 task-management NjA(or blank)
+# ./GetFollowersByTopic.sh $topic-name $cursor
+# ./GetFollowersByTopic.sh task-management NjA(or blank)
 # Lay max duoc 100 subs
 # subscribers(first:100 after:$cursor)
 # Lay lite info
 
 
-mkdir tmp/
+mkdir -p tmp/followers-by-topic/
 
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
@@ -36,7 +36,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
       {
         id parent{id}
         products{totalCount}
-        subscribers(first:100 after:$cursor)
+        subscribers(first:20 after:$cursor)
         {
           edges
           {
@@ -87,6 +87,6 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     }
 
   "}' \
---compressed> "tmp/_r.subs-by-topic.$1.$2.ongoing"
+--compressed> "tmp/followers-by-topic/$1.$2.ongoing"
 
-mv "tmp/_r.subs-by-topic.$1.$2.ongoing" "tmp/_r.subs-by-topic.$1.$2.json"
+mv "tmp/followers-by-topic/$1.$2.ongoing" "tmp/followers-by-topic/$1.$2.json"

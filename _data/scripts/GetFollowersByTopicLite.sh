@@ -1,13 +1,14 @@
 # Lay toan subs theo topic
 
-# ./GetFollowersByTopic.sh so-thu-tu $topic-name $order $cursor
-# ./GetFollowersByTopic.sh 1 task-management NjA(or blank)
+# ./GetFollowersByTopicLite.sh $stt $topic-name $limit $cursor
+# ./GetFollowersByTopicLite.sh 0 task-management 100 NjA(or blank)
+# limit 20,40,60,80,100
 # Lay max duoc 100 subs
 # subscribers(first:100 after:$cursor)
 # Lay lite info
 
 
-mkdir tmp/
+mkdir -p tmp/followers-by-topic/
 
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
@@ -29,27 +30,38 @@ curl 'https://www.producthunt.com/frontend/graphql' \
   --data-raw $'
   {
     "operationName":"TopicPage",
-    "variables":{"slug":"'$1'","cursor":"'$2'"},
+    "variables":{"slug":"'$2'","cursor":"'$4'"},
     "query":"query TopicPage($slug:String\u0021$cursor:String)
     {
       topic(slug:$slug)
       {
         id parent{id}
         products{totalCount}
-        subscribers(first:100 after:$cursor)
+        subscribers(first:'$3' after:$cursor)
         {
           edges
           {
             node
             {
-              id username twitterUsername
+              id username
+              name twitterUsername createdAt
+              isMaker isTrashed
               followersCount followingsCount badgesCount
               productsCount collectionsCount votesCount
               submittedPostsCount stacksCount
-              isMaker isTrashed
-              createdAt
+
               karmaBadge {score}
               visitStreak { duration }
+              work {id jobTitle companyName product{id} }
+              followedTopics { edges {node { id } } }
+              submittedPosts { edges { node{id} } }
+
+              activityEvents(first:1)
+              {
+                edges { node { id occurredAt } }
+                totalCount
+              }
+
             }
           }
           totalCount pageInfo{endCursor hasNextPage}
@@ -58,6 +70,6 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     }
 
   "}' \
---compressed> "tmp/_r.subs-by-topic.$1.$2.ongoing"
+--compressed> "tmp/followers-by-topic/$1.$2.$3.$4.ongoing"
 
-mv "tmp/_r.subs-by-topic.$1.$2.ongoing" "tmp/_r.subs-by-topic.$1.$2.json"
+mv "tmp/followers-by-topic/$1.$2.$3.$4.ongoing" "tmp/followers-by-topic/$1.$2.$3.$4.json"

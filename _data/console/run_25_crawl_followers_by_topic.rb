@@ -2,13 +2,19 @@
 #
 #
 
+max_num = 100
+cursors = Cursor.where("id%#{max_num}=0").order(:id)
+
 where_str = "parent_id is null and followers_count is not null"
+where_str = "followers_count < 120000"
+
 commands = []
 Topic.where(where_str).order("followers_count").each do |t|
-  commands.push "./GetFollowersByTopicR.sh 0 #{t.slug} 100"
+  cursors[..(t.followers_count/max_num+1)].each_with_index do |cursor, i|
+    commands.push "./GetFollowersByTopicLite.sh #{cursor.id} #{t.slug} #{cursor.code}"
+  end
 end
-slipt_commands_to_files(commands, 10, cursors)
-
+slipt_commands_to_files(commands, 30)
 
 
 
@@ -43,11 +49,11 @@ end
 
 import_followers "/Users/quang/Downloads/followers"
 
-fns = Dir["/Users/quang/Downloads/followers/**/*.json"]
+fns = Dir["/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp/**/*.json"]
 fns.each do |fn|
   arr = fn.split("/").last.split(".")
   id = arr[1].to_i
   code = arr[4]
-  Cursor.create(id: id, code: code)
+  Cursor.find_or_create_by(page: id, code: code)
 end
 

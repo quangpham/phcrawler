@@ -5,18 +5,21 @@
 # ./GetFollowersByTopicR.sh stt $topic-name $limit $order $cursor (file GetFollowersByTopic.sh goc, crawl hang loat)
 
 # Lay theo params trong file cau hinh
+# Default config file
 # _config.txt
-# stt="118120"
+# stt="311100"
 # slug="productivity"
-# limit="20"
-# cursor="MTE4MTIw"
+# limit="100"
+# cursor="MzExMTAw"
+# last_cursor="__"
+
 
 
 # Lay max duoc 100 subs
 # Lay user info -> can nhac xem lay lite hay full
 
 
-# for i in {1..5}; do ./GetFollowersByTopicR.sh; done
+# for i in {1..5000}; do ./GetFollowersByTopicR.sh; done
 
 if [ -s _config.txt ];then
   # Co file  _config.txt, va file ko bi empty
@@ -83,15 +86,32 @@ if [ -s _config.txt ];then
   if [ -s "tmp/followers.$stt.$slug.$limit.$cursor.json" ];then
     # Co file, va not empty
     rm _config.txt
-    hasNextPage=$(jq '.data.topic.subscribers.pageInfo.hasNextPage' tmp/followers.$stt.$slug.$limit.$cursor.json)
-    if [ "$hasNextPage" = "true" ]; then
-        endCursor=$(jq --raw-output '.data.topic.subscribers.pageInfo.endCursor' tmp/followers.$stt.$slug.$limit.$cursor.json)
-        n=$(($stt+$limit))
-        echo "stt=\"$n\""  >> _config.txt
-        echo "slug=\"$slug\""  >> _config.txt
-        echo "limit=\"$limit\""  >> _config.txt
-        echo "cursor=\"$endCursor\""  >> _config.txt
+
+    if [ "$cursor" != "$last_cursor" ]; then
+      hasNextPage=$(jq '.data.topic.subscribers.pageInfo.hasNextPage' tmp/followers.$stt.$slug.$limit.$cursor.json)
+
+      if [ "$hasNextPage" = "true" ]; then
+          endCursor=$(jq --raw-output '.data.topic.subscribers.pageInfo.endCursor' tmp/followers.$stt.$slug.$limit.$cursor.json)
+          n=$(($stt+$limit))
+          echo "stt=\"$n\""  >> _config.txt
+          echo "slug=\"$slug\""  >> _config.txt
+          echo "limit=\"$limit\""  >> _config.txt
+          echo "cursor=\"$endCursor\""  >> _config.txt
+          echo "last_cursor=\"$last_cursor\""  >> _config.txt
+          # echo $endCursor
+          # echo $last_cursor
+          # if [ "$endCursor" != "$last_cursor" ]; then
+          #   n=$(($stt+$limit))
+          #   echo "stt=\"$n\""  >> _config.txt
+          #   echo "slug=\"$slug\""  >> _config.txt
+          #   echo "limit=\"$limit\""  >> _config.txt
+          #   echo "cursor=\"$endCursor\""  >> _config.txt
+          #   echo "last_cursor=\"$last_cursor\""  >> _config.txt
+          # fi
+      fi
     fi
+
+
   fi
 
 fi
