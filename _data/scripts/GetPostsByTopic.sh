@@ -5,7 +5,10 @@
 # posts(first:20 after:$cursor order:$order)
 # order: trending, by_date, most_commented, most_upvoted
 
-mkdir -p tmp/
+mkdir -p tmp/posts-by-topic/
+
+# source _config.sh
+# echo $user
 
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
@@ -45,10 +48,16 @@ curl 'https://www.producthunt.com/frontend/graphql' \
                       contributors(limit:200) {
                         role
                         user {
-                          id name username headline twitterUsername
-                          websiteUrl followersCount followingsCount
-                          isMaker isTrashed badgesCount
-                          karmaBadge{score} createdAt
+
+                          id username
+                          name headline websiteUrl twitterUsername about createdAt
+                          isMaker isTrashed
+                          followersCount followingsCount badgesCount
+                          productsCount collectionsCount votesCount
+                          submittedPostsCount stacksCount
+
+                          karmaBadge {score}
+
                         }
                       }
                     }
@@ -59,9 +68,9 @@ curl 'https://www.producthunt.com/frontend/graphql' \
           }
           "
       }' \
-  --compressed> "tmp/_r.posts-by-topic.$1.$2.$3.ongoing"
+  --compressed> "tmp/posts-by-topic/$1.$2.$3.ongoing"
 
-  mv "tmp/_r.posts-by-topic.$1.$2.$3.ongoing" "tmp/_r.posts-by-topic.$1.$2.$3.json"
+  mv "tmp/posts-by-topic/$1.$2.$3.ongoing" "tmp/posts-by-topic/$1.$2.$3.json"
 
 # posts(first:1 after:$cursor order:$order)
 # RAW 16/07/2023

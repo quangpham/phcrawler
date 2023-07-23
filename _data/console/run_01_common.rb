@@ -2,7 +2,7 @@
 # Init tmp
 
 def init_tmp
-  system "mkdir -p tmp/run/ && rm -R tmp/run/ && mkdir -p tmp/run/"
+  system "mkdir -p tmp/run/ && rm -R tmp/run* && mkdir -p tmp/run/"
   system "cp _data/scripts/*.sh tmp/run/"
   system "touch tmp/run/run.sh && chmod u+x tmp/run/run.sh"
 end
@@ -26,6 +26,13 @@ def slipt_commands_to_files commands, number_split_files = 15
 
   system "cd tmp/ && zip -r run.zip run/"
 end
+
+def helper_get_node_by_path n, path
+  path_arr = path.kind_of?(Array) ? path : path.gsub(" ","").split(",")
+  return nil if path_arr.empty?
+  return (path_arr.count == 1 ? n[path_arr.first] : helper_get_node_by_path(n[path_arr.first], path_arr.drop(1)))
+end
+
 
 def helper_get_user_collection_by_node_data n
   c = UserCollection.find_or_initialize_by(id: n["id"].to_i)

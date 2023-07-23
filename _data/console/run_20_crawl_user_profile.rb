@@ -4,12 +4,13 @@ commands = []
 # where_str =  "(version!=2 or version is null) and (followers > 50 or badges > 1 or score > 1 or is_maker=true)"
 where_str = "followers > 50 or badges > 1 or score > 1 or is_maker=true or version=2 or version=3 or version=4"
 where_str = "(followers > 3 or badges > 1 or score > 1 or is_maker=true) and (version!=5 or version is null) and (is_trashed is null or is_trashed=false)"
+where_str = "is_trashed is null"
 User.where(where_str).select(:id, :username, :is_trashed).each do |u|
   if u.is_trashed == false || u.is_trashed.nil?
     commands.push "./GetUserProfile.sh #{u.username}"
   end
 end
-slipt_commands_to_files(commands, 30, cursors)
+slipt_commands_to_files(commands, 30)
 
 
 

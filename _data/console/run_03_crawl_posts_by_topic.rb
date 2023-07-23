@@ -9,23 +9,36 @@
 
 
 # Tao it files
+# commands = []
+
+# max_posts = 400
+# Topic.where("parent_id is null").each do |t|
+#   cursors[..(max_posts/20+2)].each_with_index do |cursor, i|
+#     commands.push "./GetPostsByTopic.sh #{1000+i} #{t.slug} #{cursor}"
+#   end
+# end
+
+# max_posts = 100
+# Topic.where("parent_id is not null").each do |t|
+#   cursors[..(max_posts/20+2)].each_with_index do |cursor, i|
+#     commands.push "./GetPostsByTopic.sh #{1000+i} #{t.slug} #{cursor}"
+#   end
+# end
+
+# slipt_commands_to_files(commands, 15, cursors)
+
+
+
+max_num = 20
+cursors = Cursor.where("page%#{max_num}=0").order(:page)
+
 commands = []
-
-max_posts = 400
-Topic.where("parent_id is null").each do |t|
-  cursors[..(max_posts/20+2)].each_with_index do |cursor, i|
-    commands.push "./GetPostsByTopic.sh #{1000+i} #{t.slug} #{cursor}"
+Topic.order(:posts_count).each do |t|
+  cursors[..(t.posts_count/max_num+1)].each_with_index do |cursor, i|
+    commands.push "./GetPostsByTopic.sh #{cursor.page} #{t.slug} #{cursor.code}"
   end
 end
-
-max_posts = 100
-Topic.where("parent_id is not null").each do |t|
-  cursors[..(max_posts/20+2)].each_with_index do |cursor, i|
-    commands.push "./GetPostsByTopic.sh #{1000+i} #{t.slug} #{cursor}"
-  end
-end
-
-slipt_commands_to_files(commands, 15, cursors)
+slipt_commands_to_files(commands, 30)
 
 
 # Buoc 4
@@ -38,14 +51,14 @@ def post_version obj
   if obj.id.nil?
     version = "new-by-topic"
   else
-    version = "topic-01|#{obj.version}"
+    version = "topic-02|#{obj.version}"
   end
   return version.gsub(" ","").split("|").uniq.join("|")
 end
 
 
 def import_posts json_path="tmp/run/tmp/"
-  Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
+  Dir["#{json_path}/**/*.json".gsub("//","/")].sort.each do |fn|
     begin
       data = JSON.parse(File.read(fn))
 
@@ -64,3 +77,6 @@ def import_posts json_path="tmp/run/tmp/"
     end
   end
 end
+
+
+import_posts "/Users/quang/Downloads/ok/posts-by-topic"

@@ -7,7 +7,7 @@
 # collections duoc max 100
 # submittedPosts duoc max 20
 
-mkdir -p tmp/
+mkdir -p tmp/user-profiles/
 
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
@@ -49,12 +49,9 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         stacks { edges {node { id product { id slug } } } }
         submittedPosts { edges { node{id} } }
 
-        collections
-        {
-          edges
-          {
-            node
-            {
+        collections {
+          edges {
+            node {
               id name slug title description path productsCount createdAt
               products { edges { node {id} } }
             }
@@ -64,8 +61,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         links { id name url kind }
         badgeGroups{ awardKind badgesCount }
 
-        activityEvents(first:1)
-        {
+        activityEvents(first:1) {
           edges { node { id occurredAt } }
           totalCount
         }
@@ -73,14 +69,13 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         followers { edges { node { id  } } }
         following { edges { node { id  } } }
 
-
       }
     }
 
   "}' \
-  --compressed > "tmp/_r.profile.$1.ongoing"
+  --compressed > "tmp/user-profiles/$1.ongoing"
 
-mv "tmp/_r.profile.$1.ongoing" "tmp/_r.profile.$1.json"
+mv "tmp/user-profiles/$1.ongoing" "tmp/user-profiles/$1.json"
 
 
 
