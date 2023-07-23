@@ -27,12 +27,37 @@ def slipt_commands_to_files commands, number_split_files = 15
   system "cd tmp/ && zip -r run.zip run/"
 end
 
-def helper_get_node_by_path n, path
-  path_arr = path.kind_of?(Array) ? path : path.gsub(" ","").split(",")
+def helper_get_node_by_path n, path, obj_type = nil
+  path_arr = path.kind_of?(Array) ? path : "#{path.to_s}".gsub(" ","").split(",")
   return nil if path_arr.empty?
-  return (path_arr.count == 1 ? n[path_arr.first] : helper_get_node_by_path(n[path_arr.first], path_arr.drop(1)))
+
+  if path_arr.count == 1
+    v = n[path_arr.first]
+    if obj_type.blank?
+      return v
+    elsif obj_type == "int"
+      return v.to_i == 0 ? nil : v.to_i
+    elsif obj_type == "string"
+      return v == "" ? nil : v
+    elsif obj_type == "bool"
+      return v == false ? nil : v
+    elsif obj_type == "array"
+      return v.empty? ? nil : v
+    end
+  else
+    if n[path_arr.first]
+      return helper_get_node_by_path(n[path_arr.first], path_arr.drop(1), obj_type)
+    else
+      return nil
+    end
+  end
+
 end
 
+# fn = "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp/user-profiles/byosko.json"
+# data = JSON.parse(File.read(fn))
+# helper_get_node_by_path(data, "data,profile,b", "array")
+# helper_get_node_by_path(data, "data,profile,id", "int")
 
 def helper_get_user_collection_by_node_data n
   c = UserCollection.find_or_initialize_by(id: n["id"].to_i)
@@ -43,10 +68,8 @@ def helper_get_user_collection_by_node_data n
   c.products_count = n["productsCount"].to_i
   c.org_created_at = n["createdAt"]
 
-  if n["products"]
-    if n["products"]["edges"]
-      c.product_ids = n["products"]["edges"].collect { |e| e["node"]["id"].to_i }
-    end
+  if edges = helper_get_node_by_path(n, "products,edges", "array")
+    c.product_ids = edges.collect { |e| e["node"]["id"].to_i }
   end
 
   return c
@@ -66,74 +89,42 @@ def helper_get_user_by_node_data u
   user = User.find_or_initialize_by(id: user_id)
   user.username = u["username"] if !u["username"].nil? && !u["isTrashed"]
 
-  string_map = [
-    ["name","name"],
-    ["headline","headline"],
-    ["website","websiteUrl"],
-    ["twitter","twitterUsername"],
-    ["about","about"],
-    ["org_created_at","createdAt"],
-    ["job_title","work","jobTitle"],
-    ["company_name","work","companyName"]
+  obj_map = [
+    {key: "name", path: "name", obj_type: "string"},
+    {key: "headline", path: "headline", obj_type: "string"},
+    {key: "website", path: "websiteUrl", obj_type: "string"},
+    {key: "twitter", path: "twitterUsername", obj_type: "string"},
+    {key: "about", path: "about", obj_type: "string"},
+    {key: "org_created_at", path: "createdAt", obj_type: nil},
+    {key: "job_title", path: "work,jobTitle", obj_type: "string"},
+    {key: "company_name", path: "work,companyName", obj_type: "string"},
+    {key: "work_product_id", path: "work,product,id", obj_type: "int"},
+    {key: "is_maker", path: "isMaker", obj_type: "bool"},
+    {key: "is_trashed", path: "isTrashed", obj_type: "bool"},
+    {key: "followers", path: "followersCount", obj_type: "int", get_max: true},
+    {key: "following", path: "followingsCount", obj_type: "int", get_max: true},
+    {key: "badges", path: "badgesCount", obj_type: "int", get_max: true},
+    {key: "products_count", path: "productsCount", obj_type: "int", get_max: true},
+    {key: "collections_count", path: "collectionsCount", obj_type: "int", get_max: true},
+    {key: "votes_count", path: "votesCount", obj_type: "int", get_max: true},
+    {key: "submitted_posts_count", path: "submittedPostsCount", obj_type: "int", get_max: true},
+    {key: "stacks_count", path: "stacksCount", obj_type: "int", get_max: true},
+    {key: "score", path: "karmaBadge,score", obj_type: "int", get_max: true},
+    {key: "activities_count", path: "activityEvents,totalCount", obj_type: "int", get_max: true},
+    {key: "max_streak", path: "visitStreak,duration", obj_type: "int", get_max: true}
   ]
-  string_map.each do |m|
-    if m.count == 2
-      user[m[0]] = u[m[1]] if !u[m[1]].nil?
-    elsif m.count == 3
-      if u[m[1]]
-        if u[m[1]][m[2]]
-          user[m[0]] = u[m[1]][m[2]]
-        end
+
+  obj_map.each do |m|
+    if v = helper_get_node_by_path(u, m[:path], m[:obj_type])
+      if m[:get_max] == true
+        user[ m[:key] ] = user[ m[:key] ].nil? ? v : [ user[ m[:key] ], v ].max
+      else
+        user[ m[:key] ] = v
       end
     end
-    user[m[0]] = nil if user[m[0]] == ""
   end
 
-  bool_map = [
-    ["is_maker","isMaker"],
-    ["is_trashed","isTrashed"]
-  ]
-
-  bool_map.each do |m|
-    user[m[0]] = u[m[1]] if !u[m[1]].nil?
-    user[m[0]] = nil if user[m[0]] == false
-  end
-
-  int_map = [
-    ["followers","followersCount"],
-    ["following","followingsCount"],
-    ["badges","badgesCount"],
-    ["products_count","productsCount"],
-    ["collections_count","collectionsCount"],
-    ["votes_count","votesCount"],
-    ["submitted_posts_count","submittedPostsCount"],
-    ["stacks_count","stacksCount"],
-    ["score","karmaBadge","score"],
-    ["work_product_id","work","product","id"],
-    ["activities_count","activityEvents","totalCount"]
-  ]
-
-  int_map.each do |m|
-    if m.count == 2
-      user[m[0]] = u[m[1]].to_i if !u[m[1]].nil?
-    elsif m.count == 3
-      if u[m[1]]
-        if u[m[1]][m[2]]
-          user[m[0]] = u[m[1]][m[2]].to_i
-        end
-      end
-    elsif m.count == 4
-      if u[m[1]]
-        if u[m[1]][m[2]]
-          if u[m[1]][m[2]][m[3]]
-            user[m[0]] = u[m[1]][m[2]][m[3]].to_i
-          end
-        end
-      end
-    end
-    user[m[0]] = nil if user[m[0]] == 0
-  end
-
+  # INIT
   arr_map = [
     ["followed_topic_ids", "followed_topics_count"],
     ["follower_ids"],
@@ -147,53 +138,32 @@ def helper_get_user_by_node_data u
     user[m[0]] = [] if user[m[0]].nil?
   end
 
-  if u["visitStreak"]
-    if u["visitStreak"]["duration"]
-      user.max_streak = [user.max_streak.to_i, u["visitStreak"]["duration"].to_i].max
-      user.max_streak = nil if user.max_streak == 0
-    end
+  if edges = helper_get_node_by_path(u, "followedTopics,edges", "array")
+    user.followed_topic_ids += edges.collect { |e| e["node"]["id"].to_i }
   end
 
-  if u["followedTopics"]
-    if u["followedTopics"]["edges"]
-      user.followed_topic_ids += u["followedTopics"]["edges"].collect { |e| e["node"]["id"].to_i }
-    end
+  if edges = helper_get_node_by_path(u, "followers,edges", "array")
+    user.follower_ids += edges.collect { |e| e["node"]["id"].to_i }
   end
 
-  if u["followers"]
-    if u["followers"]["edges"]
-      user.follower_ids += u["followers"]["edges"].collect { |e| e["node"]["id"].to_i }
-    end
+  if edges = helper_get_node_by_path(u, "following,edges", "array")
+    user.following_ids += edges.collect { |e| e["node"]["id"].to_i }
   end
 
-  if u["following"]
-    if u["following"]["edges"]
-      user.following_ids += u["following"]["edges"].collect { |e| e["node"]["id"].to_i }
-    end
+  if edges = helper_get_node_by_path(u, "submittedPosts,edges", "array")
+    user.submitted_post_ids += edges.collect { |e| e["node"]["id"].to_i }
   end
 
-  if u["stacks"]
-    if u["stacks"]["edges"]
-      user.stack_product_ids += u["stacks"]["edges"].collect { |e| e["node"]["product"]["id"].to_i }
-    end
+  if edges = helper_get_node_by_path(u, "stacks,edges", "array")
+    user.stack_product_ids += edges.collect { |e| e["node"]["product"]["id"].to_i }
   end
 
-  # submittedPosts
-  if u["submittedPosts"]
-    if u["submittedPosts"]["edges"]
-      user.submitted_post_ids += u["submittedPosts"]["edges"].collect { |e| e["node"]["id"].to_i }
-    end
-  end
-
-  # collections
-  if u["collections"]
-    if u["collections"]["edges"]
-      u["collections"]["edges"].each do |ce|
-        c = helper_get_user_collection_by_node_data(ce["node"])
-        c.user_id = user_id
-        c.save
-        user.collection_ids.push(c.id)
-      end
+  if edges = helper_get_node_by_path(u, "collections,edges", "array")
+    edges.each do |ce|
+      c = helper_get_user_collection_by_node_data(ce["node"])
+      c.user_id = user_id
+      c.save
+      user.collection_ids.push(c.id)
     end
   end
 
@@ -212,15 +182,11 @@ def helper_get_user_by_node_data u
     end
   end
 
-  if u["activityEvents"]
-    if u["activityEvents"]["edges"]
-      if u["activityEvents"]["edges"].count > 0
-        if user.last_active_at.nil?
-          user.last_active_at = u["activityEvents"]["edges"][0]["node"]["occurredAt"]
-        else
-          user.last_active_at = [user.last_active_at, u["activityEvents"]["edges"][0]["node"]["occurredAt"]].max
-        end
-      end
+  if edges = helper_get_node_by_path(u, "activityEvents,edges", "array")
+    if user.last_active_at.nil?
+      user.last_active_at = edges[0]["node"]["occurredAt"]
+    else
+      user.last_active_at = [user.last_active_at, edges[0]["node"]["occurredAt"]].max
     end
   end
 
@@ -240,6 +206,10 @@ def helper_get_user_by_node_data u
 
   return user
 end
+
+# fn = "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp/user-profiles/byosko.json"
+# data = JSON.parse(File.read(fn))
+# user = helper_get_user_by_node_data(data["data"]["profile"])
 
 def helper_get_post_by_node_data n
   post = Post.find_or_initialize_by(id: n["id"].to_i)

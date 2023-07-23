@@ -15,22 +15,27 @@ slipt_commands_to_files(commands, 30)
 
 
 
+# def user_version obj
+#   version = ""
+#   if obj.id.nil?
+#     version = "new-by-voters"
+#   else
+#     version = "voters-04|#{obj.version}"
+#   end
+#   return version.gsub(" ","").split("|").uniq.join("|")
+# end
+
 def import_profiles json_path="tmp/run/tmp/"
-  Dir["#{json_path}/**/_r.*.json".gsub("//","/")].shuffle.each do |fn|
+  Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
     begin
       data = JSON.parse(File.read(fn))
       if data["data"]
         if data["data"]["profile"]
           user = helper_get_user_by_node_data(data["data"]["profile"])
-          user.version = 5
+          user.versions = user.versions.nil? ? [0] : ([0] + user.versions).user.versions
           user.save
-        else
-          username = fn.split("/").last.gsub("_r.profile.","").gsub(".json","")
-          if user = User.find_by(username: username)
-            user.update(is_trashed: true)
-          end
+          system "rm #{fn}"
         end
-        system "rm #{fn}"
       end
     rescue
     end
@@ -38,10 +43,8 @@ def import_profiles json_path="tmp/run/tmp/"
 end
 
 
-import_profiles "/Users/quang/Downloads/users"
+import_profiles "/Users/quang/Downloads/ok/user-profiles"
 
-import_profiles "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp"
-import_profiles "/Users/quang/Projects/upbase/phcrawler/tmp/run/tmp"
-import_profiles "/Users/quang/Downloads/done_3"
+
 
 
