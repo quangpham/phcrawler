@@ -7,7 +7,7 @@
 # posts(first:20 year:$year month:$month day:$day order:$order after:$cursor)
 # order: DAILY_RANK, MONTHLY_RANK, VOTES
 
-mkdir -p tmp/
+mkdir -p tmp/posts-by-date/
 
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
@@ -58,6 +58,6 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     }
 
     "}' \
-  --compressed > "tmp/_r.posts-by-date.$1.$2.$3.$4.ongoing"
+  --compressed > "tmp/posts-by-date/$1.$2.$3.$4.ongoing"
 
-mv "tmp/_r.posts-by-date.$1.$2.$3.$4.ongoing" "tmp/_r.posts-by-date.$1.$2.$3.$4.json"
+mv "tmp/posts-by-date/$1.$2.$3.$4.ongoing" "tmp/posts-by-date/$1.$2.$3.$4.json"

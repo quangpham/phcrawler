@@ -7,11 +7,11 @@ scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.145.254:/roo
 ssh root@146.190.93.2 'ls -1 run/tmp/user-profiles/ | wc -l'
 ssh root@157.245.145.254 'ls -1 run/tmp/user-profiles/ | wc -l'
 
-ssh root@146.190.93.2 "cd /root/run/ && mkdir done_04_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_04_a/ {} + && zip -r done_04_a.zip done_04_a/"
-scp root@146.190.93.2:/root/run/done_04_a.zip /Users/quang/Downloads/ok/user-profiles/
+ssh root@146.190.93.2 "cd /root/run/ && mkdir done_09_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_09_a/ {} + && zip -r done_09_a.zip done_09_a/"
+scp root@146.190.93.2:/root/run/done_09_a.zip /Users/quang/Downloads/ok/user-profiles/
 
-ssh root@157.245.145.254 "cd /root/run/ && mkdir done_04_b && find tmp/user-profiles/ -name '*.json' -exec mv -t done_04_b/ {} + && zip -r done_04_b.zip done_04_b/"
-scp root@157.245.145.254:/root/run/done_04_b.zip /Users/quang/Downloads/ok/user-profiles/
+ssh root@157.245.145.254 "cd /root/run/ && mkdir done_09_b && find tmp/user-profiles/ -name '*.json' -exec mv -t done_09_b/ {} + && zip -r done_09_b.zip done_09_b/"
+scp root@157.245.145.254:/root/run/done_09_b.zip /Users/quang/Downloads/ok/user-profiles/
 
 scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@146.190.93.2:/root/a.zip
 ssh root@146.190.93.2 'cd /root/ && rm -rf run* && unzip a.zip '

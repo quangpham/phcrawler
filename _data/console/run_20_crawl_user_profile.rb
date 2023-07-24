@@ -32,13 +32,21 @@ def import_profiles json_path="tmp/run/tmp/"
       if data["data"]
         if data["data"]["profile"]
           user = helper_get_user_by_node_data(data["data"]["profile"])
-          user.versions = user.versions.nil? ? [0] : ([0] + user.versions).user.versions
+          user.versions = user.versions.nil? ? [0] : ([0] + user.versions).uniq
           user.save
           system "rm #{fn}"
+        else
+          un = fn.split("/").last.split(".json").first
+          if user = User.find_by(username: un)
+            user.is_trashed = true
+            user.save
+            system "rm #{fn}"
+          end
         end
       end
     rescue
     end
+
   end
 end
 
