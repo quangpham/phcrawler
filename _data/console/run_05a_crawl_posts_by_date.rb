@@ -11,6 +11,9 @@
 # - Tinh toan de lam phien ban lite, contributor it hon
 
 ### Tinh toan posts_count cho tung ngay
+
+
+
 commands = []
 PostArchive.select(:id, :sys_created_at).order(:id).each do |a|
   commands.push "./GetPostsByDate.sh #{a.sys_created_at.year.to_i} #{a.sys_created_at.month.to_i} #{a.sys_created_at.day.to_i}"
@@ -35,13 +38,13 @@ def post_version obj
   if obj.id.nil?
     version = "new-by-archive"
   else
-    version = "archive-01|#{obj.version}"
+    version = "arc-02|#{obj.version}"
   end
   return version.gsub(" ","").split("|").uniq.join("|")
 end
 
 def import_posts json_path="tmp/run/tmp/"
-  Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
+  Dir["#{json_path}/*.json".gsub("//","/")].sort.each do |fn|
     begin
       data = JSON.parse(File.read(fn))
       posts_data = data["data"]["posts"]
@@ -66,5 +69,20 @@ def import_posts json_path="tmp/run/tmp/"
     end
   end
 end
+
+
+## CRAWL NHUNG NGAY VUA ROI
+(2..365).to_a.reverse.to_a.each do |i|
+  if PostArchive.find_by(sys_created_at: i.days.ago).nil?
+    a = PostArchive.create(sys_created_at: i.days.ago)
+    system "cd _data/scripts/ && ./GetPostsByDateR.sh #{a.sys_created_at.year.to_i} #{a.sys_created_at.month.to_i} #{a.sys_created_at.day.to_i}"
+  end
+end
+import_posts "_data/scripts/tmp/posts-by-date/"
+
+
+
+
+import_posts "_data/scripts/tmp/posts-by-date/"
 
 # import_posts "/Users/quang/Downloads/done_5"

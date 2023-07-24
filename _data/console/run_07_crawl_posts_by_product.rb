@@ -27,6 +27,15 @@ end
 slipt_commands_to_files(commands, 10, cursors)
 
 
+###
+commands = []
+Product.where("posts_count is null").each do |t|
+  commands.push "./GetPostsByProduct.sh #{t.slug}"
+end
+slipt_commands_to_files(commands, 10)
+
+
+
 # Buoc 8
 # Import posts
 # Update mot vai thuoc tinh cua posts
@@ -37,16 +46,19 @@ def post_version obj
   if obj.id.nil?
     version = "new-by-product"
   else
-    version = "product-05|#{obj.version}"
+    version = "product-06|#{obj.version}"
   end
   return version.gsub(" ","").split("|").uniq.join("|")
 end
 
 def import_posts json_path="tmp/run/tmp/"
-  Dir["#{json_path}/_r.*.json".gsub("//","/")].sort.each do |fn|
+  Dir["#{json_path}/**/*.json".gsub("//","/")].sort.each do |fn|
     begin
       data = JSON.parse(File.read(fn))
       product_id = data["data"]["product"]["id"].to_i
+
+      product = helper_get_product_by_node_data(data["data"]["product"])
+      product.save
 
       data["data"]["product"]["posts"]["edges"].each do |p|
         post = helper_get_post_by_node_data(p["node"])
@@ -65,3 +77,4 @@ def import_posts json_path="tmp/run/tmp/"
   end
 end
 
+import_posts "/Users/quang/Downloads/ok/posts-by-product"

@@ -1,3 +1,28 @@
+# Todo
+
+# Crawl posts theo ngay, co them post moi (va co luon product moi)
+# > van de la co nhung post ko lay duoc product id
+
+# Crawl Recent products -> thuc chat la crawl post moi (ma co theo thong tin product)
+# crawl lai tiep nhu product gan day nhat
+
+# Crawl product detail (cho nhung product moi)
+# => crawl voters
+# Crawl posts detail cho nhung post cach day 3 thang
+
+# Dinh ki
+# crawl lai toan bo post detail
+# crawl lai toan bo product detail
+# crawl lai toan bo user detail
+
+
+# Side
+# topic subcribers
+# category
+# product by category
+# users' followers/following
+
+
 
 
 scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@146.190.93.2:/root/
@@ -7,11 +32,11 @@ scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.145.254:/roo
 ssh root@146.190.93.2 'ls -1 run/tmp/user-profiles/ | wc -l'
 ssh root@157.245.145.254 'ls -1 run/tmp/user-profiles/ | wc -l'
 
-ssh root@146.190.93.2 "cd /root/run/ && mkdir done_09_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_09_a/ {} + && zip -r done_09_a.zip done_09_a/"
-scp root@146.190.93.2:/root/run/done_09_a.zip /Users/quang/Downloads/ok/user-profiles/
+ssh root@146.190.93.2 "cd /root/run/ && mkdir done_14_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_14_a/ {} + && zip -r done_14_a.zip done_14_a/"
+scp root@146.190.93.2:/root/run/done_14_a.zip /Users/quang/Downloads/ok/user-profiles/
 
-ssh root@157.245.145.254 "cd /root/run/ && mkdir done_09_b && find tmp/user-profiles/ -name '*.json' -exec mv -t done_09_b/ {} + && zip -r done_09_b.zip done_09_b/"
-scp root@157.245.145.254:/root/run/done_09_b.zip /Users/quang/Downloads/ok/user-profiles/
+ssh root@157.245.145.254 "cd /root/run/ && mkdir done_14_b && find tmp/user-profiles/ -name '*.json' -exec mv -t done_14_b/ {} + && zip -r done_14_b.zip done_14_b/"
+scp root@157.245.145.254:/root/run/done_14_b.zip /Users/quang/Downloads/ok/user-profiles/
 
 scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@146.190.93.2:/root/a.zip
 ssh root@146.190.93.2 'cd /root/ && rm -rf run* && unzip a.zip '

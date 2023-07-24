@@ -1,6 +1,7 @@
 # Lay toan posts theo product
-# ./GetPostsByProduct.sh so-thu-tu product-name cursor
-# ./GetPostsByProduct.sh 1 itch-io NjA(or blank)
+# ./GetPostsByProduct.sh product-name cursor
+# ./GetPostsByProduct.sh itch-io NjA(or blank)
+# ./GetPostsByProduct.sh smartsync
 # Mot lan chi lan duoc max 20 posts/product
 
 # posts(first:20 after:$cursor filter:$filter order:$order)
@@ -8,7 +9,7 @@
 # filter: ALL, FEATURED, POSTED, SCHEDULED
 # order: DATE, VOTES
 
-mkdir -p tmp/
+mkdir -p tmp/posts-by-product/
 
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
@@ -30,12 +31,31 @@ curl 'https://www.producthunt.com/frontend/graphql' \
   --data-raw $'
     {
         "operationName":"ProductPageLaunches",
-        "variables":{"slug":"'$2'","cursor":"'$3'","filter":"ALL","order":"DATE"},
-        "query":"query ProductPageLaunches($slug:String\u0021$cursor:String$filter:ProductsPostsFilter$order:ProductsPostsOrder)
+        "variables":{"slug":"'$1'","cursor":"'$2'","filter":"ALL","order":"DATE","reviewssorder":"LATEST"},
+        "query":"query ProductPageLaunches($slug:String\u0021$cursor:String$filter:ProductsPostsFilter$order:ProductsPostsOrder$reviewssorder:ReviewsOrder\u0021)
             {
                 product(slug:$slug)
                     {
-                        id name slug
+                        id slug name tagline logoUuid
+                        followersCount reviewsRating
+                        createdAt
+
+                        reviews(first:20 order:$reviewssorder){
+                            edges{
+                            node {
+                                id createdAt
+                                user {
+                                    id name username twitterUsername
+                                    websiteUrl followersCount followingsCount
+                                    badgesCount karmaBadge{score} isTrashed createdAt
+                                }
+                            }
+                            }
+                            totalCount
+                        }
+
+                        topics(first:100) { edges{node{id}} }
+
                         posts(first:20 after:$cursor filter:$filter order:$order)
                         {
                             edges {
@@ -61,9 +81,9 @@ curl 'https://www.producthunt.com/frontend/graphql' \
                     }
             }"
     }' \
-  --compressed> "tmp/_r.posts-by-product.$1.$2.$3.ongoing"
+  --compressed> "tmp/posts-by-product/$1.$2.ongoing"
 
-  mv "tmp/_r.posts-by-product.$1.$2.$3.ongoing" "tmp/_r.posts-by-product.$1.$2.$3.json"
+  mv "tmp/posts-by-product/$1.$2.ongoing" "tmp/posts-by-product/$1.$2.json"
 
 # fragment PostItem on Post{id commentsCount name shortenedUrl slug tagline updatedAt pricingType topics(first:1){edges{node{id name slug __typename}__typename}__typename}redirectToProduct{id slug __typename}...PostThumbnail ...PostVoteButton __typename}
 

@@ -1,7 +1,7 @@
 # Lay toan posts theo product
-# ./GetPostsByDate.sh year month day cursor
-# ./GetPostsByDate.sh 2016 6 6 NjA(or blank)
-# ./GetPostsByDate.sh 2023 7 22
+# ./GetPostsByDateR.sh year month day cursor
+# ./GetPostsByDateR.sh 2016 6 6 NjA(or blank)
+# ./GetPostsByDateR.sh 2023 7 22
 # Mot lan chi lan duoc max 20 posts/lan
 # Cai nay lay thoai mai, nhung chi gioi han 20 de lam cho ki, contributors(limit:200) => consider lite hay full, vi du lieu nhieu
 
@@ -62,3 +62,15 @@ curl 'https://www.producthunt.com/frontend/graphql' \
   --compressed > "tmp/posts-by-date/$1.$2.$3.$4.ongoing"
 
 mv "tmp/posts-by-date/$1.$2.$3.$4.ongoing" "tmp/posts-by-date/$1.$2.$3.$4.json"
+
+if [ -s "tmp/posts-by-date/$1.$2.$3.$4.json" ];then
+    echo "ALAL"
+    hasNextPage=$(jq '.data.posts.pageInfo.hasNextPage' tmp/posts-by-date/$1.$2.$3.$4.json)
+    echo $hasNextPage
+    if [ "$hasNextPage" = "true" ]; then
+        endCursor=$(jq --raw-output '.data.posts.pageInfo.endCursor' tmp/posts-by-date/$1.$2.$3.$4.json)
+        ./GetPostsByDateR.sh $1 $2 $3 $endCursor
+    fi
+fi
+
+
