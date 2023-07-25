@@ -244,3 +244,35 @@ data["data"]["post"]["contributors"].each {|n| str = str.push(n["role"]).uniq}
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+commands = []
+where_str = "is_trashed is null and versions is null"
+User.where(where_str).select(:id, :username, :is_trashed).each do |u|
+  if u.is_trashed == false || u.is_trashed.nil?
+    commands.push "./GetUserProfile.sh #{u.username}"
+  end
+end
+
+Product.all.select(:id, :slug).each do |t|
+  commands.push "./GetPostsByProduct.sh #{t.slug}"
+end
+
+Post.all.select(:id, :slug).each do |p|
+  commands.push "./GetVotersByPost.sh #{p.slug} 100000"
+end
+
+slipt_commands_to_files(commands, 30)

@@ -214,64 +214,101 @@ end
 def helper_get_post_by_node_data n
   post = Post.find_or_initialize_by(id: n["id"].to_i)
 
-  post.name = n["name"] if n["name"]
-  post.slug = n["slug"] if n["slug"]
-  post.tagline = n["tagline"] if n["tagline"]
-  post.pricing_type = n["pricingType"] if n["pricingType"]
-  post.comments_count = n["commentsCount"] if n["commentsCount"]
-  post.votes_count = n["votesCount"] if n["votesCount"]
-  post.org_created_at = n["createdAt"] if n["createdAt"]
-  post.org_featured_at = n["featuredAt"] if n["featuredAt"]
-  post.org_updated_at = n["updatedAt"] if n["updatedAt"]
+  # post.name = n["name"] if n["name"]
+  # post.slug = n["slug"] if n["slug"]
+  # post.tagline = n["tagline"] if n["tagline"]
+  # post.pricing_type = n["pricingType"] if n["pricingType"]
+  # post.comments_count = n["commentsCount"] if n["commentsCount"]
+  # post.votes_count = n["votesCount"] if n["votesCount"]
+  # post.org_created_at = n["createdAt"] if n["createdAt"]
+  # post.org_featured_at = n["featuredAt"] if n["featuredAt"]
+  # post.org_updated_at = n["updatedAt"] if n["updatedAt"]
 
-  if n["redirectToProduct"]
-    if n["redirectToProduct"]["id"]
-      post.product_id = n["redirectToProduct"]["id"].to_i
-    end
-  end
+  obj_map = [
+    {key: "name", path: "name", obj_type: "string"},
+    {key: "slug", path: "slug", obj_type: "string"},
+    {key: "tagline", path: "tagline", obj_type: "string"},
+    {key: "pricing_type", path: "pricingType", obj_type: "string"},
+    {key: "comments_count", path: "commentsCount", obj_type: "int", get_max: true},
+    {key: "votes_count", path: "votesCount", obj_type: "int", get_max: true},
+    {key: "org_created_at", path: "createdAt", obj_type: nil},
+    {key: "org_featured_at", path: "featuredAt", obj_type: nil},
+    {key: "org_updated_at", path: "updatedAt", obj_type: nil}
+  ]
 
-  if n["topics"]
-    if n["topics"]["edges"]
-      if n["topics"]["edges"].count > 0
-        post.topic_ids = [] if post.topic_ids.nil?
-        n["topics"]["edges"].each do |_n|
-          post.topic_ids.push(_n["node"]["id"].to_i)
-        end
-        post.topic_ids = post.topic_ids.uniq.compact.sort
-        post.topic_ids = nil if post.topic_ids.empty?
+  obj_map.each do |m|
+    if v = helper_get_node_by_path(n, m[:path], m[:obj_type])
+      if m[:get_max] == true
+        post[ m[:key] ] = post[ m[:key] ].nil? ? v : [ post[ m[:key] ], v ].max
+      else
+        post[ m[:key] ] = v
       end
     end
   end
 
-  post.hunter_ids = [] if post.hunter_ids.nil?
-  post.maker_ids = [] if post.maker_ids.nil?
-  post.commenter_ids = [] if post.commenter_ids.nil?
-  post.upvoter_ids = [] if post.upvoter_ids.nil?
+  arr_map = [
+    ["topic_ids"],
+    ["hunter_ids"],
+    ["maker_ids"],
+    ["commenter_ids"],
+    ["upvoter_ids"],
+  ]
 
-  if n["contributors"]
-    if n["contributors"].count > 0
-      n["contributors"].each do |_n|
-        u = _n["user"]
-        user_id = u["id"].to_i
-        post.hunter_ids.push(user_id) if !_n["role"].index("hunter").nil?
-        post.maker_ids.push(user_id) if !_n["role"].index("maker").nil?
-        post.commenter_ids.push(user_id) if !_n["role"].index("commenter").nil?
-        post.upvoter_ids.push(user_id) if !_n["role"].index("upvoter").nil?
+  arr_map.each do |m|
+    post[m[0]] = [] if post[m[0]].nil?
+  end
 
-        user = helper_get_user_by_node_data(u)
-        user.save
-      end
+  if product_id = helper_get_node_by_path(n, "product,id", "int") || helper_get_node_by_path(n, "redirectToProduct,id", "int")
+    unless Product.find_by(id: product_id)
+       product_slug = helper_get_node_by_path(n, "product,slug", "string") || helper_get_node_by_path(n, "redirectToProduct,slug", "string")
+       Product.create(id: product_id, slug: product_slug)
     end
   end
 
-  post.hunter_ids = post.hunter_ids.uniq.compact.sort
-  post.hunter_ids = nil if post.hunter_ids.empty?
-  post.maker_ids = post.maker_ids.uniq.compact.sort
-  post.maker_ids = nil if post.maker_ids.empty?
-  post.commenter_ids = post.commenter_ids.uniq.compact.sort
-  post.commenter_ids = nil if post.commenter_ids.empty?
-  post.upvoter_ids = post.upvoter_ids.uniq.compact.sort
-  post.upvoter_ids = nil if post.upvoter_ids.empty?
+  # if n["redirectToProduct"]
+  #   if n["redirectToProduct"]["id"]
+  #     post.product_id = n["redirectToProduct"]["id"].to_i
+  #   end
+  # end
+
+  # if n["product"]
+  #   if n["product"]["id"]
+  #     post.product_id = n["product"]["id"].to_i
+  #   end
+  # end
+  #
+
+  if edges = helper_get_node_by_path(n, "topics,edges", "array")
+    post.topic_ids += edges.collect {|_n| _n["node"]["id"].to_i }
+  end
+
+  if contributors = helper_get_node_by_path(n, "contributors", "array")
+    contributors.each do |_n|
+      u = _n["user"]
+      user_id = u["id"].to_i
+      post.hunter_ids.push(user_id) if !_n["role"].index("hunter").nil?
+      post.maker_ids.push(user_id) if !_n["role"].index("maker").nil?
+      post.commenter_ids.push(user_id) if !_n["role"].index("commenter").nil?
+      post.upvoter_ids.push(user_id) if !_n["role"].index("upvoter").nil?
+
+      user = helper_get_user_by_node_data(u)
+      user.save
+    end
+  end
+
+  arr_map.each do |m|
+    if post[m[0]]
+      post[m[0]] = post[m[0]].uniq.compact.sort
+      if post[m[0]].empty?
+        post[m[0]] = nil
+      end
+      if m[1]
+         if post[m[0]]
+          post[m[1]] = post[m[0]].count
+         end
+      end
+    end
+  end
 
   return post
 end
@@ -280,63 +317,82 @@ def helper_get_product_by_node_data n
   product_id = n["id"].to_i
   product = Product.find_or_initialize_by(id: product_id)
 
-  product.slug = n["slug"] if n["slug"]
-  product.name = n["name"] if n["name"]
-  product.tagline = n["tagline"] if n["tagline"]
-  product.logo_uuid = n["logoUuid"] if n["logoUuid"]
+  # product.slug = n["slug"] if n["slug"]
+  # product.name = n["name"] if n["name"]
+  # product.tagline = n["tagline"] if n["tagline"]
+  # product.logo_uuid = n["logoUuid"] if n["logoUuid"]
+  # product.followers_count = n["followersCount"] if n["followersCount"]
+  # product.reviews_rating = n["reviewsRating"] if n["reviewsRating"]
+  # product.org_created_at = n["createdAt"] if n["createdAt"]
 
-  product.followers_count = n["followersCount"] if n["followersCount"]
-  product.reviews_rating = n["reviewsRating"] if n["reviewsRating"]
-  product.org_created_at = n["createdAt"] if n["createdAt"]
 
-  if n["topics"]
-    if n["topics"]["edges"].count > 0
-      product.topic_ids = [] if product.topic_ids.nil?
-      n["topics"]["edges"].each do |t|
-        product.topic_ids.push(t["node"]["id"].to_i)
+  obj_map = [
+    {key: "name", path: "name", obj_type: "string"},
+    {key: "slug", path: "slug", obj_type: "string"},
+    {key: "tagline", path: "tagline", obj_type: "string"},
+    {key: "logo_uuid", path: "logoUuid", obj_type: "string"},
+    {key: "followers_count", path: "followers_count", obj_type: "int", get_max: true},
+    {key: "posts_count", path: "posts,totalCount", obj_type: "int", get_max: true},
+    {key: "reviews_count", path: "reviews,totalCount", obj_type: "int", get_max: true},
+    {key: "reviews_rating", path: "reviews_rating", obj_type: nil},
+    {key: "org_created_at", path: "createdAt", obj_type: nil}
+  ]
+
+  obj_map.each do |m|
+    if v = helper_get_node_by_path(n, m[:path], m[:obj_type])
+      if m[:get_max] == true
+        product[ m[:key] ] = product[ m[:key] ].nil? ? v : [ product[ m[:key] ], v ].max
+      else
+        product[ m[:key] ] = v
       end
-      product.topic_ids = product.topic_ids.uniq.compact.sort
-      product.topic_ids = nil if product.topic_ids.empty?
     end
   end
 
-  if n["posts"]
-    edges_count = n["posts"]["edges"].count
-    product.posts_count = n["posts"]["totalCount"]
-    # if product.posts_count > edges_count
-    #   product.note = "#{product.note}|p #{edges_count}-#{product.posts_count}"
-    # end
-    if edges_count > 0
-      product.post_ids = [] if product.post_ids.nil?
-      n["posts"]["edges"].each do |t|
-        ppost = helper_get_post_by_node_data(t["node"])
-        ppost.product_id = product_id
-        ppost.save
-        product.post_ids.push(ppost.id)
-      end
-      product.post_ids = product.post_ids.uniq.compact.sort
-      product.post_ids = nil if product.post_ids.empty?
+  arr_map = [
+    ["topic_ids"],
+    ["post_ids"],
+    ["reviewers_ids"]
+  ]
+
+  arr_map.each do |m|
+    product[m[0]] = [] if product[m[0]].nil?
+  end
+
+  if edges = helper_get_node_by_path(n, "topics,edges", "array")
+    product.topic_ids += edges.collect { |_n| _n["node"]["id"].to_i }
+  end
+
+  if edges = helper_get_node_by_path(n, "posts,edges", "array")
+    edges.each do |_n|
+      _post = helper_get_post_by_node_data(_n["node"])
+      _post.product_id = product_id
+      _post.save
+      product.post_ids.push(_post.id)
     end
   end
 
-  if n["reviews"]
-    edges_count = n["reviews"]["edges"].count
-    product.reviews_count = n["reviews"]["totalCount"]
-    # if product.reviews_count > edges_count
-    #   product.note = "#{product.note}|r #{edges_count}-#{product.reviews_count}"
-    # end
-    if edges_count > 0
-      raw_sql = ""
-      product.reviewers_ids = [] if product.reviewers_ids.nil?
-      n["reviews"]["edges"].each do |r|
-        user = helper_get_user_by_node_data(r["node"]["user"])
-        user.save
-        product.reviewers_ids.push(user.id)
-        raw_sql += "INSERT INTO product_reviewer (product_id, user_id, created_at) VALUES(#{product_id},#{user.id},'#{r["node"]["createdAt"]}') ON CONFLICT (product_id, user_id) DO NOTHING;"
+  if edges = helper_get_node_by_path(n, "reviews,edges", "array")
+    raw_sql = ""
+    edges.each do |_n|
+      user = helper_get_user_by_node_data(_n["node"]["user"])
+      user.save
+      product.reviewers_ids.push(user.id)
+      raw_sql += "INSERT INTO product_reviewer (product_id, user_id, created_at) VALUES(#{product_id},#{user.id},'#{_n["node"]["createdAt"]}') ON CONFLICT (product_id, user_id) DO NOTHING;"
+    end
+    ActiveRecord::Base.connection.execute(raw_sql)
+  end
+
+  arr_map.each do |m|
+    if product[m[0]]
+      product[m[0]] = product[m[0]].uniq.compact.sort
+      if product[m[0]].empty?
+        product[m[0]] = nil
       end
-      product.reviewers_ids = product.reviewers_ids.uniq.compact
-      product.reviewers_ids = nil if product.reviewers_ids.empty?
-      ActiveRecord::Base.connection.execute(raw_sql)
+      if m[1]
+         if product[m[0]]
+          product[m[1]] = product[m[0]].count
+         end
+      end
     end
   end
 

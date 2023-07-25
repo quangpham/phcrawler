@@ -51,30 +51,27 @@ def post_version obj
   return version.gsub(" ","").split("|").uniq.join("|")
 end
 
+
 def import_posts json_path="tmp/run/tmp/"
-  Dir["#{json_path}/**/*.json".gsub("//","/")].sort.each do |fn|
-    begin
+  Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
+    if File.exist?(fn) && !File.zero?(fn)
       data = JSON.parse(File.read(fn))
-      product_id = data["data"]["product"]["id"].to_i
+      if product_data = helper_get_node_by_path(data, "data,product")
+        product_id = product_data["id"].to_i
 
-      product = helper_get_product_by_node_data(data["data"]["product"])
-      product.save
+        product = helper_get_product_by_node_data(product_data)
+        product.versions = product.versions.nil? ? [0] : ([0] + product.versions).uniq
+        product.save
 
-      data["data"]["product"]["posts"]["edges"].each do |p|
-        post = helper_get_post_by_node_data(p["node"])
-        post.product_id = product_id
-        post.version = post_version(post)
-        post.save
+        if product_data["posts"]["edges"].count > 0
+          system "rm #{fn}"
+        end
       end
-
-      if data["data"]["product"]["posts"]["edges"].count > 0
-        system "rm #{fn}"
-      end
-
-    rescue
-      next
     end
   end
 end
 
 import_posts "/Users/quang/Downloads/ok/posts-by-product"
+
+
+

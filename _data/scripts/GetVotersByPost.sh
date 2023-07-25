@@ -5,7 +5,7 @@
 # Get them thong tin cho post: votesCount commentsCount updatedAt topic_ids
 # Chua lay duoc product_id
 
-mkdir -p tmp/
+mkdir -p tmp/voters-by-post/
 
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
@@ -39,7 +39,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         id name slug tagline pricingType
         commentsCount votesCount
         createdAt featuredAt updatedAt
-        redirectToProduct { id }
+        product{id slug}
         topics(first:100){ edges{node{id}} }
         contributors(limit:$limit)
         {
@@ -57,6 +57,6 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     "
   }
     ' \
-  --compressed > "tmp/_r.$1.ongoing"
+  --compressed > "tmp/voters-by-post/$1.ongoing"
 
-mv "tmp/_r.$1.ongoing" "tmp/_r.$1.json"
+mv "tmp/voters-by-post/$1.ongoing" "tmp/voters-by-post/$1.json"

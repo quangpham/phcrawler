@@ -3,12 +3,15 @@
 # Crawl posts theo ngay, co them post moi (va co luon product moi)
 # > van de la co nhung post ko lay duoc product id
 
+
 # Crawl Recent products -> thuc chat la crawl post moi (ma co theo thong tin product)
 # crawl lai tiep nhu product gan day nhat
+
 
 # Crawl product detail (cho nhung product moi)
 # => crawl voters
 # Crawl posts detail cho nhung post cach day 3 thang
+
 
 # Dinh ki
 # crawl lai toan bo post detail
@@ -25,24 +28,24 @@
 
 
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@146.190.93.2:/root/
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.145.254:/root/
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.223.83.131:/root/
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@167.99.74.30:/root/
 
 
-ssh root@146.190.93.2 'ls -1 run/tmp/user-profiles/ | wc -l'
-ssh root@157.245.145.254 'ls -1 run/tmp/user-profiles/ | wc -l'
+ssh root@159.223.83.131 'ls -1 run/tmp/voters-by-post/ | wc -l'
+ssh root@167.99.74.30 'ls -1 run/tmp/voters-by-post/ | wc -l'
 
-ssh root@146.190.93.2 "cd /root/run/ && mkdir done_14_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_14_a/ {} + && zip -r done_14_a.zip done_14_a/"
-scp root@146.190.93.2:/root/run/done_14_a.zip /Users/quang/Downloads/ok/user-profiles/
+ssh root@159.223.83.131 "cd /root/run/ && mkdir done_04_a && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_04_a/ {} + && zip -r done_04_a.zip done_04_a/"
+scp root@159.223.83.131:/root/run/done_04_a.zip /Users/quang/Downloads/ok/voters-by-post/
 
-ssh root@157.245.145.254 "cd /root/run/ && mkdir done_14_b && find tmp/user-profiles/ -name '*.json' -exec mv -t done_14_b/ {} + && zip -r done_14_b.zip done_14_b/"
-scp root@157.245.145.254:/root/run/done_14_b.zip /Users/quang/Downloads/ok/user-profiles/
+ssh root@167.99.74.30 "cd /root/run/ && mkdir done_04_b && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_04_b/ {} + && zip -r done_04_b.zip done_04_b/"
+scp root@167.99.74.30:/root/run/done_04_b.zip /Users/quang/Downloads/ok/voters-by-post/
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@146.190.93.2:/root/a.zip
-ssh root@146.190.93.2 'cd /root/ && rm -rf run* && unzip a.zip '
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.223.83.131:/root/a.zip
+ssh root@159.223.83.131 'cd /root/ && rm -rf run* && unzip a.zip '
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.145.254:/root/a.zip
-ssh root@157.245.145.254 'cd /root/ && rm -rf run* && unzip a.zip'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@167.99.74.30:/root/a.zip
+ssh root@167.99.74.30 'cd /root/ && rm -rf run* && unzip a.zip'
 
 # Lay thong tin cua topic
 # Trong do co thong tin cua subscribers

@@ -34,25 +34,27 @@ def post_version obj
 end
 
 def import_voters json_path="tmp/run/tmp/"
-  Dir["#{json_path}/_r.*.json".gsub("//","/")].shuffle.each do |fn|
-    begin
+  Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
+    if File.exist?(fn) && !File.zero?(fn)
       fn2 = fn.gsub(".json",".ongoing")
       system "mv #{fn} #{fn2}"
 
-      _data = JSON.parse(File.read(fn2))
-      data = _data["data"]["post"]
+      data = JSON.parse(File.read(fn2))
+      if post_data = helper_get_node_by_path(data, "data,post")
+        post = helper_get_post_by_node_data(post_data)
+        post.versions = post.versions.nil? ? [0] : ([0] + post.versions).uniq
+        # post.version = post_version(post)
+        # post.is_checked = true
+        post.save
 
-      post = helper_get_post_by_node_data(data)
-      post.version = post_version(post)
-      post.is_checked = true
-      post.save
-
-      if data["contributors"].count > 0
-        system "rm #{fn2}"
+        if post_data["contributors"].count > 0
+          system "rm #{fn2}"
+        end
       end
-    rescue
+
     end
   end
 end
 
+import_voters "/Users/quang/Downloads/ok/voters-by-post"
 # import_voters "/Users/quang/Downloads/done_4/"

@@ -1,4 +1,10 @@
 # https://www.producthunt.com/all
+# ./GetRecentProducts.sh cursor
+# ./GetRecentProducts.sh 1-181
+# kind: FEATURED, ALL, POPULAR, NEWEST
+
+# filters: {}
+# filters: {bootstrapped: true}, {soloMaker: true}
 
 mkdir -p tmp/recent-products/
 
@@ -22,7 +28,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
   --data-raw $'
   {
     "operationName":"HomePage",
-    "variables":{"cursor":"1-181","kind":"ALL","filters":{}},
+    "variables":{"cursor":"'$1'","kind":"ALL","filters":{}},
     "query":"query HomePage($cursor:String$kind:HomefeedKindEnum\u0021$filters:HomefeedFiltersInput\u0021)
     {
         homefeed(after:$cursor kind:$kind filters:$filters)
@@ -53,7 +59,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         phHomepageOgImageUrl viewer{id showHomepageOnboarding __typename}
     }
     fragment AdFragment on Ad{id subject post{id slug name updatedAt commentsCount topics(first:1){edges{node{id name __typename}__typename}__typename}...PostVoteButtonFragment __typename}ctaText name tagline thumbnailUuid url __typename}
-    fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt product{id isSubscribed __typename}disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}
+    fragment PostVoteButtonFragment on Post{id featuredAt updatedAt createdAt product{id slug isSubscribed __typename}disabledWhenScheduled hasVoted ...on Votable{id votesCount __typename}__typename}
     fragment PostItemFragment on Post
     {
         id commentsCount name shortenedUrl slug tagline updatedAt pricingType
@@ -81,4 +87,4 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     fragment UserCircleListFragment on User{id ...UserImage __typename}
     "
 }' \
-  --compressed > "tmp/recent-products/1.json"
+  --compressed > "tmp/recent-products/r.$1.json"
