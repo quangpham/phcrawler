@@ -214,16 +214,6 @@ end
 def helper_get_post_by_node_data n
   post = Post.find_or_initialize_by(id: n["id"].to_i)
 
-  # post.name = n["name"] if n["name"]
-  # post.slug = n["slug"] if n["slug"]
-  # post.tagline = n["tagline"] if n["tagline"]
-  # post.pricing_type = n["pricingType"] if n["pricingType"]
-  # post.comments_count = n["commentsCount"] if n["commentsCount"]
-  # post.votes_count = n["votesCount"] if n["votesCount"]
-  # post.org_created_at = n["createdAt"] if n["createdAt"]
-  # post.org_featured_at = n["featuredAt"] if n["featuredAt"]
-  # post.org_updated_at = n["updatedAt"] if n["updatedAt"]
-
   obj_map = [
     {key: "name", path: "name", obj_type: "string"},
     {key: "slug", path: "slug", obj_type: "string"},
@@ -259,6 +249,7 @@ def helper_get_post_by_node_data n
   end
 
   if product_id = helper_get_node_by_path(n, "product,id", "int") || helper_get_node_by_path(n, "redirectToProduct,id", "int")
+    post.product_id = product_id
     unless Product.find_by(id: product_id)
        product_slug = helper_get_node_by_path(n, "product,slug", "string") || helper_get_node_by_path(n, "redirectToProduct,slug", "string")
        Product.create(id: product_id, slug: product_slug)

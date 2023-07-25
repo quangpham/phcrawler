@@ -12,7 +12,7 @@ commands = []
 Post.where("(is_checked=false or is_checked is null) and version is null").each do |p|
   commands.push "./GetVotersByPost.sh #{p.slug} 100000"
 end
-slipt_commands_to_files(commands, 15, cursors)
+slipt_commands_to_files(commands, 15)
 
 # Buoc 21
 # Sync len server de chay
@@ -40,16 +40,27 @@ def import_voters json_path="tmp/run/tmp/"
       system "mv #{fn} #{fn2}"
 
       data = JSON.parse(File.read(fn2))
-      if post_data = helper_get_node_by_path(data, "data,post")
-        post = helper_get_post_by_node_data(post_data)
-        post.versions = post.versions.nil? ? [0] : ([0] + post.versions).uniq
-        # post.version = post_version(post)
-        # post.is_checked = true
-        post.save
 
-        if post_data["contributors"].count > 0
-          system "rm #{fn2}"
+      if data["data"]
+        if post_data = helper_get_node_by_path(data, "data,post")
+          post = helper_get_post_by_node_data(post_data)
+          post.versions = post.versions.nil? ? [0] : ([0] + post.versions).uniq
+          # post.version = post_version(post)
+          # post.is_checked = true
+          post.save
+
+          if post_data["contributors"].count > 0
+            system "rm #{fn2}"
+          end
+        else
+          slug = fn2.split("/").last.split(".ongoing").first
+          if _post = Post.find_by(slug: slug)
+            _post.is_trashed = true
+            _post.save
+            system "rm #{fn2}"
+          end
         end
+
       end
 
     end

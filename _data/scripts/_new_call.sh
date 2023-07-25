@@ -13,6 +13,8 @@
 # Crawl posts detail cho nhung post cach day 3 thang
 
 
+# Recheck lai nhung users moi duoc add vao bang hunters, upvoters, vv
+
 # Dinh ki
 # crawl lai toan bo post detail
 # crawl lai toan bo product detail
@@ -28,6 +30,8 @@
 
 
 
+
+
 scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.223.83.131:/root/
 scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@167.99.74.30:/root/
 
@@ -35,11 +39,11 @@ scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@167.99.74.30:/root/
 ssh root@159.223.83.131 'ls -1 run/tmp/voters-by-post/ | wc -l'
 ssh root@167.99.74.30 'ls -1 run/tmp/voters-by-post/ | wc -l'
 
-ssh root@159.223.83.131 "cd /root/run/ && mkdir done_04_a && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_04_a/ {} + && zip -r done_04_a.zip done_04_a/"
-scp root@159.223.83.131:/root/run/done_04_a.zip /Users/quang/Downloads/ok/voters-by-post/
+ssh root@159.223.83.131 "cd /root/run/ && mkdir done_05_a && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_05_a/ {} + && zip -r done_05_a.zip done_05_a/"
+scp root@159.223.83.131:/root/run/done_05_a.zip /Users/quang/Downloads/ok/voters-by-post/
 
-ssh root@167.99.74.30 "cd /root/run/ && mkdir done_04_b && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_04_b/ {} + && zip -r done_04_b.zip done_04_b/"
-scp root@167.99.74.30:/root/run/done_04_b.zip /Users/quang/Downloads/ok/voters-by-post/
+ssh root@167.99.74.30 "cd /root/run/ && mkdir done_05_b && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_05_b/ {} + && zip -r done_05_b.zip done_05_b/"
+scp root@167.99.74.30:/root/run/done_05_b.zip /Users/quang/Downloads/ok/voters-by-post/
 
 scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.223.83.131:/root/a.zip
 ssh root@159.223.83.131 'cd /root/ && rm -rf run* && unzip a.zip '
