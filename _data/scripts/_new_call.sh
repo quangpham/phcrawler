@@ -9,9 +9,11 @@
 # crawl lai tiep nhu product gan day nhat
 
 
-# Crawl product detail (cho nhung product moi)
+# Crawl product detail, GetPostsByProduct
+# (cho nhung product moi)
 # => crawl voters
 # Crawl posts detail cho nhung post cach day 3 thang
+
 
 
 # Recheck lai nhung users moi duoc add vao bang hunters, upvoters, vv
@@ -20,6 +22,8 @@
 # crawl lai toan bo post detail
 # crawl lai toan bo product detail
 # crawl lai toan bo user detail
+
+# Sau moi lan fullscan -> update lai old_count
 
 
 # Side
