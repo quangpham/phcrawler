@@ -72,9 +72,16 @@ end
 
 
 ## CRAWL NHUNG NGAY VUA ROI
-(2..365).to_a.reverse.to_a.each do |i|
+(1..365).to_a.reverse.to_a.each do |i|
   if PostArchive.find_by(sys_created_at: i.days.ago).nil?
     a = PostArchive.create(sys_created_at: i.days.ago)
+    system "cd _data/scripts/ && ./GetPostsByDateR.sh #{a.sys_created_at.year.to_i} #{a.sys_created_at.month.to_i} #{a.sys_created_at.day.to_i}"
+  end
+end
+import_posts "_data/scripts/tmp/posts-by-date/"
+
+(1..30).to_a.reverse.to_a.each do |i|
+  if a = PostArchive.find_by(sys_created_at: i.days.ago)
     system "cd _data/scripts/ && ./GetPostsByDateR.sh #{a.sys_created_at.year.to_i} #{a.sys_created_at.month.to_i} #{a.sys_created_at.day.to_i}"
   end
 end

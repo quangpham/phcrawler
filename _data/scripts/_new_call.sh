@@ -1,6 +1,7 @@
 # Todo
 
-# Crawl posts theo ngay, co them post moi (va co luon product moi)
+# Crawl posts theo ngay, GetPostsByDate
+# co them post moi (va co luon product moi)
 # > van de la co nhung post ko lay duoc product id
 
 

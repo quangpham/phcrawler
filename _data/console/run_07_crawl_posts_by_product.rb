@@ -29,7 +29,7 @@ slipt_commands_to_files(commands, 10, cursors)
 
 ###
 commands = []
-Product.where("posts_count is null").each do |t|
+Product.where("versions is null and is_trashed is null").each do |t|
   commands.push "./GetPostsByProduct.sh #{t.slug}"
 end
 slipt_commands_to_files(commands, 10)
@@ -56,22 +56,42 @@ def import_posts json_path="tmp/run/tmp/"
   Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
     if File.exist?(fn) && !File.zero?(fn)
       data = JSON.parse(File.read(fn))
-      if product_data = helper_get_node_by_path(data, "data,product")
-        product_id = product_data["id"].to_i
+      if data["data"]
+        slug = fn.split("/").last.split(".").first
 
-        product = helper_get_product_by_node_data(product_data)
-        product.versions = product.versions.nil? ? [0] : ([0] + product.versions).uniq
-        product.save
+        if product_data = helper_get_node_by_path(data, "data,product")
+          product_id = product_data["id"].to_i
 
-        if product_data["posts"]["edges"].count > 0
-          system "rm #{fn}"
+          product = helper_get_product_by_node_data(product_data)
+          product.versions = product.versions.nil? ? [0] : ([0] + product.versions).uniq
+          product.save
+
+          if slug!=product.slug
+             if p = Product.find_by(slug: slug)
+              p.delete
+             end
+          end
+
+          if product_data["posts"]["edges"].count > 0
+            system "rm #{fn}"
+          end
+
+        else
+          if product = Product.find_by(slug: slug)
+            product.is_trashed = true
+            product.save
+            system "rm #{fn}"
+          end
         end
       end
+
     end
   end
 end
 
 import_posts "/Users/quang/Downloads/ok/posts-by-product"
+import_posts "/Users/quang/Projects/upbase/phcrawler/tmp/run/tmp/posts-by-product"
 
+import_posts "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp/posts-by-product"
 
 
