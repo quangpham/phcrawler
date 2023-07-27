@@ -57,7 +57,6 @@ def import_posts json_path="tmp/run/tmp/"
 
         posts_data["edges"].each do |p|
           post = helper_get_post_by_node_data(p["node"])
-          post.version = post_version(post)
           post.save
         end
 

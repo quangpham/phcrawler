@@ -1,7 +1,7 @@
 # Lay toan posts theo product
-# ./GetPostsByProduct.sh product-name cursor
-# ./GetPostsByProduct.sh itch-io NjA(or blank)
-# ./GetPostsByProduct.sh smartsync
+# ./GetPostsByProductR.sh product-name cursor
+# ./GetPostsByProductR.sh itch-io NjA(or blank)
+# ./GetPostsByProductR.sh smartsync
 # Mot lan chi lan duoc max 20 posts/product
 
 # posts(first:20 after:$cursor filter:$filter order:$order)
@@ -84,6 +84,16 @@ curl 'https://www.producthunt.com/frontend/graphql' \
   --compressed> "tmp/posts-by-product/$1.$2.ongoing"
 
   mv "tmp/posts-by-product/$1.$2.ongoing" "tmp/posts-by-product/$1.$2.json"
+
+if [ -s "tmp/posts-by-product/$1.$2.json" ];then
+    hasNextPage=$(jq '.data.product.posts.pageInfo.hasNextPage' tmp/posts-by-product/$1.$2.json)
+    # echo $hasNextPage
+    if [ "$hasNextPage" = "true" ]; then
+        endCursor=$(jq --raw-output '.data.product.posts.pageInfo.endCursor' tmp/posts-by-product/$1.$2.json)
+        ./GetPostsByProductR.sh $1 $endCursor
+    fi
+fi
+
 
 # fragment PostItem on Post{id commentsCount name shortenedUrl slug tagline updatedAt pricingType topics(first:1){edges{node{id name slug __typename}__typename}__typename}redirectToProduct{id slug __typename}...PostThumbnail ...PostVoteButton __typename}
 

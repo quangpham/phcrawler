@@ -1,36 +1,3 @@
-# Todo
-
-# Crawl posts theo ngay, GetPostsByDate
-# co them post moi (va co luon product moi)
-# > van de la co nhung post ko lay duoc product id
-
-
-# Crawl Recent products -> thuc chat la crawl post moi (ma co theo thong tin product)
-# crawl lai tiep nhu product gan day nhat
-
-
-# Crawl product detail, GetPostsByProduct
-# (cho nhung product moi)
-# => crawl voters
-# Crawl posts detail cho nhung post cach day 3 thang
-
-
-
-# Recheck lai nhung users moi duoc add vao bang hunters, upvoters, vv
-
-# Dinh ki
-# crawl lai toan bo post detail
-# crawl lai toan bo product detail
-# crawl lai toan bo user detail
-
-# Sau moi lan fullscan -> update lai old_count
-
-
-# Side
-# topic subcribers
-# category
-# product by category
-# users' followers/following
 
 
 

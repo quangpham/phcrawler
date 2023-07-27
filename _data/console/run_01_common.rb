@@ -126,13 +126,13 @@ def helper_get_user_by_node_data u
 
   # INIT
   arr_map = [
-    ["followed_topic_ids", "followed_topics_count"],
+    ["followed_topic_ids", "gen_followed_topics_count"],
     ["follower_ids"],
     ["following_ids"],
     ["stack_product_ids"],
     ["submitted_post_ids"],
     ["collection_ids"],
-    ["links", "links_count"]
+    ["links", "gen_links_count"]
   ]
   arr_map.each do |m|
     user[m[0]] = [] if user[m[0]].nil?
@@ -196,6 +196,7 @@ def helper_get_user_by_node_data u
       if user[m[0]].empty?
         user[m[0]] = nil
       end
+
       if m[1]
          if user[m[0]]
           user[m[1]] = user[m[0]].count

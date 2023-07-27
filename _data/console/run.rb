@@ -1,3 +1,40 @@
+# gen_count, org_count, sys_count, old_count
+
+# Todo
+
+# Crawl posts theo ngay, GetPostsByDate
+# co them post moi (va co luon product moi)
+# > van de la co nhung post ko lay duoc product id
+
+# Khi import them du lieu moi vao posts -> thay doi ve posts_count -> track them duoc theo ngay
+# Khi import users -> co du lieu moi ve followers -> track duoc
+
+
+# Crawl product detail, GetPostsByProduct
+# (cho nhung product moi, dua theo nhung post moi duoc dang < 90 ngay)
+# => crawl voters
+# Crawl posts detail cho nhung post cach day 3 thang
+
+
+
+# Recheck lai nhung users moi duoc add vao bang hunters, upvoters, vv
+
+# Dinh ki
+# crawl lai toan bo post detail
+# crawl lai toan bo product detail
+# crawl lai toan bo user detail
+
+# Sau moi lan fullscan -> update lai old_count
+
+
+# Side
+# topic subcribers
+# category
+# product by category
+# users' followers/following
+
+
+
 # TODO
 # Crawl subcribers qua TopicPage
 # Crawl recentStacks qua TopicPage

@@ -64,9 +64,9 @@ curl 'https://www.producthunt.com/frontend/graphql' \
 mv "tmp/posts-by-date/$1.$2.$3.$4.ongoing" "tmp/posts-by-date/$1.$2.$3.$4.json"
 
 if [ -s "tmp/posts-by-date/$1.$2.$3.$4.json" ];then
-    echo "ALAL"
+    # echo "ALAL"
     hasNextPage=$(jq '.data.posts.pageInfo.hasNextPage' tmp/posts-by-date/$1.$2.$3.$4.json)
-    echo $hasNextPage
+    # echo $hasNextPage
     if [ "$hasNextPage" = "true" ]; then
         endCursor=$(jq --raw-output '.data.posts.pageInfo.endCursor' tmp/posts-by-date/$1.$2.$3.$4.json)
         ./GetPostsByDateR.sh $1 $2 $3 $endCursor
