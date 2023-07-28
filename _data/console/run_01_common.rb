@@ -204,7 +204,7 @@ def helper_get_user_by_node_data u
       end
     end
   end
-
+  user.scans = ( (user.scans + [Date.today.yday()]) - user.fullscans).uniq.sort
   return user
 end
 
@@ -302,6 +302,8 @@ def helper_get_post_by_node_data n
     end
   end
 
+  post.scans = ( (post.scans + [Date.today.yday()]) - post.fullscans).uniq.sort
+
   return post
 end
 
@@ -365,13 +367,17 @@ def helper_get_product_by_node_data n
 
   if edges = helper_get_node_by_path(n, "reviews,edges", "array")
     raw_sql = ""
+    old_reviewers_ids_count = product.reviewers_ids.count
     edges.each do |_n|
       user = helper_get_user_by_node_data(_n["node"]["user"])
       user.save
       product.reviewers_ids.push(user.id)
       raw_sql += "INSERT INTO product_reviewer (product_id, user_id, created_at) VALUES(#{product_id},#{user.id},'#{_n["node"]["createdAt"]}') ON CONFLICT (product_id, user_id) DO NOTHING;"
     end
-    ActiveRecord::Base.connection.execute(raw_sql)
+
+    if product.reviewers_ids.uniq.count > old_reviewers_ids_count
+      ActiveRecord::Base.connection.execute(raw_sql)
+    end
   end
 
   arr_map.each do |m|
@@ -387,6 +393,8 @@ def helper_get_product_by_node_data n
       end
     end
   end
+
+  product.scans = ( (product.scans + [Date.today.yday()]) - product.fullscans).uniq.sort
 
   return product
 

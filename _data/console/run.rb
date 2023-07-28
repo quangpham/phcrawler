@@ -2,12 +2,18 @@
 
 # Todo
 
+# Buoc 1
+# Local:
 # Crawl posts theo ngay, GetPostsByDate
 # co them post moi (va co luon product moi)
 # > van de la co nhung post ko lay duoc product id
 
+
 # Khi import them du lieu moi vao posts -> thay doi ve posts_count -> track them duoc theo ngay
 # Khi import users -> co du lieu moi ve followers -> track duoc
+
+# Buoc 2
+#
 
 
 # Crawl product detail, GetPostsByProduct

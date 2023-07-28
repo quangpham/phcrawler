@@ -17,22 +17,25 @@ sql = '
 '
 
 
-commands = []
-Product.where("posts_count>sys_posts_count").each do |t|
-  cursors[..(t.posts_count/10+2)].each_with_index do |cursor, i|
-    commands.push "./GetPostsByProduct.sh #{1000+i} #{t.slug} #{cursor}"
-  end
-end
+# commands = []
+# Product.where("posts_count>sys_posts_count").each do |t|
+#   cursors[..(t.posts_count/10+2)].each_with_index do |cursor, i|
+#     commands.push "./GetPostsByProduct.sh #{1000+i} #{t.slug} #{cursor}"
+#   end
+# end
 
-slipt_commands_to_files(commands, 10, cursors)
+# slipt_commands_to_files(commands, 10, cursors)
 
 
 ###
 commands = []
-Product.where("versions is null and is_trashed is null").each do |t|
-  commands.push "./GetPostsByProduct.sh #{t.slug}"
+where_str = "posts_count is null or posts_count > 20 or id in (select distinct product_id from posts where org_created_at > now() - interval '90 day')"
+where_str = "posts_count > 20"
+where_str = "fullscans ='{}'"
+Product.where("(#{where_str}) and (is_trashed=false or is_trashed is null)").each do |t|
+  commands.push "./GetPostsByProductR.sh #{t.slug}"
 end
-slipt_commands_to_files(commands, 10)
+slipt_commands_to_files(commands, 1)
 
 
 
@@ -41,15 +44,7 @@ slipt_commands_to_files(commands, 10)
 # Update mot vai thuoc tinh cua posts
 # Update them voters
 
-def post_version obj
-  version = ""
-  if obj.id.nil?
-    version = "new-by-product"
-  else
-    version = "product-06|#{obj.version}"
-  end
-  return version.gsub(" ","").split("|").uniq.join("|")
-end
+
 
 
 def import_posts json_path="tmp/run/tmp/"
@@ -63,7 +58,8 @@ def import_posts json_path="tmp/run/tmp/"
           product_id = product_data["id"].to_i
 
           product = helper_get_product_by_node_data(product_data)
-          product.versions = product.versions.nil? ? [0] : ([0] + product.versions).uniq
+          # product.versions = product.versions.nil? ? [0] : ([0] + product.versions).uniq
+          product.fullscans = (product.fullscans + [Date.today.yday()] ).uniq.sort
           product.save
 
           if slug!=product.slug
@@ -75,7 +71,6 @@ def import_posts json_path="tmp/run/tmp/"
           if product_data["posts"]["edges"].count > 0
             system "rm #{fn}"
           end
-
         else
           if product = Product.find_by(slug: slug)
             product.is_trashed = true
