@@ -431,12 +431,6 @@ sql = '
   select id,unnest(post_ids) as post_id from products where post_ids is not null and post_ids != '{}'
   ON CONFLICT (product_id, post_id) DO NOTHING;
 
-  # insert into product_reviewer(product_id, user_id)
-  # select id,unnest(reviewers_ids) as user_id from products where reviewers_ids is not null and reviewers_ids != '{}'
-  # ON CONFLICT (product_id, user_id) DO NOTHING;
-
-
-
 
   update products p set sys_posts_count=t.posts_count
   from (
@@ -451,6 +445,17 @@ sql = '
       group by product_id
   ) t
   where p.id = t.product_id;
+
+  # insert into product_reviewer(product_id, user_id)
+  # select id,unnest(reviewers_ids) as user_id from products where reviewers_ids is not null and reviewers_ids != '{}'
+  # ON CONFLICT (product_id, user_id) DO NOTHING;
+
+
+
+
+
+
+
 
   update posts p set sys_votes_count=t.votes_count
   from (

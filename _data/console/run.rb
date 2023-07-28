@@ -21,6 +21,18 @@
 # => crawl voters
 # Crawl posts detail cho nhung post cach day 3 thang
 
+# Buoc 2.a
+# Crawl reviewers
+#
+# update products p set sys_reviews_count=t.reviews_count
+# from (
+#     select product_id,count(user_id) as reviews_count from product_reviewer
+#     group by product_id
+# ) t
+# where p.id = t.product_id;
+
+# Crawl reviwers
+# Select Product: id in (select distinct product_id from posts where org_created_at > now() - interval '90 day') and reviews_count > 20 and reviews_count > sys_reviews_count
 
 
 # Recheck lai nhung users moi duoc add vao bang hunters, upvoters, vv
