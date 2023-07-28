@@ -15,13 +15,13 @@ raw_sql = '
     ) t
     where p.id = t.product_id;
 '
-
 ActiveRecord::Base.connection.execute(raw_sql)
+
 
 commands = []
 Product.where("reviews_count>sys_reviews_count and reviews_count > 19").each do |t|
   cursors[..(t.reviews_count/20+1)].each_with_index do |cursor, i|
-    commands.push "./GetReviewersByProduct.sh #{1000+i} #{t.slug} #{cursor}"
+    commands.push "./GetReviewersByProduct.sh N #{t.slug} #{cursor}"
   end
 end
 

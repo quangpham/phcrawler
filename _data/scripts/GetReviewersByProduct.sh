@@ -1,8 +1,13 @@
 # Lay toan posts theo product
-# ./GetReviewersByProduct.sh so-thu-tu product-name cursor
-# ./GetReviewersByProduct.sh 1 acorn-protocol-2 NjA(or blank)
+# ./GetReviewersByProduct.sh R(or N) product-name cursor
+# Neu $1=R => Recursive
+
+# ./GetReviewersByProduct.sh N acorn-protocol-2
+# ./GetReviewersByProduct.sh R acorn-protocol-2 NjA(or blank)
+
 # Mot lan chi lan duoc max 20 posts / topic
-mkdir -p tmp/
+
+mkdir -p tmp/reviewers-by-product/
 
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
@@ -49,6 +54,16 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         }
 
       "}' \
-  --compressed> "tmp/_r.reviewers-by-product.$1.$2.$3.ongoing"
+  --compressed> "tmp/reviewers-by-product/$2.$3.ongoing"
 
-  mv "tmp/_r.reviewers-by-product.$1.$2.$3.ongoing" "tmp/_r.reviewers-by-product.$1.$2.$3.json"
+  mv "tmp/reviewers-by-product/$2.$3.ongoing" "tmp/reviewers-by-product/$2.$3.json"
+
+if [ "$1" = "R" ]; then
+  if [ -s "tmp/reviewers-by-product/$2.$3.json" ];then
+      hasNextPage=$(jq '.data.product.reviews.pageInfo.hasNextPage' tmp/reviewers-by-product/$2.$3.json)
+      if [ "$hasNextPage" = "true" ]; then
+          endCursor=$(jq --raw-output '.data.product.reviews.pageInfo.endCursor' tmp/reviewers-by-product/$2.$3.json)
+          ./GetReviewersByProduct.sh R $2 $endCursor
+      fi
+  fi
+fi

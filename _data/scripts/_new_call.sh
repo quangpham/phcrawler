@@ -11,14 +11,14 @@ poosts-by-date
 poosts-by-product
 poosts-by-product
 
-ssh root@159.65.7.68 'ls -1 run/tmp/posts-by-date/ | wc -l'
-ssh root@167.99.74.30 'ls -1 run/tmp/posts-by-date/ | wc -l'
+ssh root@159.65.7.68 'ls -1 run/tmp/posts-by-product/ | wc -l'
+ssh root@167.99.74.30 'ls -1 run/tmp/posts-by-product/ | wc -l'
 
-ssh root@159.65.7.68 "cd /root/run/ && mkdir done_03_a && find tmp/posts-by-date/ -name '*.json' -exec mv -t done_03_a/ {} + && zip -r done_03_a.zip done_03_a/"
-scp root@159.65.7.68:/root/run/done_03_a.zip /Users/quang/Downloads/ok/posts-by-date/
+ssh root@159.65.7.68 "cd /root/run/ && mkdir done_04_a && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_04_a/ {} + && zip -r done_04_a.zip done_04_a/"
+scp root@159.65.7.68:/root/run/done_04_a.zip /Users/quang/Downloads/ok/posts-by-product/
 
-ssh root@167.99.74.30 "cd /root/run/ && mkdir done_03_b && find tmp/posts-by-date/ -name '*.json' -exec mv -t done_03_b/ {} + && zip -r done_03_b.zip done_03_b/"
-scp root@167.99.74.30:/root/run/done_03_b.zip /Users/quang/Downloads/ok/posts-by-date/
+ssh root@167.99.74.30 "cd /root/run/ && mkdir done_04_b && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_04_b/ {} + && zip -r done_04_b.zip done_04_b/"
+scp root@167.99.74.30:/root/run/done_04_b.zip /Users/quang/Downloads/ok/posts-by-product/
 
 scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.65.7.68:/root/a.zip
 ssh root@159.65.7.68 'cd /root/ && rm -rf run* && unzip a.zip'
