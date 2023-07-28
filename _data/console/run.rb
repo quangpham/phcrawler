@@ -32,6 +32,26 @@
 # where p.id = t.product_id;
 
 # Crawl reviwers
+#
+#
+###
+# update_reviews_count_sql = '
+#   update products p set sys_reviews_count=t.reviews_count
+#   from (
+#       select product_id,count(user_id) as reviews_count from product_reviewer
+#       group by product_id
+#   ) t
+#   where p.id = t.product_id;
+
+#   update products p set sys_posts_count=t.posts_count
+#   from (
+#     select product_id,count(id) as posts_count from posts
+#     group by product_id
+#   ) t
+#   where p.id = t.product_id;
+# '
+# ActiveRecord::Base.connection.execute(update_reviews_count_sql)
+
 # Select Product: id in (select distinct product_id from posts where org_created_at > now() - interval '90 day') and reviews_count > 20 and reviews_count > sys_reviews_count
 
 

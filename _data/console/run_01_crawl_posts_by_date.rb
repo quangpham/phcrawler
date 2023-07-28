@@ -1,17 +1,10 @@
-# Buoc 5
+# Buoc 51
 # Tao file Crawl posts theo date (archive)
 # Muc dich
 # - crawl them posts (max 20)
-# - Luu lai posts_count theo ngay
 
-# Notes:
-# - Moi lan crawl duoc 20 posts/lan
-#
 # Extra:
 # - Tinh toan de lam phien ban lite, contributor it hon
-
-### Tinh toan posts_count cho tung ngay
-
 
 # Tao lenh crawl toan bo post trong 60 ngay vua qua
 commands = []
@@ -23,7 +16,7 @@ commands = []
 end
 slipt_commands_to_files(commands, 10)
 
-
+###
 def import_posts json_path="tmp/run/tmp/"
   Dir["#{json_path}/**/*.json".gsub("//","/")].sort.each do |fn|
     data = JSON.parse(File.read(fn))

@@ -4,48 +4,25 @@
 # - Lay het posts cua 1 product
 # - Lay them data cua posts duoc crawl (contributors, topic_ids, etc)
 # Note:
-# - 10 posts/lan
-
-# SQL Query:
-sql = '
-  update products p set sys_posts_count=t.posts_count
-  from (
-    select product_id,count(id) as posts_count from posts
-    group by product_id
-  ) t
-  where p.id = t.product_id;
-'
+# - 20 posts/lan -> R
 
 
-# commands = []
-# Product.where("posts_count>sys_posts_count").each do |t|
-#   cursors[..(t.posts_count/10+2)].each_with_index do |cursor, i|
-#     commands.push "./GetPostsByProduct.sh #{1000+i} #{t.slug} #{cursor}"
-#   end
-# end
-
-# slipt_commands_to_files(commands, 10, cursors)
-
-
-###
+# Tao lenh crawl
 commands = []
-where_str = "posts_count is null or posts_count > 20 or id in (select distinct product_id from posts where org_created_at > now() - interval '90 day')"
-where_str = "posts_count > 20"
-where_str = "fullscans ='{}'"
-Product.where("(#{where_str}) and (is_trashed=false or is_trashed is null)").each do |t|
+slugs = []
+slugs += Product.where("(fullscans ='{}') and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
+slugs += Product.where("(id in (select distinct product_id from posts where org_created_at > now() - interval '90 day') ) and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
+slugs.uniq.sort.each do |t|
   commands.push "./GetPostsByProductR.sh #{t.slug}"
 end
-slipt_commands_to_files(commands, 1)
 
+slipt_commands_to_files(commands, 10)
 
 
 # Buoc 8
 # Import posts
 # Update mot vai thuoc tinh cua posts
 # Update them voters
-
-
-
 
 def import_posts json_path="tmp/run/tmp/"
   Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
@@ -56,9 +33,7 @@ def import_posts json_path="tmp/run/tmp/"
 
         if product_data = helper_get_node_by_path(data, "data,product")
           product_id = product_data["id"].to_i
-
           product = helper_get_product_by_node_data(product_data)
-          # product.versions = product.versions.nil? ? [0] : ([0] + product.versions).uniq
           product.fullscans = (product.fullscans + [Date.today.yday()] ).uniq.sort
           product.save
 
@@ -86,7 +61,6 @@ end
 
 import_posts "/Users/quang/Downloads/ok/posts-by-product"
 import_posts "/Users/quang/Projects/upbase/phcrawler/tmp/run/tmp/posts-by-product"
-
 import_posts "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp/posts-by-product"
 
 
