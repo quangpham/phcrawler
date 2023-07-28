@@ -8,6 +8,10 @@
 #
 # Post.where("is_checked is not null").each do |p|
 
+
+# update posts set sys_votes_count=array_length(uniq(upvoter_ids||commenter_ids||hunter_ids||maker_ids),1);
+
+
 commands = []
 Post.where("(is_checked=false or is_checked is null) and version is null").each do |p|
   commands.push "./GetVotersByPost.sh #{p.slug} 100000"
