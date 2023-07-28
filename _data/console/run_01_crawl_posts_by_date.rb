@@ -7,6 +7,7 @@
 # - Tinh toan de lam phien ban lite, contributor it hon
 
 # Tao lenh crawl toan bo post trong 60 ngay vua qua
+
 commands = []
 (1..60).to_a.reverse.to_a.each do |i|
   if a = PostArchive.find_or_create_by(sys_created_at: i.days.ago)
