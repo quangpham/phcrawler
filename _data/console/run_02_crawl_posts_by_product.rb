@@ -15,8 +15,9 @@ commands = []
 slugs = []
 slugs += Product.where("(fullscans ='{}') and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
 slugs += Product.where("(id in (select distinct product_id from posts where org_created_at > now() - interval '90 day') ) and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
-slugs.uniq.sort.each do |t|
-  commands.push "./GetPostsByProductR.sh #{t.slug}"
+slugs += Product.where("(id in (select distinct product_id from posts where org_updated_at > now() - interval '30 day') ) and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
+slugs.uniq.sort.each do |slug|
+  commands.push "./GetPostsByProductR.sh #{slug}"
 end
 
 slipt_commands_to_files(commands, 10)

@@ -7,7 +7,7 @@
 
 
 # SQL Query truoc
-sql = '
+raw_sql = '
     update products p set sys_reviews_count=t.reviews_count
     from (
         select product_id,count(user_id) as reviews_count from product_reviewer
@@ -15,6 +15,8 @@ sql = '
     ) t
     where p.id = t.product_id;
 '
+
+ActiveRecord::Base.connection.execute(raw_sql)
 
 commands = []
 Product.where("reviews_count>sys_reviews_count and reviews_count > 19").each do |t|
