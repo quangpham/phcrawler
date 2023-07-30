@@ -12,8 +12,9 @@
 #
 
 
-# ssh root@159.89.192.33 "cd /root/run/ && mkdir -p done_06_a/a done_06_a/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_06_a/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_06_a/b/ {} + && zip -r done_06_a.zip done_06_a/"
-# scp root@159.89.192.33:/root/run/done_06_a.zip /Users/quang/Downloads/ok/posts-by-product/
+ssh root@159.89.192.33 "cd /root/run/ && mkdir -p done_07_a/a done_07_a/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_07_a/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_07_a/b/ {} + && zip -r done_07_a.zip done_07_a/"
+scp root@159.89.192.33:/root/run/done_07_a.zip /Users/quang/Downloads/ok/posts-by-product/
+
 #
 #
 #
