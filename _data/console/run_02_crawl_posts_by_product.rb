@@ -12,6 +12,11 @@
 #
 
 
+# ssh root@159.89.192.33 "cd /root/run/ && mkdir -p done_06_a/a done_06_a/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_06_a/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_06_a/b/ {} + && zip -r done_06_a.zip done_06_a/"
+# scp root@159.89.192.33:/root/run/done_06_a.zip /Users/quang/Downloads/ok/posts-by-product/
+#
+#
+#
 # Tao lenh crawl
 commands = []
 slugs = []
@@ -32,16 +37,18 @@ slipt_commands_to_files(commands, 15)
 # Update them voters
 
 def import_posts json_path="tmp/run/tmp/"
-  Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
+  Dir["#{json_path}/**/*.json".gsub("//","/")].sort.each do |fn|
     if File.exist?(fn) && !File.zero?(fn)
-      data = JSON.parse(File.read(fn))
+      data = parse_json(File.read(fn))
+      next if data.nil?
+
       if data["data"]
         slug = fn.split("/").last.split(".").first
 
         if product_data = helper_get_node_by_path(data, "data,product")
           product_id = product_data["id"].to_i
           product = helper_get_product_by_node_data(product_data)
-          product.fullscans = (product.fullscans + [Date.today.yday()] ).uniq.sort
+          # product.fullscans = (product.fullscans + [Date.today.yday()] ).uniq.sort
           product.fullscans_needed = nil if product.fullscans_needed == true
           product.save
 
@@ -51,9 +58,7 @@ def import_posts json_path="tmp/run/tmp/"
              end
           end
 
-          if product_data["posts"]["edges"].count > 0
-            system "rm #{fn}"
-          end
+          system "rm #{fn}" if product_data["createdAt"]
         else
           if product = Product.find_by(slug: slug)
             product.is_trashed = true

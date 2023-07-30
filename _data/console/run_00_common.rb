@@ -27,12 +27,17 @@ def slipt_commands_to_files commands, number_split_files = 15
   system "cd tmp/ && zip -r run.zip run/"
 end
 
+def parse_json string
+  JSON.parse(string) rescue nil
+end
+
 def helper_get_node_by_path n, path, obj_type = nil
   path_arr = path.kind_of?(Array) ? path : "#{path.to_s}".gsub(" ","").split(",")
   return nil if path_arr.empty?
 
   if path_arr.count == 1
     v = n[path_arr.first]
+    return nil if v.nil?
     if obj_type.blank?
       return v
     elsif obj_type == "int"
@@ -215,7 +220,7 @@ def helper_get_user_by_node_data u
       end
     end
   end
-  user.scans = ( (user.scans + [Date.today.yday()]) - user.fullscans).uniq.sort
+  # user.scans = ( (user.scans + [Date.today.yday()]) - user.fullscans).uniq.sort
   return user
 end
 
@@ -324,7 +329,7 @@ def helper_get_post_by_node_data n
     end
   end
 
-  post.scans = ( (post.scans + [Date.today.yday()]) - post.fullscans).uniq.sort
+  # post.scans = ( (post.scans + [Date.today.yday()]) - post.fullscans).uniq.sort
 
   return post
 end
@@ -427,7 +432,7 @@ def helper_get_product_by_node_data n
     end
   end
 
-  product.scans = ( (product.scans + [Date.today.yday()]) - product.fullscans).uniq.sort
+  # product.scans = ( (product.scans + [Date.today.yday()]) - product.fullscans).uniq.sort
 
   return product
 

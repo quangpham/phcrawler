@@ -93,10 +93,12 @@ if [ -s "tmp/posts-by-product/$1.$2.json" ];then
         ./GetPostsByProductR.sh $1 $endCursor
     fi
 
-    hasNextReviewsPage=$(jq '.data.product.reviews.pageInfo.hasNextPage' tmp/posts-by-product/$1.$2.json)
-    if [ "$hasNextReviewsPage" = "true" ]; then
-        reviewsEndCursor=$(jq --raw-output '.data.product.reviews.pageInfo.endCursor' tmp/posts-by-product/$1.$2.json)
-        ./GetReviewersByProduct.sh R $1 $reviewsEndCursor
+    if [ "$hasNextPage" = "false" ]; then
+        hasNextReviewsPage=$(jq '.data.product.reviews.pageInfo.hasNextPage' tmp/posts-by-product/$1.$2.json)
+        if [ "$hasNextReviewsPage" = "true" ]; then
+            reviewsEndCursor=$(jq --raw-output '.data.product.reviews.pageInfo.endCursor' tmp/posts-by-product/$1.$2.json)
+            ./GetReviewersByProduct.sh R $1 $reviewsEndCursor
+        fi
     fi
 fi
 
