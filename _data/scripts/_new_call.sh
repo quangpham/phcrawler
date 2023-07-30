@@ -4,27 +4,29 @@
 
 
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.65.7.68:/root/
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.89.192.33:/root/
 scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@167.99.74.30:/root/
 
 poosts-by-date
 poosts-by-product
 poosts-by-product
 
-ssh root@159.65.7.68 'ls -1 run/tmp/posts-by-product/ | wc -l'
-ssh root@167.99.74.30 'ls -1 run/tmp/posts-by-product/ | wc -l'
+ssh root@159.89.192.33 'ls -1 run/tmp/posts-by-date/ | wc -l'
+ssh root@167.99.74.30 'ls -1 run/tmp/posts-by-date/ | wc -l'
 
-ssh root@159.65.7.68 "cd /root/run/ && mkdir done_04_a && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_04_a/ {} + && zip -r done_04_a.zip done_04_a/"
-scp root@159.65.7.68:/root/run/done_04_a.zip /Users/quang/Downloads/ok/posts-by-product/
-
-ssh root@167.99.74.30 "cd /root/run/ && mkdir done_04_b && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_04_b/ {} + && zip -r done_04_b.zip done_04_b/"
-scp root@167.99.74.30:/root/run/done_04_b.zip /Users/quang/Downloads/ok/posts-by-product/
-
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.65.7.68:/root/a.zip
-ssh root@159.65.7.68 'cd /root/ && rm -rf run* && unzip a.zip'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.89.192.33:/root/a.zip
+ssh root@159.89.192.33 'cd /root/ && rm -rf run* && unzip a.zip'
 
 scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@167.99.74.30:/root/a.zip
 ssh root@167.99.74.30 'cd /root/ && rm -rf run* && unzip a.zip'
+
+ssh root@159.89.192.33 "cd /root/run/ && mkdir done_05_a && find tmp/posts-by-date/ -name '*.json' -exec mv -t done_05_a/ {} + && zip -r done_05_a.zip done_05_a/"
+scp root@159.89.192.33:/root/run/done_05_a.zip /Users/quang/Downloads/ok/posts-by-date/
+
+ssh root@167.99.74.30 "cd /root/run/ && mkdir done_05_b && find tmp/posts-by-date/ -name '*.json' -exec mv -t done_05_b/ {} + && zip -r done_05_b.zip done_05_b/"
+scp root@167.99.74.30:/root/run/done_05_b.zip /Users/quang/Downloads/ok/posts-by-date/
+
+
 
 
 

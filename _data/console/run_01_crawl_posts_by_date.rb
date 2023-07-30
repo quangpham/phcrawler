@@ -28,6 +28,7 @@ def import_posts json_path="tmp/run/tmp/"
       a = PostArchive.find_or_initialize_by(sys_created_at: posts_data["edges"][0]["node"]["createdAt"])
       a.posts_count = posts_data["totalCount"]
       a.save
+
       posts_data["edges"].each do |p|
         post = helper_get_post_by_node_data(p["node"])
         post.save

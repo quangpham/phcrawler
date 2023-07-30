@@ -88,6 +88,7 @@ def helper_get_user_by_node_data u
 
   user = User.find_or_initialize_by(id: user_id)
   user.username = u["username"] if !u["username"].nil? && !u["isTrashed"]
+  user.fullscans_needed = true unless user.persisted?
 
   obj_map = [
     {key: "name", path: "name", obj_type: "string"},
@@ -101,12 +102,12 @@ def helper_get_user_by_node_data u
     {key: "work_product_id", path: "work,product,id", obj_type: "int"},
     {key: "is_maker", path: "isMaker", obj_type: "bool"},
     {key: "is_trashed", path: "isTrashed", obj_type: "bool"},
-    {key: "followers", path: "followersCount", obj_type: "int", get_max: true},
-    {key: "following", path: "followingsCount", obj_type: "int", get_max: true},
+    {key: "followers", path: "followersCount", obj_type: "int", get_max: true, fullscans_check: true},
+    {key: "following", path: "followingsCount", obj_type: "int", get_max: true, fullscans_check: true},
     {key: "badges", path: "badgesCount", obj_type: "int", get_max: true},
     {key: "products_count", path: "productsCount", obj_type: "int", get_max: true},
-    {key: "collections_count", path: "collectionsCount", obj_type: "int", get_max: true},
-    {key: "votes_count", path: "votesCount", obj_type: "int", get_max: true},
+    {key: "collections_count", path: "collectionsCount", obj_type: "int", get_max: true, fullscans_check: true},
+    {key: "votes_count", path: "votesCount", obj_type: "int", get_max: true, fullscans_check: true},
     {key: "submitted_posts_count", path: "submittedPostsCount", obj_type: "int", get_max: true},
     {key: "stacks_count", path: "stacksCount", obj_type: "int", get_max: true},
     {key: "score", path: "karmaBadge,score", obj_type: "int", get_max: true},
@@ -116,11 +117,21 @@ def helper_get_user_by_node_data u
 
   obj_map.each do |m|
     if v = helper_get_node_by_path(u, m[:path], m[:obj_type])
+      old_v = user[ m[:key] ]
+      new_v = nil
+
       if m[:get_max] == true
-        user[ m[:key] ] = user[ m[:key] ].nil? ? v : [ user[ m[:key] ], v ].max
+        new_v = user[ m[:key] ].nil? ? v : [ user[ m[:key] ], v ].max
       else
-        user[ m[:key] ] = v
+        new_v = v
       end
+
+      user[ m[:key] ] = new_v
+
+      if m[:fullscans_check] == true && old_v != new_v
+        user.fullscans_needed = true
+      end
+
     end
   end
 
@@ -214,14 +225,15 @@ end
 
 def helper_get_post_by_node_data n
   post = Post.find_or_initialize_by(id: n["id"].to_i)
+  post.fullscans_needed = true unless post.persisted?
 
   obj_map = [
     {key: "name", path: "name", obj_type: "string"},
     {key: "slug", path: "slug", obj_type: "string"},
     {key: "tagline", path: "tagline", obj_type: "string"},
     {key: "pricing_type", path: "pricingType", obj_type: "string"},
-    {key: "comments_count", path: "commentsCount", obj_type: "int", get_max: true},
-    {key: "votes_count", path: "votesCount", obj_type: "int", get_max: true},
+    {key: "comments_count", path: "commentsCount", obj_type: "int", get_max: true, fullscans_check: true},
+    {key: "votes_count", path: "votesCount", obj_type: "int", get_max: true, fullscans_check: true},
     {key: "org_created_at", path: "createdAt", obj_type: nil},
     {key: "org_featured_at", path: "featuredAt", obj_type: nil},
     {key: "org_updated_at", path: "updatedAt", obj_type: nil}
@@ -229,11 +241,21 @@ def helper_get_post_by_node_data n
 
   obj_map.each do |m|
     if v = helper_get_node_by_path(n, m[:path], m[:obj_type])
+      old_v = post[ m[:key] ]
+      new_v = nil
+
       if m[:get_max] == true
-        post[ m[:key] ] = post[ m[:key] ].nil? ? v : [ post[ m[:key] ], v ].max
+        new_v = post[ m[:key] ].nil? ? v : [ post[ m[:key] ], v ].max
       else
-        post[ m[:key] ] = v
+        new_v = v
       end
+
+      post[ m[:key] ] = new_v
+
+      if m[:fullscans_check] == true && old_v != new_v
+        post.fullscans_needed = true
+      end
+
     end
   end
 
@@ -310,6 +332,7 @@ end
 def helper_get_product_by_node_data n
   product_id = n["id"].to_i
   product = Product.find_or_initialize_by(id: product_id)
+  product.fullscans_needed = true unless product.persisted?
 
   # product.slug = n["slug"] if n["slug"]
   # product.name = n["name"] if n["name"]
@@ -325,20 +348,30 @@ def helper_get_product_by_node_data n
     {key: "slug", path: "slug", obj_type: "string"},
     {key: "tagline", path: "tagline", obj_type: "string"},
     {key: "logo_uuid", path: "logoUuid", obj_type: "string"},
-    {key: "followers_count", path: "followers_count", obj_type: "int", get_max: true},
-    {key: "posts_count", path: "posts,totalCount", obj_type: "int", get_max: true},
-    {key: "reviews_count", path: "reviews,totalCount", obj_type: "int", get_max: true},
+    {key: "followers_count", path: "followers_count", obj_type: "int", get_max: true, fullscans_check: true},
+    {key: "posts_count", path: "posts,totalCount", obj_type: "int", get_max: true, fullscans_check: true},
+    {key: "reviews_count", path: "reviews,totalCount", obj_type: "int", get_max: true, fullscans_check: true},
     {key: "reviews_rating", path: "reviews_rating", obj_type: nil},
     {key: "org_created_at", path: "createdAt", obj_type: nil}
   ]
 
   obj_map.each do |m|
     if v = helper_get_node_by_path(n, m[:path], m[:obj_type])
+      old_v = product[ m[:key] ]
+      new_v = nil
+
       if m[:get_max] == true
-        product[ m[:key] ] = product[ m[:key] ].nil? ? v : [ product[ m[:key] ], v ].max
+        new_v = product[ m[:key] ].nil? ? v : [ product[ m[:key] ], v ].max
       else
-        product[ m[:key] ] = v
+        new_v = v
       end
+
+      product[ m[:key] ] = new_v
+
+      if m[:fullscans_check] == true && old_v != new_v
+        product.fullscans_needed = true
+      end
+
     end
   end
 
