@@ -11,11 +11,22 @@
 
 # update posts set sys_votes_count=array_length(uniq(upvoter_ids||commenter_ids||hunter_ids||maker_ids),1);
 
+# scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.89.192.33:/root/a.zip
+# ssh root@159.89.192.33 'cd /root/ && rm -rf run* && unzip a.zip'
+
+# ssh root@159.89.192.33 'ls -1 run/tmp/voters-by-post/ | wc -l'
+
+# ssh root@159.89.192.33 "cd /root/run/ && mkdir done_05_b && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_05_b/ {} + && zip -r done_05_b.zip done_05_b/"
+# scp root@159.89.192.33:/root/run/done_05_b.zip /Users/quang/Downloads/ok/voters-by-post/
+
 
 commands = []
-Post.where("(is_checked=false or is_checked is null) and version is null").each do |p|
-  commands.push "./GetVotersByPost.sh #{p.slug} 100000"
+slugs = []
+slugs += Post.where("fullscans_needed=true and (is_trashed is null or is_trashed=false)").select(:id, :slug).collect {|p| p.slug}
+slugs.uniq.sort.each do |slug|
+  commands.push "./GetVotersByPost.sh #{slug} 100000"
 end
+
 slipt_commands_to_files(commands, 15)
 
 # Buoc 21
@@ -26,16 +37,6 @@ slipt_commands_to_files(commands, 15)
 # Import Voters
 # Lam them phan topic_ids, votesCount commentsCount updatedAt
 #
-
-def post_version obj
-  version = ""
-  if obj.id.nil?
-    version = "new-by-voters"
-  else
-    version = "voters-04|#{obj.version}"
-  end
-  return version.gsub(" ","").split("|").uniq.join("|")
-end
 
 def import_voters json_path="tmp/run/tmp/"
   Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
@@ -48,11 +49,7 @@ def import_voters json_path="tmp/run/tmp/"
       if data["data"]
         if post_data = helper_get_node_by_path(data, "data,post")
           post = helper_get_post_by_node_data(post_data)
-          post.versions = post.versions.nil? ? [0] : ([0] + post.versions).uniq
-          # post.version = post_version(post)
-          # post.is_checked = true
           post.save
-
           if post_data["contributors"].count > 0
             system "rm #{fn2}"
           end

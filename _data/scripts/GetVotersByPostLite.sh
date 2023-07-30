@@ -1,5 +1,5 @@
 # ./GetVotersByPostLite.sh post-slug limit
-# ./GetVotersByPostLite.sh startup-stash 100000
+# ./GetVotersByPostLite.sh slack 100000
 
 # Get voters (contributors) thoai mai
 # Get them thong tin cho post: votesCount commentsCount updatedAt topic_ids
@@ -7,9 +7,8 @@
 # Lite de crawl duoc full contributors, nhung thieu fields
 # Users chi id username twitterUsername createdAt
 
-mkdir -p tmp/
 
-# rm _data/product_hunt/contributors/_r.json*
+mkdir -p tmp/voters-by-post/
 
 curl 'https://www.producthunt.com/frontend/graphql' \
   -H 'authority: www.producthunt.com' \
@@ -39,6 +38,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     {
       post(id:$postId)
       {
+
         id name slug tagline pricingType
         commentsCount votesCount
         createdAt featuredAt updatedAt
@@ -57,6 +57,6 @@ curl 'https://www.producthunt.com/frontend/graphql' \
     "
   }
     ' \
-  --compressed > "tmp/_r.lite.$1.ongoing"
+  --compressed > "tmp/voters-by-post/$1.ongoing"
 
-mv "tmp/_r.lite.$1.ongoing" "tmp/_r.lite.$1.json"
+mv "tmp/voters-by-post/$1.ongoing" "tmp/voters-by-post/$1.json"
