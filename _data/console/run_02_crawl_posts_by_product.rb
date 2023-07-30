@@ -13,6 +13,7 @@
 # Tao lenh crawl
 commands = []
 slugs = []
+slugs += Product.where(fullscans_check: true).select(:id, :slug).collect {|p| p.slug}
 slugs += Product.where("(fullscans ='{}') and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
 slugs += Product.where("(id in (select distinct product_id from posts where org_created_at > now() - interval '90 day') ) and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
 slugs += Product.where("(id in (select distinct product_id from posts where org_updated_at > now() - interval '30 day') ) and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
@@ -20,7 +21,7 @@ slugs.uniq.sort.each do |slug|
   commands.push "./GetPostsByProductR.sh #{slug}"
 end
 
-slipt_commands_to_files(commands, 10)
+slipt_commands_to_files(commands, 15)
 
 
 # Buoc 8
@@ -39,6 +40,7 @@ def import_posts json_path="tmp/run/tmp/"
           product_id = product_data["id"].to_i
           product = helper_get_product_by_node_data(product_data)
           product.fullscans = (product.fullscans + [Date.today.yday()] ).uniq.sort
+          product.fullscans_needed = nil if product.fullscans_needed == true
           product.save
 
           if slug!=product.slug
