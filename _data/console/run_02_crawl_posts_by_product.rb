@@ -5,9 +5,11 @@
 # - Lay them data cua posts duoc crawl (contributors, topic_ids, etc)
 # Note:
 # - 20 posts/lan -> R
+# - Crawl R luon GetReviewersByProduct
 #
 # Extra
 # Neu chay full, scan all thi tao lai command
+#
 
 
 # Tao lenh crawl

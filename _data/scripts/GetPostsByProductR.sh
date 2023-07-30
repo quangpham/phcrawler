@@ -51,7 +51,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
                                 }
                             }
                             }
-                            totalCount
+                            totalCount pageInfo{endCursor hasNextPage}
                         }
 
                         topics(first:100) { edges{node{id}} }
@@ -87,12 +87,23 @@ curl 'https://www.producthunt.com/frontend/graphql' \
 
 if [ -s "tmp/posts-by-product/$1.$2.json" ];then
     hasNextPage=$(jq '.data.product.posts.pageInfo.hasNextPage' tmp/posts-by-product/$1.$2.json)
-    # echo $hasNextPage
+
     if [ "$hasNextPage" = "true" ]; then
         endCursor=$(jq --raw-output '.data.product.posts.pageInfo.endCursor' tmp/posts-by-product/$1.$2.json)
         ./GetPostsByProductR.sh $1 $endCursor
     fi
+
+    hasNextReviewsPage=$(jq '.data.product.reviews.pageInfo.hasNextPage' tmp/posts-by-product/$1.$2.json)
+    if [ "$hasNextReviewsPage" = "true" ]; then
+        reviewsEndCursor=$(jq --raw-output '.data.product.reviews.pageInfo.endCursor' tmp/posts-by-product/$1.$2.json)
+        ./GetReviewersByProduct.sh R $1 $reviewsEndCursor
+    fi
 fi
+
+
+
+
+
 
 
 # fragment PostItem on Post{id commentsCount name shortenedUrl slug tagline updatedAt pricingType topics(first:1){edges{node{id name slug __typename}__typename}__typename}redirectToProduct{id slug __typename}...PostThumbnail ...PostVoteButton __typename}
