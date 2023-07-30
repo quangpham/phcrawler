@@ -92,7 +92,7 @@ def helper_get_user_by_node_data u
   user_id = u["id"].to_i
 
   user = User.find_or_initialize_by(id: user_id)
-  user.username = u["username"] if !u["username"].nil? && !u["isTrashed"]
+  user.username = u["username"].strip if !u["username"].nil? && !u["isTrashed"]
   user.fullscans_needed = true unless user.persisted?
 
   obj_map = [
@@ -221,6 +221,7 @@ def helper_get_user_by_node_data u
     end
   end
   # user.scans = ( (user.scans + [Date.today.yday()]) - user.fullscans).uniq.sort
+  user.fullscans_needed = nil if user.is_trashed == true
   return user
 end
 
@@ -330,7 +331,7 @@ def helper_get_post_by_node_data n
   end
 
   # post.scans = ( (post.scans + [Date.today.yday()]) - post.fullscans).uniq.sort
-
+  post.fullscans_needed = nil if post.is_trashed == true
   return post
 end
 
@@ -433,9 +434,8 @@ def helper_get_product_by_node_data n
   end
 
   # product.scans = ( (product.scans + [Date.today.yday()]) - product.fullscans).uniq.sort
-
+  product.fullscans_needed = nil if product.is_trashed == true
   return product
-
 end
 
 

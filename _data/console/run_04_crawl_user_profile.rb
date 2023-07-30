@@ -1,11 +1,10 @@
 # scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.89.192.33:/root/a.zip
 # ssh root@159.89.192.33 'cd /root/ && rm -rf run* && unzip a.zip'
-#
 
 # ssh root@159.89.192.33 'ls -1 run/tmp/user-profiles/ | wc -l'
 
-ssh root@159.89.192.33 "cd /root/run/ && mkdir done_02_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_02_a/ {} + && zip -r done_02_a.zip done_02_a/"
-scp root@159.89.192.33:/root/run/done_02_a.zip /Users/quang/Downloads/ok/user-profiles/
+# ssh root@159.89.192.33 "cd /root/run/ && mkdir done_04_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_04_a/ {} + && zip -r done_04_a.zip done_04_a/"
+# scp root@159.89.192.33:/root/run/done_04_a.zip /Users/quang/Downloads/ok/user-profiles/
 
 
 commands = []
@@ -28,10 +27,12 @@ def import_profiles json_path="tmp/run/tmp/"
         user.fullscans_needed = nil if user.fullscans_needed == true
         user.save
         system "rm #{fn}"
+        User.where("username=? and id!=?", user.username, user.id).update_all(is_trashed: true, fullscans_needed: nil)
       else
         un = fn.split("/").last.split(".json").first
         if user = User.find_by(username: un)
           user.is_trashed = true
+          user.fullscans_needed = nil
           user.save
           system "rm #{fn}"
         end
