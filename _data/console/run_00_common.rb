@@ -110,13 +110,13 @@ def helper_get_user_by_node_data u
     {key: "followers", path: "followersCount", obj_type: "int", get_max: true, fullscans_check: true},
     {key: "following", path: "followingsCount", obj_type: "int", get_max: true, fullscans_check: true},
     {key: "badges", path: "badgesCount", obj_type: "int", get_max: true},
-    {key: "products_count", path: "productsCount", obj_type: "int", get_max: true},
+    {key: "products_count", path: "productsCount", obj_type: "int", get_max: true, fullscans_check: true},
     {key: "collections_count", path: "collectionsCount", obj_type: "int", get_max: true, fullscans_check: true},
     {key: "votes_count", path: "votesCount", obj_type: "int", get_max: true, fullscans_check: true},
-    {key: "submitted_posts_count", path: "submittedPostsCount", obj_type: "int", get_max: true},
-    {key: "stacks_count", path: "stacksCount", obj_type: "int", get_max: true},
+    {key: "submitted_posts_count", path: "submittedPostsCount", obj_type: "int", get_max: true, fullscans_check: true},
+    {key: "stacks_count", path: "stacksCount", obj_type: "int", get_max: true, fullscans_check: true},
     {key: "score", path: "karmaBadge,score", obj_type: "int", get_max: true},
-    {key: "activities_count", path: "activityEvents,totalCount", obj_type: "int", get_max: true},
+    {key: "activities_count", path: "activityEvents,totalCount", obj_type: "int", get_max: true, fullscans_check: true},
     {key: "max_streak", path: "visitStreak,duration", obj_type: "int", get_max: true}
   ]
 
