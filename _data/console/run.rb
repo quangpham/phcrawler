@@ -144,9 +144,33 @@ slipt_commands_to_files(commands, 10, cursors)
 
 
 # Crawl topic's subscribers
+#
+#
+
+users = User.where("id not in (select following_id from user_followings where user_id=5849596) and id in (select distinct user_id from post_upvoter where post_id in (select post_id from post_topic where topic_id in (48))) and followers > 10 and followers < 100 and last_active_at > '2023-07-01 07:44:17' and is_trashed is null")
+commands = users.collect {|u| u.id.to_s}
+
+slipt_commands_to_files(commands, 1)
+
+users.each do |u|
+  system " cd _data/scripts && ./KevinPhamFollowAUser.sh #{u.id}"
+end
 
 
+def import_followers json_path="tmp/run/tmp/"
+  Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
+    data = JSON.parse(File.read(fn))
+    if data["data"]
+      if data["data"]["profile"]
+        user = helper_get_user_by_node_data(data["data"]["profile"])
+        user.save
+        # system "rm #{fn}"
+      end
+    end
+  end
+end
 
+import_followers "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp/followers-by-user/"
 
 
 

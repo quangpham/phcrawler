@@ -159,11 +159,23 @@ def helper_get_user_by_node_data u
   end
 
   if edges = helper_get_node_by_path(u, "followers,edges", "array")
+    old_val = user.follower_ids.uniq.sort
     user.follower_ids += edges.collect { |e| e["node"]["id"].to_i }
+    new_val = user.follower_ids.uniq.sort
+    if old_val != new_val
+      raw_sql = (new_val - old_val).collect {|i| "INSERT INTO user_followers (user_id, follower_id) VALUES(#{user.id}, #{i}) ON CONFLICT (user_id, follower_id) DO NOTHING;" }
+      ActiveRecord::Base.connection.execute(raw_sql.join(";"))
+    end
   end
 
   if edges = helper_get_node_by_path(u, "following,edges", "array")
+    old_val = user.following_ids.uniq.sort
     user.following_ids += edges.collect { |e| e["node"]["id"].to_i }
+    new_val = user.following_ids.uniq.sort
+    if old_val != new_val
+      raw_sql = (new_val - old_val).collect {|i| "INSERT INTO user_followings (user_id,following_id) VALUES(#{user.id},#{i}) ON CONFLICT (user_id,following_id) DO NOTHING;" }
+      ActiveRecord::Base.connection.execute(raw_sql.join(";"))
+    end
   end
 
   if edges = helper_get_node_by_path(u, "submittedPosts,edges", "array")
@@ -220,6 +232,7 @@ def helper_get_user_by_node_data u
       end
     end
   end
+
   # user.scans = ( (user.scans + [Date.today.yday()]) - user.fullscans).uniq.sort
   user.fullscans_needed = nil if user.is_trashed == true
   return user
@@ -468,6 +481,17 @@ sql = '
   insert into product_post(product_id, post_id)
   select id,unnest(post_ids) as post_id from products where post_ids is not null and post_ids != '{}'
   ON CONFLICT (product_id, post_id) DO NOTHING;
+
+
+  insert into user_followers(user_id, follower_id)
+  select id,unnest(follower_ids) as follower_id from users where follower_ids is not null and follower_ids != '{}'
+  ON CONFLICT (user_id, follower_id) DO NOTHING;
+
+  insert into user_followings(user_id, following_id)
+  select id,unnest(following_ids) as following_id from users where following_ids is not null and following_ids != '{}'
+  ON CONFLICT (user_id, following_id) DO NOTHING;
+
+
 
 
   update products p set sys_posts_count=t.posts_count
