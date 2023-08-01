@@ -184,7 +184,13 @@ def helper_get_user_by_node_data u
   end
 
   if edges = helper_get_node_by_path(u, "votedPosts,edges", "array")
+    old_val = user.voted_post_ids.uniq.sort
     user.voted_post_ids += edges.collect { |e| e["node"]["id"].to_i }
+    new_val = user.voted_post_ids.uniq.sort
+    if old_val != new_val
+      raw_sql = (new_val - old_val).collect {|i| "INSERT INTO post_upvoter (user_id,post_id) VALUES(#{user.id},#{i}) ON CONFLICT (user_id,post_id) DO NOTHING;" }
+      ActiveRecord::Base.connection.execute(raw_sql.join(";"))
+    end
   end
 
   if edges = helper_get_node_by_path(u, "stacks,edges", "array")
