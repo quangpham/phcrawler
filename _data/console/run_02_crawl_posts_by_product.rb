@@ -12,19 +12,24 @@
 #
 
 
-ssh root@159.89.192.33 "cd /root/run/ && mkdir -p done_07_a/a done_07_a/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_07_a/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_07_a/b/ {} + && zip -r done_07_a.zip done_07_a/"
-scp root@159.89.192.33:/root/run/done_07_a.zip /Users/quang/Downloads/ok/posts-by-product/
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@209.97.164.48:/root/a.zip
+ssh root@209.97.164.48 'cd /root/ && rm -rf run* && unzip a.zip'
 
-#
-#
-#
+ssh root@209.97.164.48 'ls -1 run/tmp/posts-by-product/ | wc -l'
+ssh root@209.97.164.48 'ls -1 run/tmp/reviewers-by-product/ | wc -l'
+
+ssh root@209.97.164.48 "cd /root/run/ && mkdir -p done_07_a/a done_07_a/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_07_a/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_07_a/b/ {} + && zip -r done_07_a.zip done_07_a/"
+scp root@209.97.164.48:/root/run/done_07_a.zip /Users/quang/Downloads/ok/posts-by-product/
+
+
+
 # Tao lenh crawl
+
 commands = []
 slugs = []
-slugs += Product.where(fullscans_check: true).select(:id, :slug).collect {|p| p.slug}
-slugs += Product.where("(fullscans ='{}') and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
-slugs += Product.where("(id in (select distinct product_id from posts where org_created_at > now() - interval '90 day') ) and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
-slugs += Product.where("(id in (select distinct product_id from posts where org_updated_at > now() - interval '30 day') ) and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
+slugs += Product.where(fullscans_needed: true).select(:id, :slug).collect {|p| p.slug}
+slugs += Product.where("(id in (select distinct product_id from posts where org_created_at > now() - interval '30 day') ) and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
+slugs += Product.where("(id in (select distinct product_id from posts where org_updated_at > now() - interval '15 day') ) and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
 slugs.uniq.sort.each do |slug|
   commands.push "./GetPostsByProductR.sh #{slug}"
 end
@@ -45,27 +50,26 @@ def import_posts json_path="tmp/run/tmp/"
 
       if data["data"]
         slug = fn.split("/").last.split(".").first
-
+        # product = helper_get_product_by_node_data(n)
         if product_data = helper_get_node_by_path(data, "data,product")
           product_id = product_data["id"].to_i
           product = helper_get_product_by_node_data(product_data)
-          # product.fullscans = (product.fullscans + [Date.today.yday()] ).uniq.sort
           product.fullscans_needed = nil if product.fullscans_needed == true
           product.save
 
-          if slug!=product.slug
-             if p = Product.find_by(slug: slug)
-              p.delete
-             end
-          end
+          # if slug!=product.slug
+          #    if p = Product.find_by(slug: slug)
+          #     p.delete
+          #    end
+          # end
 
           system "rm #{fn}" if product_data["createdAt"]
-        else
-          if product = Product.find_by(slug: slug)
-            product.is_trashed = true
-            product.save
-            system "rm #{fn}"
-          end
+        # else
+        #   if product = Product.find_by(slug: slug)
+        #     product.is_trashed = true
+        #     product.save
+        #     system "rm #{fn}"
+        #   end
         end
       end
 

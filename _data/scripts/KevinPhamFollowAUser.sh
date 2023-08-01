@@ -1,16 +1,16 @@
 #./KevinPhamFollowAUser.sh user-id
 
-username=$( tail -n 1  user_ids.txt | xargs)
-username="${username//[$'\t\n\r']}"
-echo $username
+userid=$( tail -n 1  user_ids.txt | xargs)
+userid="${userid//[$'\t\n\r']}"
+echo $userid
 
 # sed -i '' -e '$ d' foo.txt # MAC OS
 sed -i '$ d' user_ids.txt # LINUX
 
 
-if [ -z "$username" ]
+if [ -z "$userid" ]
 then
-    echo "\$username is empty"
+    echo "\$userid is empty"
 else
     curl 'https://www.producthunt.com/frontend/graphql' \
     -H 'authority: www.producthunt.com' \
@@ -28,7 +28,7 @@ else
     -H 'sec-fetch-site: same-origin' \
     -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36' \
     -H 'x-requested-with: XMLHttpRequest' \
-    --data-raw $'{"operationName":"UserFollowCreate","variables":{"input":{"userId":"'$username'","sourceComponent":"user_profile"}},"query":"mutation UserFollowCreate($input:UserFollowCreateInput\u0021){response:userFollowCreate(input:$input){node{id ...UserFollowButtonFragment __typename}__typename}}fragment UserFollowButtonFragment on User{id followersCount isFollowed __typename}"}' \
+    --data-raw $'{"operationName":"UserFollowCreate","variables":{"input":{"userId":"'$userid'","sourceComponent":"user_profile"}},"query":"mutation UserFollowCreate($input:UserFollowCreateInput\u0021){response:userFollowCreate(input:$input){node{id ...UserFollowButtonFragment __typename}__typename}}fragment UserFollowButtonFragment on User{id followersCount isFollowed __typename}"}' \
     --compressed
 fi
 

@@ -6,6 +6,7 @@
 # ./GetUserProfile.sh jesv
 # collections duoc max 100
 # submittedPosts duoc max 20
+# votedPosts duoc max 20
 
 mkdir -p tmp/user-profiles/
 
@@ -48,6 +49,10 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         followedTopics { edges {node { id } } }
         stacks { edges {node { id product { id slug } } } }
         submittedPosts { edges { node{id} } }
+        votedPosts(first:20) {
+          edges { node{id} }
+          totalCount pageInfo{endCursor hasNextPage}
+        }
 
         collections {
           edges {

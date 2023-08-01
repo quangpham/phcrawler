@@ -11,18 +11,20 @@
 
 # update posts set sys_votes_count=array_length(uniq(upvoter_ids||commenter_ids||hunter_ids||maker_ids),1);
 
-# scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.89.192.33:/root/a.zip
-# ssh root@159.89.192.33 'cd /root/ && rm -rf run* && unzip a.zip'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@209.97.164.48:/root/a.zip
+ssh root@209.97.164.48 'cd /root/ && rm -rf run* && unzip a.zip'
 
-# ssh root@159.89.192.33 'ls -1 run/tmp/voters-by-post/ | wc -l'
+ssh root@209.97.164.48 'ls -1 run/tmp/voters-by-post/ | wc -l'
 
-# ssh root@159.89.192.33 "cd /root/run/ && mkdir done_01_a && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_01_a/ {} + && zip -r done_01_a.zip done_01_a/"
-# scp root@159.89.192.33:/root/run/done_01_a.zip /Users/quang/Downloads/ok/voters-by-post/
+ssh root@209.97.164.48 "cd /root/run/ && mkdir done_02_a && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_02_a/ {} + && zip -r done_02_a.zip done_02_a/"
+scp root@209.97.164.48:/root/run/done_02_a.zip /Users/quang/Downloads/ok/voters-by-post/
 
 
 commands = []
 slugs = []
 slugs += Post.where("fullscans_needed=true and (is_trashed is null or is_trashed=false)").select(:id, :slug).collect {|p| p.slug}
+slugs += Post.where("org_created_at > now() - interval '60 day' and (is_trashed is null or is_trashed=false)").select(:id, :slug).collect {|p| p.slug}
+slugs += Post.where("org_updated_at > now() - interval '15 day' and (is_trashed is null or is_trashed=false)").select(:id, :slug).collect {|p| p.slug}
 slugs.uniq.sort.each do |slug|
   commands.push "./GetVotersByPost.sh #{slug} 100000"
 end

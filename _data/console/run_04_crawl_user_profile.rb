@@ -1,10 +1,12 @@
-# scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@159.89.192.33:/root/a.zip
-# ssh root@159.89.192.33 'cd /root/ && rm -rf run* && unzip a.zip'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@209.97.164.48:/root/a.zip
+ssh root@209.97.164.48 'cd /root/ && rm -rf run* && unzip a.zip'
 
-# ssh root@159.89.192.33 'ls -1 run/tmp/user-profiles/ | wc -l'
+ssh root@209.97.164.48 'ls -1 run/tmp/user-profiles/ | wc -l'
 
-# ssh root@159.89.192.33 "cd /root/run/ && mkdir done_04_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_04_a/ {} + && zip -r done_04_a.zip done_04_a/"
-# scp root@159.89.192.33:/root/run/done_04_a.zip /Users/quang/Downloads/ok/user-profiles/
+ssh root@209.97.164.48 "cd /root/run/ && mkdir done_01_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_01_a/ {} + && zip -r done_01_a.zip done_01_a/"
+scp root@209.97.164.48:/root/run/done_01_a.zip /Users/quang/Downloads/ok/user-profiles/
+
+
 
 
 commands = []

@@ -147,6 +147,7 @@ def helper_get_user_by_node_data u
     ["following_ids"],
     ["stack_product_ids"],
     ["submitted_post_ids"],
+    ["voted_post_ids","gen_voted_posts_count"],
     ["collection_ids"],
     ["links", "gen_links_count"]
   ]
@@ -180,6 +181,10 @@ def helper_get_user_by_node_data u
 
   if edges = helper_get_node_by_path(u, "submittedPosts,edges", "array")
     user.submitted_post_ids += edges.collect { |e| e["node"]["id"].to_i }
+  end
+
+  if edges = helper_get_node_by_path(u, "votedPosts,edges", "array")
+    user.voted_post_ids += edges.collect { |e| e["node"]["id"].to_i }
   end
 
   if edges = helper_get_node_by_path(u, "stacks,edges", "array")
@@ -338,7 +343,6 @@ def helper_get_product_by_node_data n
     {key: "name", path: "name", obj_type: "string"},
     {key: "slug", path: "slug", obj_type: "string"},
     {key: "tagline", path: "tagline", obj_type: "string"},
-    {key: "logo_uuid", path: "logoUuid", obj_type: "string"},
     {key: "followers_count", path: "followers_count", obj_type: "int", get_max: true, fullscans_check: true},
     {key: "posts_count", path: "posts,totalCount", obj_type: "int", get_max: true, fullscans_check: true},
     {key: "reviews_count", path: "reviews,totalCount", obj_type: "int", get_max: true, fullscans_check: true},
@@ -463,6 +467,19 @@ sql = '
   ON CONFLICT (user_id, following_id) DO NOTHING;
 
 
+
+
+  UPDATE users u set last_active_at=GREATEST(u.last_active_at, t.last_active_at)
+  from (
+    select user_id, max(org_created_at) as last_active_at
+    from (
+      select pu.post_id,pu.user_id,p.org_created_at from post_upvoter pu
+      inner join posts p on pu.post_id=p.id
+      where pu.post_id in (select id from posts where org_created_at > now() - interval '360 day')
+    ) t1
+    group by user_id
+  ) t
+  where u.id = t.user_id;
 
 
   update products p set sys_posts_count=t.posts_count
