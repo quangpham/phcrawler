@@ -233,14 +233,9 @@ def helper_get_user_by_node_data u
     end
   end
 
-  # user.scans = ( (user.scans + [Date.today.yday()]) - user.fullscans).uniq.sort
   user.fullscans_needed = nil if user.is_trashed == true
   return user
 end
-
-# fn = "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp/user-profiles/byosko.json"
-# data = JSON.parse(File.read(fn))
-# user = helper_get_user_by_node_data(data["data"]["profile"])
 
 def helper_get_post_by_node_data n
   post = Post.find_or_initialize_by(id: n["id"].to_i)
@@ -294,22 +289,9 @@ def helper_get_post_by_node_data n
     post.product_id = product_id
     unless Product.find_by(id: product_id)
        product_slug = helper_get_node_by_path(n, "product,slug", "string") || helper_get_node_by_path(n, "redirectToProduct,slug", "string")
-       Product.create(id: product_id, slug: product_slug)
+       Product.create(id: product_id, slug: product_slug, fullscans_needed: true)
     end
   end
-
-  # if n["redirectToProduct"]
-  #   if n["redirectToProduct"]["id"]
-  #     post.product_id = n["redirectToProduct"]["id"].to_i
-  #   end
-  # end
-
-  # if n["product"]
-  #   if n["product"]["id"]
-  #     post.product_id = n["product"]["id"].to_i
-  #   end
-  # end
-  #
 
   if edges = helper_get_node_by_path(n, "topics,edges", "array")
     post.topic_ids += edges.collect {|_n| _n["node"]["id"].to_i }
@@ -343,7 +325,6 @@ def helper_get_post_by_node_data n
     end
   end
 
-  # post.scans = ( (post.scans + [Date.today.yday()]) - post.fullscans).uniq.sort
   post.fullscans_needed = nil if post.is_trashed == true
   return post
 end
@@ -352,15 +333,6 @@ def helper_get_product_by_node_data n
   product_id = n["id"].to_i
   product = Product.find_or_initialize_by(id: product_id)
   product.fullscans_needed = true unless product.persisted?
-
-  # product.slug = n["slug"] if n["slug"]
-  # product.name = n["name"] if n["name"]
-  # product.tagline = n["tagline"] if n["tagline"]
-  # product.logo_uuid = n["logoUuid"] if n["logoUuid"]
-  # product.followers_count = n["followersCount"] if n["followersCount"]
-  # product.reviews_rating = n["reviewsRating"] if n["reviewsRating"]
-  # product.org_created_at = n["createdAt"] if n["createdAt"]
-
 
   obj_map = [
     {key: "name", path: "name", obj_type: "string"},
@@ -446,7 +418,6 @@ def helper_get_product_by_node_data n
     end
   end
 
-  # product.scans = ( (product.scans + [Date.today.yday()]) - product.fullscans).uniq.sort
   product.fullscans_needed = nil if product.is_trashed == true
   return product
 end

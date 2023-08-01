@@ -40,5 +40,6 @@ def import_posts json_path="tmp/run/tmp/"
   end
 end
 
+import_posts "tmp/run/tmp/posts-by-date/"
 import_posts "/Users/quang/Downloads/ok/posts-by-date/"
 import_posts "_data/scripts/tmp/posts-by-date/"
