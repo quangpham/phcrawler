@@ -19,8 +19,11 @@ slipt_commands_to_files(commands, 10)
 
 ###
 def import_posts json_path="tmp/run/tmp/"
-  Dir["#{json_path}/**/*.json".gsub("//","/")].sort.each do |fn|
-    data = JSON.parse(File.read(fn))
+  Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
+    next if !(File.exist?(fn) && !File.zero?(fn))
+    data = parse_json(File.read(fn))
+    next if data.nil?
+
     posts_data = data["data"]["posts"]
     edges_count = posts_data["edges"].count
 
@@ -39,6 +42,7 @@ def import_posts json_path="tmp/run/tmp/"
 
   end
 end
+
 
 import_posts "tmp/run/tmp/posts-by-date/"
 import_posts "/Users/quang/Downloads/ok/posts-by-date/"

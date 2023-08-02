@@ -12,19 +12,19 @@
 #
 
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@209.97.164.48:/root/a.zip
-ssh root@209.97.164.48 'cd /root/ && rm -rf run* && unzip a.zip'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.102.177:/root/a.zip
+ssh root@157.245.102.177 'cd /root/ && rm -rf run* && unzip a.zip'
 
-ssh root@209.97.164.48 'ls -1 run/tmp/posts-by-product/ | wc -l'
-ssh root@209.97.164.48 'ls -1 run/tmp/reviewers-by-product/ | wc -l'
+ssh root@157.245.102.177 'ls -1 run/tmp/posts-by-product/ | wc -l'
+ssh root@157.245.102.177 'ls -1 run/tmp/reviewers-by-product/ | wc -l'
 
-ssh root@209.97.164.48 "cd /root/run/ && mkdir -p done_07_a/a done_07_a/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_07_a/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_07_a/b/ {} + && zip -r done_07_a.zip done_07_a/"
-scp root@209.97.164.48:/root/run/done_07_a.zip /Users/quang/Downloads/ok/posts-by-product/
+mkdir -p /Users/quang/Downloads/ok/posts-by-product/
+ssh root@157.245.102.177 "cd /root/run/ && mkdir -p done_01_a/a done_01_a/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_01_a/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_01_a/b/ {} + && zip -r done_01_a.zip done_01_a/"
+scp root@157.245.102.177:/root/run/done_01_a.zip /Users/quang/Downloads/ok/posts-by-product/
 
 
 
 # Tao lenh crawl
-
 commands = []
 slugs = []
 slugs += Product.where(fullscans_needed: true).select(:id, :slug).collect {|p| p.slug}
@@ -43,36 +43,15 @@ slipt_commands_to_files(commands, 15)
 # Update them voters
 
 def import_posts json_path="tmp/run/tmp/"
-  Dir["#{json_path}/**/*.json".gsub("//","/")].sort.each do |fn|
-    if File.exist?(fn) && !File.zero?(fn)
-      data = parse_json(File.read(fn))
-      next if data.nil?
-
-      if data["data"]
-        slug = fn.split("/").last.split(".").first
-        # product = helper_get_product_by_node_data(n)
-        if product_data = helper_get_node_by_path(data, "data,product")
-          product_id = product_data["id"].to_i
-          product = helper_get_product_by_node_data(product_data)
-          product.fullscans_needed = nil if product.fullscans_needed == true
-          product.save
-
-          # if slug!=product.slug
-          #    if p = Product.find_by(slug: slug)
-          #     p.delete
-          #    end
-          # end
-
-          system "rm #{fn}" if product_data["createdAt"]
-        # else
-        #   if product = Product.find_by(slug: slug)
-        #     product.is_trashed = true
-        #     product.save
-        #     system "rm #{fn}"
-        #   end
-        end
-      end
-
+  Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
+    next if !(File.exist?(fn) && !File.zero?(fn))
+    data = parse_json(File.read(fn))
+    next if data.nil?
+    if product_data = helper_get_node_by_path(data, "data,product")
+      product = helper_get_product_by_node_data(product_data)
+      product.fullscans_needed = nil if product.fullscans_needed == true
+      product.save
+      system "rm #{fn}" if product_data["createdAt"]
     end
   end
 end
