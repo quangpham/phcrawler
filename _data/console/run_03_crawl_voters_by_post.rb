@@ -42,32 +42,31 @@ slipt_commands_to_files(commands, 15)
 
 def import_voters json_path="tmp/run/tmp/"
   Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
-    if File.exist?(fn) && !File.zero?(fn)
-      data = parse_json(File.read(fn))
-      next if data.nil?
-
-      if data["data"]
-        slug = fn.split("/").last.split(".json").first
-        if post_data = helper_get_node_by_path(data, "data,post")
-          post = helper_get_post_by_node_data(post_data)
-          post.fullscans_needed = nil if post.fullscans_needed == true
-          post.save
-          if post_data["contributors"].count > 0
-            system "rm #{fn}"
-          end
-          Post.where("slug=? and id!=?", slug, post.id).delete_all
-        else
-          if _post = Post.find_by(slug: slug)
-            _post.is_trashed = true
-            _post.save
-            system "rm #{fn}"
-          end
+    next if !(File.exist?(fn) && !File.zero?(fn))
+    data = parse_json(File.read(fn))
+    next if data.nil?
+    if data["data"]
+      # slug = fn.split("/").last.split(".json").first
+      if post_data = helper_get_node_by_path(data, "data,post")
+        post = helper_get_post_by_node_data(post_data)
+        post.fullscans_needed = nil if post.fullscans_needed == true
+        post.save
+        if post_data["contributors"].count > 0
+          system "rm #{fn}"
         end
-
+        # Post.where("slug=? and id!=?", slug, post.id).delete_all
+      # else
+      #   if _post = Post.find_by(slug: slug)
+      #     _post.is_trashed = true
+      #     _post.save
+      #     system "rm #{fn}"
+      #   end
       end
 
     end
   end
 end
+
+import_voters "tmp/run/tmp/voters-by-post"
 
 import_voters "/Users/quang/Downloads/ok/voters-by-post"
