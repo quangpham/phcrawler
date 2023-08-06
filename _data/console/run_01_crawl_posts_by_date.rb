@@ -8,14 +8,29 @@
 
 # Tao lenh crawl toan bo post trong 60 ngay vua qua
 
+
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@139.59.245.56:/root/a.zip
+ssh root@139.59.245.56 'cd /root/ && rm -rf run* && unzip a.zip'
+
+ssh root@139.59.245.56 'ls -1 run/tmp/posts-by-date/ | wc -l'
+
+mkdir -p /Users/quang/Downloads/ok/posts-by-date/
+ssh root@139.59.245.56 "cd /root/run/ && mkdir done_02_a && find tmp/posts-by-date/ -name '*.json' -exec mv -t done_02_a/ {} + && zip -r done_02_a.zip done_02_a/"
+scp root@139.59.245.56:/root/run/done_02_a.zip /Users/quang/Downloads/ok/posts-by-date/
+
+
+
 commands = []
 (1..60).to_a.reverse.to_a.each do |i|
   if a = PostArchive.find_or_create_by(sys_created_at: i.days.ago)
+    if a.week_day.nil?
+      a.update(week_day: a.sys_created_at.strftime('%^a'))
+    end
     # system "cd _data/scripts/ && ./GetPostsByDateR.sh #{a.sys_created_at.year.to_i} #{a.sys_created_at.month.to_i} #{a.sys_created_at.day.to_i}"
     commands.push "./GetPostsByDateR.sh #{a.sys_created_at.year.to_i} #{a.sys_created_at.month.to_i} #{a.sys_created_at.day.to_i}"
   end
 end
-slipt_commands_to_files(commands, 10)
+slipt_commands_to_files(commands, 15)
 
 ###
 def import_posts json_path="tmp/run/tmp/"
@@ -43,7 +58,7 @@ def import_posts json_path="tmp/run/tmp/"
   end
 end
 
-
-import_posts "tmp/run/tmp/posts-by-date/"
 import_posts "/Users/quang/Downloads/ok/posts-by-date/"
+import_posts "tmp/run/tmp/posts-by-date/"
+
 import_posts "_data/scripts/tmp/posts-by-date/"

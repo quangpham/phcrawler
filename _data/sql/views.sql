@@ -1,11 +1,12 @@
 CREATE VIEW user_topic_view AS
-select
+SELECT
     pt.topic_id,
     pu.post_id,
     u.id,
     u.username,
     u.headline,
     u.twitter,
+    u.linkedin,
     u.website,
     u.about,
     u.badges,
@@ -32,45 +33,44 @@ select
     u.gen_voted_posts_count,
     u.upvotes_score,
     u.visit_streak_score
-from post_upvoter pu
-inner join post_topic pt on pu.post_id=pt.post_id
-inner join users u on pu.user_id=u.id;
+FROM post_upvoter pu
+JOIN post_topic pt ON pu.post_id = pt.post_id
+JOIN users u ON pu.user_id = u.id;
 
 
 CREATE VIEW user_topic_48 AS
-select
-    id,
-    max(username) as username,
-    count(post_id) as posts_count,
-    max(headline) as headline,
-    max(twitter) as twitter,
-    max(website) as website,
-    max(about) as about,
-    max(badges) as badges,
-    max(followers) as followers,
-    max(following) as following,
-    max(score) as score,
-    max(votes_count) as votes_count,
-    max(job_title) as job_title,
-    max(company_name) as company_name,
-    max(gen_links_count) as gen_links_count,
-    max(gen_followed_topics_count) as gen_followed_topics_count,
-    max(collections_count) as collections_count,
-    max(submitted_posts_count) as submitted_posts_count,
-    max(stacks_count) as stacks_count,
-    max(products_count) as products_count,
-    max(max_streak) as max_streak,
-    bool_or(is_maker) as is_maker,
-    bool_or(is_trashed) as is_trashed,
-    max(org_created_at) as org_created_at,
-    max(created_at) as created_at,
-    max(activities_count) as activities_count,
-    max(last_active_at) as last_active_at,
-    max(updated_at) as updated_at,
-    max(gen_voted_posts_count) as gen_voted_posts_count,
-    max(upvotes_score) as upvotes_score,
-    max(visit_streak_score) as visit_streak_score
-from user_topic_view
-where topic_id=48 and followers > 10 and followers < 100 and last_active_at > now() - interval '30 day'
-group by id
-
+SELECT user_topic_view.id,
+    max(user_topic_view.username::text) AS username,
+    count(user_topic_view.post_id) AS posts_count,
+    max(user_topic_view.headline::text) AS headline,
+    max(user_topic_view.twitter::text) AS twitter,
+    max(user_topic_view.linkedin::text) AS linkedin,
+    max(user_topic_view.website::text) AS website,
+    max(user_topic_view.about::text) AS about,
+    max(user_topic_view.badges) AS badges,
+    max(user_topic_view.followers) AS followers,
+    max(user_topic_view.following) AS following,
+    max(user_topic_view.score) AS score,
+    max(user_topic_view.votes_count) AS votes_count,
+    max(user_topic_view.job_title::text) AS job_title,
+    max(user_topic_view.company_name::text) AS company_name,
+    max(user_topic_view.gen_links_count) AS gen_links_count,
+    max(user_topic_view.gen_followed_topics_count) AS gen_followed_topics_count,
+    max(user_topic_view.collections_count) AS collections_count,
+    max(user_topic_view.submitted_posts_count) AS submitted_posts_count,
+    max(user_topic_view.stacks_count) AS stacks_count,
+    max(user_topic_view.products_count) AS products_count,
+    max(user_topic_view.max_streak) AS max_streak,
+    bool_or(user_topic_view.is_maker) AS is_maker,
+    bool_or(user_topic_view.is_trashed) AS is_trashed,
+    max(user_topic_view.org_created_at) AS org_created_at,
+    max(user_topic_view.created_at) AS created_at,
+    max(user_topic_view.activities_count) AS activities_count,
+    max(user_topic_view.last_active_at) AS last_active_at,
+    max(user_topic_view.updated_at) AS updated_at,
+    max(user_topic_view.gen_voted_posts_count) AS gen_voted_posts_count,
+    max(user_topic_view.upvotes_score) AS upvotes_score,
+    max(user_topic_view.visit_streak_score) AS visit_streak_score
+FROM user_topic_view
+WHERE user_topic_view.topic_id = 48 AND user_topic_view.followers > 10 AND user_topic_view.followers < 200 AND user_topic_view.last_active_at > (now() - '30 days'::interval)
+GROUP BY user_topic_view.id;
