@@ -67,6 +67,8 @@ def import_voters json_path="tmp/run/tmp/"
   end
 end
 
+import_voters "/Users/quang/Downloads/ok/voters-by-post"
+
 import_voters "tmp/run/tmp/voters-by-post"
 
-import_voters "/Users/quang/Downloads/ok/voters-by-post"
+
