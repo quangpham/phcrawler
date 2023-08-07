@@ -12,7 +12,7 @@ commands = []
 usernames = []
 usernames += User.where("fullscans_needed=true and (is_trashed is null or is_trashed=false)").select(:id, :username).collect {|p| p.username}
 # usernames += User.where("(is_trashed is null or is_trashed=false)").select(:id, :username).collect {|p| p.username}
-usernames += User.where("fullscans_needed=false").select(:id, :username).collect {|p| p.username}
+# usernames += User.where("fullscans_needed=false").select(:id, :username).collect {|p| p.username}
 usernames.uniq.sort.each do |username|
   commands.push "./GetUserProfile.sh #{username}"
 end
