@@ -9,8 +9,8 @@ ssh root@188.166.241.233 'cd /root/ && rm -rf run* && unzip a.zip'
 ssh root@188.166.241.233 'ls -1 run/tmp/followers-by-topic/ | wc -l'
 
 mkdir -p /Users/quang/Downloads/ok/followers-by-topic/
-ssh root@188.166.241.233 "cd /root/run/ && mkdir done_01_a && find tmp/followers-by-topic/ -name '*.json' -exec mv -t done_01_a/ {} + && zip -r done_01_a.zip done_01_a/"
-scp root@188.166.241.233:/root/run/done_01_a.zip /Users/quang/Downloads/ok/followers-by-topic/
+ssh root@188.166.241.233 "cd /root/run/ && mkdir done_03_a && find tmp/followers-by-topic/ -name '*.json' -exec mv -t done_03_a/ {} + && zip -r done_03_a.zip done_03_a/"
+scp root@188.166.241.233:/root/run/done_03_a.zip /Users/quang/Downloads/ok/followers-by-topic/
 
 commands = []
 Topic.all.order("followers_count").each do |t|
