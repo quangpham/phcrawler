@@ -15,8 +15,8 @@ ssh root@188.166.241.233 'cd /root/ && rm -rf run* && unzip a.zip'
 ssh root@188.166.241.233 'ls -1 run/tmp/posts-by-date/ | wc -l'
 
 mkdir -p /Users/quang/Downloads/ok/posts-by-date/
-ssh root@188.166.241.233 "cd /root/run/ && mkdir done_02_a && find tmp/posts-by-date/ -name '*.json' -exec mv -t done_02_a/ {} + && zip -r done_02_a.zip done_02_a/"
-scp root@188.166.241.233:/root/run/done_02_a.zip /Users/quang/Downloads/ok/posts-by-date/
+ssh root@188.166.241.233 "cd /root/run/ && mkdir done_01_a && find tmp/posts-by-date/ -name '*.json' -exec mv -t done_01_a/ {} + && zip -r done_01_a.zip done_01_a/"
+scp root@188.166.241.233:/root/run/done_01_a.zip /Users/quang/Downloads/ok/posts-by-date/
 
 
 

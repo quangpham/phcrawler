@@ -16,8 +16,8 @@ ssh root@188.166.241.233 'cd /root/ && rm -rf run* && unzip a.zip'
 
 ssh root@188.166.241.233 'ls -1 run/tmp/voters-by-post/ | wc -l'
 
-ssh root@188.166.241.233 "cd /root/run/ && mkdir done_02_a && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_02_a/ {} + && zip -r done_02_a.zip done_02_a/"
-scp root@188.166.241.233:/root/run/done_02_a.zip /Users/quang/Downloads/ok/voters-by-post/
+ssh root@188.166.241.233 "cd /root/run/ && mkdir done_03_a && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_03_a/ {} + && zip -r done_03_a.zip done_03_a/"
+scp root@188.166.241.233:/root/run/done_03_a.zip /Users/quang/Downloads/ok/voters-by-post/
 
 
 commands = []
