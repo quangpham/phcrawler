@@ -217,20 +217,16 @@ def helper_get_user_by_node_data u
 
   if u["badgeGroups"]
     u["badgeGroups"].each do |b|
-      # upvotes_10
-      # visit_streak_10
-      if b["awardKind"].index("upvotes_") == 0
-        if b["badgesCount"] > 0
+      if b["badgesCount"] > 0
+        if b["awardKind"].index("upvotes_") == 0
           v = b["awardKind"].gsub("upvotes_","").to_i
           user.upvotes_score = user.upvotes_score.nil? ? v : [user.upvotes_score, v].max
-        end
-      elsif b["awardKind"].index("visit_streak_") == 0
-        if b["badgesCount"] > 0
+        elsif b["awardKind"].index("visit_streak_") == 0
           v = b["awardKind"].gsub("visit_streak_","").to_i
           user.visit_streak_score = user.visit_streak_score.nil? ? v : [user.visit_streak_score, v].max
+        else
+          user["#{b["awardKind"]}"]  = b["badgesCount"]
         end
-      else
-        user["#{b["awardKind"]}"]  = b["badgesCount"]
       end
     end
   end
