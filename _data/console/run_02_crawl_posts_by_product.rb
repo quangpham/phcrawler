@@ -12,15 +12,15 @@
 #
 
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@188.166.241.233:/root/a.zip
-ssh root@188.166.241.233 'cd /root/ && rm -rf run* && unzip a.zip'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@128.199.106.41:/root/a.zip
+ssh root@128.199.106.41 'cd /root/ && rm -rf run* && unzip a.zip'
 
-ssh root@188.166.241.233 'ls -1 run/tmp/posts-by-product/ | wc -l'
-ssh root@188.166.241.233 'ls -1 run/tmp/reviewers-by-product/ | wc -l'
+ssh root@128.199.106.41 'ls -1 run/tmp/posts-by-product/ | wc -l'
+ssh root@128.199.106.41 'ls -1 run/tmp/reviewers-by-product/ | wc -l'
 
 mkdir -p /Users/quang/Downloads/ok/posts-by-product/
-ssh root@188.166.241.233 "cd /root/run/ && mkdir -p done_01_a/a done_01_a/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_01_a/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_01_a/b/ {} + && zip -r done_01_a.zip done_01_a/"
-scp root@188.166.241.233:/root/run/done_01_a.zip /Users/quang/Downloads/ok/posts-by-product/
+ssh root@128.199.106.41 "cd /root/run/ && mkdir -p done_01_a/a done_01_a/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_01_a/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_01_a/b/ {} + && zip -r done_01_a.zip done_01_a/"
+scp root@128.199.106.41:/root/run/done_01_a.zip /Users/quang/Downloads/ok/posts-by-product/
 
 
 

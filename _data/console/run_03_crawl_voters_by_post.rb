@@ -11,13 +11,13 @@
 
 # update posts set sys_votes_count=array_length(uniq(upvoter_ids||commenter_ids||hunter_ids||maker_ids),1);
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@188.166.241.233:/root/a.zip
-ssh root@188.166.241.233 'cd /root/ && rm -rf run* && unzip a.zip'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@128.199.106.41:/root/a.zip
+ssh root@128.199.106.41 'cd /root/ && rm -rf run* && unzip a.zip'
 
-ssh root@188.166.241.233 'ls -1 run/tmp/voters-by-post/ | wc -l'
+ssh root@128.199.106.41 'ls -1 run/tmp/voters-by-post/ | wc -l'
 
-ssh root@188.166.241.233 "cd /root/run/ && mkdir done_03_a && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_03_a/ {} + && zip -r done_03_a.zip done_03_a/"
-scp root@188.166.241.233:/root/run/done_03_a.zip /Users/quang/Downloads/ok/voters-by-post/
+ssh root@128.199.106.41 "cd /root/run/ && mkdir done_03_a && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_03_a/ {} + && zip -r done_03_a.zip done_03_a/"
+scp root@128.199.106.41:/root/run/done_03_a.zip /Users/quang/Downloads/ok/voters-by-post/
 
 
 commands = []

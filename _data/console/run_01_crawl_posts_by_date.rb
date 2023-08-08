@@ -9,14 +9,14 @@
 # Tao lenh crawl toan bo post trong 60 ngay vua qua
 
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@188.166.241.233:/root/a.zip
-ssh root@188.166.241.233 'cd /root/ && rm -rf run* && unzip a.zip'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@128.199.106.41:/root/a.zip
+ssh root@128.199.106.41 'cd /root/ && rm -rf run* && unzip a.zip'
 
-ssh root@188.166.241.233 'ls -1 run/tmp/posts-by-date/ | wc -l'
+ssh root@128.199.106.41 'ls -1 run/tmp/posts-by-date/ | wc -l'
 
 mkdir -p /Users/quang/Downloads/ok/posts-by-date/
-ssh root@188.166.241.233 "cd /root/run/ && mkdir done_01_a && find tmp/posts-by-date/ -name '*.json' -exec mv -t done_01_a/ {} + && zip -r done_01_a.zip done_01_a/"
-scp root@188.166.241.233:/root/run/done_01_a.zip /Users/quang/Downloads/ok/posts-by-date/
+ssh root@128.199.106.41 "cd /root/run/ && mkdir done_01_a && find tmp/posts-by-date/ -name '*.json' -exec mv -t done_01_a/ {} + && zip -r done_01_a.zip done_01_a/"
+scp root@128.199.106.41:/root/run/done_01_a.zip /Users/quang/Downloads/ok/posts-by-date/
 
 
 

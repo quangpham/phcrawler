@@ -3,14 +3,14 @@
 #
 
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@188.166.241.233:/root/a.zip
-ssh root@188.166.241.233 'cd /root/ && rm -rf run* && unzip a.zip'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@128.199.106.41:/root/a.zip
+ssh root@128.199.106.41 'cd /root/ && rm -rf run* && unzip a.zip'
 
-ssh root@188.166.241.233 'ls -1 run/tmp/followers-by-topic/ | wc -l'
+ssh root@128.199.106.41 'ls -1 run/tmp/followers-by-topic/ | wc -l'
 
 mkdir -p /Users/quang/Downloads/ok/followers-by-topic/
-ssh root@188.166.241.233 "cd /root/run/ && mkdir done_03_a && find tmp/followers-by-topic/ -name '*.json' -exec mv -t done_03_a/ {} + && zip -r done_03_a.zip done_03_a/"
-scp root@188.166.241.233:/root/run/done_03_a.zip /Users/quang/Downloads/ok/followers-by-topic/
+ssh root@128.199.106.41 "cd /root/run/ && mkdir done_03_a && find tmp/followers-by-topic/ -name '*.json' -exec mv -t done_03_a/ {} + && zip -r done_03_a.zip done_03_a/"
+scp root@128.199.106.41:/root/run/done_03_a.zip /Users/quang/Downloads/ok/followers-by-topic/
 
 commands = []
 Topic.all.order("followers_count").each do |t|
@@ -20,10 +20,11 @@ slipt_commands_to_files(commands, 15)
 
 ##
 max_num = 100
-max_followers_to_crawl = 20000
+max_followers_to_crawl = 10000
 cursors = Cursor.where("page%#{max_num}=0").order(:page)
-Topic.all.order("followers_count").each do |t|
-  cursors[..(max_followers_to_crawl/max_num+3)].each_with_index do |cursor, i|
+Topic.where("followers_count is not null").order("followers_count").each do |t|
+  max = t.followers_count < max_followers_to_crawl ? t.followers_count : max_followers_to_crawl
+  cursors[..(max/max_num+1)].each_with_index do |cursor, i|
     commands.push "./GetFollowersByTopicLite.sh #{cursor.id} #{t.slug} #{max_num} #{cursor.code}"
   end
 end
@@ -41,7 +42,7 @@ Topic.where(where_str).order("followers_count").each do |t|
     commands.push "./GetFollowersByTopicLite.sh #{cursor.id} #{t.slug} #{max_num} #{cursor.code}"
   end
 end
-slipt_commands_to_files(commands, 30)
+slipt_commands_to_files(commands, 15)
 
 
 
