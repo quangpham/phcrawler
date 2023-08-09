@@ -9,23 +9,7 @@ scp root@128.199.106.41:/root/run/done_04_a.zip /Users/quang/Downloads/ok/user-p
 
 
 commands = []
-max_num = 20
-cursors = Cursor.where("page%#{max_num}=0").order(:page)
-
-User.where("is_tracked=true").each do |u|
-  if u.followers > max_num
-    cursors[..(u.followers/max_num+1)].each_with_index do |cursor, i|
-      commands.push "./GetUserFollowers.sh #{u.username} #{cursor.code}"
-    end
-  end
-  if u.following > max_num
-    cursors[..(u.following/max_num+1)].each_with_index do |cursor, i|
-      commands.push "./GetUserFollowing.sh #{u.username} #{cursor.code}"
-    end
-  end
-end
-
-usernames = User.where("(fullscans_needed=true OR is_tracked=true) and (is_trashed is null or is_trashed=false)").select(:id, :username).collect {|p| p.username}
+usernames = User.where("is_tracked=true").select(:id, :username).collect {|p| p.username}
 usernames.uniq.sort.each do |username|
   commands.push "./GetUserProfile.sh #{username}"
 end
@@ -34,7 +18,7 @@ slipt_commands_to_files(commands, 15)
 
 
 
-def import_profiles json_path="tmp/run/tmp/", fullscans_needed=true
+def import_profiles json_path="tmp/run/tmp/"
   Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
     next if !(File.exist?(fn) && !File.zero?(fn))
     data = parse_json(File.read(fn))
@@ -43,7 +27,7 @@ def import_profiles json_path="tmp/run/tmp/", fullscans_needed=true
       if data["data"]["profile"]
         user = helper_get_user_by_node_data(data["data"]["profile"])
         # user.fullscans_needed = nil if user.fullscans_needed == true
-        user.fullscans_needed = nil if !user.fullscans_needed.nil? && fullscans_needed
+        user.fullscans_needed = nil if !user.fullscans_needed.nil?
         user.save
         system "rm #{fn}"
         # User.where("username=? and id!=?", user.username, user.id).update_all(is_trashed: true, fullscans_needed: nil)
@@ -60,9 +44,8 @@ def import_profiles json_path="tmp/run/tmp/", fullscans_needed=true
   end
 end
 
-
-import_profiles "/Users/quang/Downloads/ok/user-profiles", true
-import_profiles "/Users/quang/Downloads/ok/user-followers", false
+import_profiles "/Users/quang/Projects/upbase/phcrawler/tmp/run/tmp/user-profiles/"
+import_profiles "/Users/quang/Downloads/ok/user-profiles"
 
 
 

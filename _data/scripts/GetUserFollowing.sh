@@ -37,21 +37,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
 
         following(first:20 after:$cursor) {
           edges { node {
-            id username
-            name headline websiteUrl twitterUsername about createdAt
-            isMaker isTrashed
-            followersCount followingsCount badgesCount
-            productsCount collectionsCount votesCount
-            submittedPostsCount stacksCount
-
-            karmaBadge {score}
-            visitStreak { duration }
-
-            activityEvents(first:1) {
-              edges { node { id occurredAt } }
-              totalCount
-            }
-
+            id username twitterUsername createdAt
           } }
           totalCount pageInfo{endCursor hasNextPage}
         }

@@ -72,11 +72,11 @@ curl 'https://www.producthunt.com/frontend/graphql' \
         }
 
         followers(first:20) {
-          edges { node { id  } }
+          edges { node { id username} }
           totalCount pageInfo{endCursor hasNextPage}
         }
         following(first:20) {
-          edges { node { id  } }
+          edges { node { id username} }
           totalCount pageInfo{endCursor hasNextPage}
         }
 

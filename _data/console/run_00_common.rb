@@ -90,6 +90,7 @@ end
 
 def helper_get_user_by_node_data u
   user_id = u["id"].to_i
+  new_users = []
 
   user = User.find_or_initialize_by(id: user_id)
   user.username = u["username"].strip if !u["username"].nil? && !u["isTrashed"]
@@ -162,6 +163,7 @@ def helper_get_user_by_node_data u
   if edges = helper_get_node_by_path(u, "followers,edges", "array")
     old_val = user.follower_ids.uniq.sort
     user.follower_ids += edges.collect { |e| e["node"]["id"].to_i }
+    new_users += edges.collect { |e| {user_id: e["node"]["id"].to_i, username: e["node"]["username"]} }
     new_val = user.follower_ids.uniq.sort
     if old_val != new_val
       raw_sql = (new_val - old_val).collect {|i| "INSERT INTO user_followers (user_id, follower_id) VALUES(#{user.id}, #{i}) ON CONFLICT (user_id, follower_id) DO NOTHING;" }
@@ -172,6 +174,7 @@ def helper_get_user_by_node_data u
   if edges = helper_get_node_by_path(u, "following,edges", "array")
     old_val = user.following_ids.uniq.sort
     user.following_ids += edges.collect { |e| e["node"]["id"].to_i }
+    new_users += edges.collect { |e| {user_id: e["node"]["id"].to_i, username: e["node"]["username"]} }
     new_val = user.following_ids.uniq.sort
     if old_val != new_val
       raw_sql = (new_val - old_val).collect {|i| "INSERT INTO user_followings (user_id,following_id) VALUES(#{user.id},#{i}) ON CONFLICT (user_id,following_id) DO NOTHING;" }
@@ -252,6 +255,11 @@ def helper_get_user_by_node_data u
          end
       end
     end
+  end
+
+  if !new_users.empty?
+    raw_sql = new_users.uniq.collect {|nu| "INSERT INTO users (id,username,fullscans_needed,created_at,updated_at) VALUES(#{nu[:user_id]},'#{nu[:username]}',TRUE,NOW(),NOW()) ON CONFLICT (id) DO NOTHING;" }
+    ActiveRecord::Base.connection.execute(raw_sql.join(";"))
   end
 
   user.fullscans_needed = nil if user.is_trashed == true
