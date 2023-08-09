@@ -63,6 +63,7 @@ end
 
 import_profiles "/Users/quang/Downloads/ok/user-profiles", true
 import_profiles "/Users/quang/Downloads/ok/user-followers", false
+import_profiles "/Users/quang/Downloads/ok/user-following", false
 
 
 
