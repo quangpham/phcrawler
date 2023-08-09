@@ -483,7 +483,13 @@ sql = '
   ON CONFLICT (user_id, following_id) DO NOTHING;
 
 
+  insert into tracked_user_followers(user_id, follower_id)
+  select user_id, follower_id from user_followers where user_id in (select id from users where is_tracked=true)
+  ON CONFLICT (user_id, follower_id) DO NOTHING;
 
+  insert into tracked_user_followings(user_id, following_id)
+  select user_id, following_id from user_followings where user_id in (select id from users where is_tracked=true)
+  ON CONFLICT (user_id, following_id) DO NOTHING;
 
   UPDATE users u set last_active_at=GREATEST(u.last_active_at, t.last_active_at)
   from (
@@ -496,6 +502,8 @@ sql = '
     group by user_id
   ) t
   where u.id = t.user_id;
+
+
 
 
   update products p set sys_posts_count=t.posts_count

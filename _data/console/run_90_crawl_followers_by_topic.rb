@@ -77,6 +77,7 @@ end
 
 
 import_followers "/Users/quang/Downloads/ok/followers-by-topic/"
+import_followers "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp/"
 
 
 def recheck_error json_path="tmp/run/tmp/"
@@ -91,7 +92,7 @@ import_followers "_data/scripts/tmp/followers-by-topic/"
 import_followers "/Users/quang/Downloads/ok/followers-by-topic/"
 
 
-fns = Dir["/Users/quang/Downloads/followers/**/*.json"]
+fns = Dir["/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp/**/*.json"]
 fns.each do |fn|
   arr = fn.split("/").last.split(".")
   id = arr[1].to_i
