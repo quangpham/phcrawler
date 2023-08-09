@@ -3,8 +3,8 @@ ssh root@128.199.106.41 'cd /root/ && rm -rf run* && unzip a.zip'
 
 ssh root@128.199.106.41 'ls -1 run/tmp/user-profiles/ | wc -l'
 
-ssh root@128.199.106.41 "cd /root/run/ && rm -rf done* && mkdir done_04_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_04_a/ {} + && zip -r done_04_a.zip done_04_a/"
-scp root@128.199.106.41:/root/run/done_04_a.zip /Users/quang/Downloads/ok/user-profiles/
+ssh root@128.199.106.41 "cd /root/run/ && rm -rf done* && mkdir done_01_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_01_a/ {} + && zip -r done_01_a.zip done_01_a/"
+scp root@128.199.106.41:/root/run/done_01_a.zip /Users/quang/Downloads/ok/user-profiles/
 
 
 
@@ -42,7 +42,6 @@ def import_profiles json_path="tmp/run/tmp/", fullscans_needed=true
     if data["data"]
       if data["data"]["profile"]
         user = helper_get_user_by_node_data(data["data"]["profile"])
-        # user.fullscans_needed = nil if user.fullscans_needed == true
         user.fullscans_needed = nil if !user.fullscans_needed.nil? && fullscans_needed
         user.save
         system "rm #{fn}"
