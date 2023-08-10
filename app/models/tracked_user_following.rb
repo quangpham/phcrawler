@@ -1,0 +1,2 @@
+class TrackedUserFollowing < ApplicationRecord
+end
