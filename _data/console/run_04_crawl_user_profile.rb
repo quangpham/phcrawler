@@ -25,12 +25,13 @@ User.where("is_tracked=true").each do |u|
   end
 end
 
-usernames = User.where("(fullscans_needed=true OR is_tracked=true) and (is_trashed is null or is_trashed=false)").select(:id, :username).collect {|p| p.username}
+
+usernames = User.where("(fullscans_needed=true OR is_tracked=true OR fullscans_needed=false) and (is_trashed is null or is_trashed=false)").select(:id, :username).collect {|p| p.username}
 usernames.uniq.sort.each do |username|
   commands.push "./GetUserProfile.sh #{username}"
 end
 
-slipt_commands_to_files(commands, 15)
+slipt_commands_to_files(commands, 30)
 
 
 
@@ -63,7 +64,3 @@ end
 import_profiles "/Users/quang/Downloads/ok/user-profiles", true
 import_profiles "/Users/quang/Downloads/ok/user-followers", false
 import_profiles "/Users/quang/Downloads/ok/user-following", false
-
-
-
-
