@@ -3,14 +3,14 @@
 #
 
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@128.199.106.41:/root/a.zip
-ssh root@128.199.106.41 'cd /root/ && rm -rf run* && unzip a.zip'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@174.138.27.130:/root/a.zip
+ssh root@174.138.27.130 'cd /root/ && rm -rf run* && unzip a.zip'
 
-ssh root@128.199.106.41 'ls -1 run/tmp/followers-by-topic/ | wc -l'
+ssh root@174.138.27.130 'ls -1 run/tmp/followers-by-topic/ | wc -l'
 
 mkdir -p /Users/quang/Downloads/ok/followers-by-topic/
-ssh root@128.199.106.41 "cd /root/run/ && mkdir done_03_a && find tmp/followers-by-topic/ -name '*.json' -exec mv -t done_03_a/ {} + && zip -r done_03_a.zip done_03_a/"
-scp root@128.199.106.41:/root/run/done_03_a.zip /Users/quang/Downloads/ok/followers-by-topic/
+ssh root@174.138.27.130 "cd /root/run/ && mkdir done_03_a && find tmp/followers-by-topic/ -name '*.json' -exec mv -t done_03_a/ {} + && zip -r done_03_a.zip done_03_a/"
+scp root@174.138.27.130:/root/run/done_03_a.zip /Users/quang/Downloads/ok/followers-by-topic/
 
 commands = []
 Topic.all.order("followers_count").each do |t|
@@ -99,4 +99,3 @@ fns.each do |fn|
   code = arr[4]
   Cursor.find_or_create_by(page: id, code: code)
 end
-

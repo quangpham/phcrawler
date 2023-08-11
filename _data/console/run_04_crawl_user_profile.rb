@@ -4,10 +4,10 @@ scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@165.22.249.185:/root
 scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@143.198.200.191:/root/a.zip
 
 
-ssh root@174.138.27.130 'cd /root/ && rm -rf run* && unzip a.zip'
-ssh root@157.245.152.12 'cd /root/ && rm -rf run* && unzip a.zip'
-ssh root@165.22.249.185 'cd /root/ && rm -rf run* && unzip a.zip'
-ssh root@143.198.200.191 'cd /root/ && rm -rf run* && unzip a.zip'
+ssh root@174.138.27.130 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./_run1.sh &'
+ssh root@157.245.152.12 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./_run2.sh &'
+ssh root@165.22.249.185 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./_run3.sh &'
+ssh root@143.198.200.191 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./_run4.sh &'
 
 ssh root@174.138.27.130 'ls -1 run/tmp/user-profiles/ | wc -l'
 ssh root@157.245.152.12 'ls -1 run/tmp/user-profiles/ | wc -l'
