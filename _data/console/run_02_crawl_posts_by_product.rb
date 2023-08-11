@@ -13,14 +13,14 @@
 
 
 scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@174.138.27.130:/root/a.zip
-ssh root@174.138.27.130 'cd /root/ && rm -rf run* && unzip a.zip'
+ssh root@174.138.27.130 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./run.sh &'
 
 ssh root@174.138.27.130 'ls -1 run/tmp/posts-by-product/ | wc -l'
 ssh root@174.138.27.130 'ls -1 run/tmp/reviewers-by-product/ | wc -l'
 
 mkdir -p /Users/quang/Downloads/ok/posts-by-product/
-ssh root@174.138.27.130 "cd /root/run/ && mkdir -p done_01_a/a done_01_a/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_01_a/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_01_a/b/ {} + && zip -r done_01_a.zip done_01_a/"
-scp root@174.138.27.130:/root/run/done_01_a.zip /Users/quang/Downloads/ok/posts-by-product/
+now=$(date +%H%M%S) && ssh root@174.138.27.130 "cd /root/run/ && mkdir -p done_$now/a done_$now/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_$now/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_$now/b/ {} + && zip -r done_$now.zip done_$now/"
+scp root@174.138.27.130:/root/run/done_$now.zip /Users/quang/Downloads/ok/posts-by-product/
 
 
 

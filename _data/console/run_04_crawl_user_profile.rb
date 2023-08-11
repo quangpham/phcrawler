@@ -14,10 +14,10 @@ ssh root@157.245.152.12 'ls -1 run/tmp/user-profiles/ | wc -l'
 ssh root@165.22.249.185 'ls -1 run/tmp/user-profiles/ | wc -l'
 ssh root@143.198.200.191 'ls -1 run/tmp/user-profiles/ | wc -l'
 
+now=$(date +%H%M%S) && ssh root@174.138.27.130 "cd /root/run/ && rm -rf done* && mkdir done_$now && find tmp/user-profiles/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
 now=$(date +%H%M%S) && ssh root@157.245.152.12 "cd /root/run/ && rm -rf done* && mkdir done_$now && find tmp/user-profiles/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
 now=$(date +%H%M%S) && ssh root@165.22.249.185 "cd /root/run/ && rm -rf done* && mkdir done_$now && find tmp/user-profiles/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
 now=$(date +%H%M%S) && ssh root@143.198.200.191 "cd /root/run/ && rm -rf done* && mkdir done_$now && find tmp/user-profiles/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
-now=$(date +%H%M%S) && ssh root@174.138.27.130 "cd /root/run/ && rm -rf done* && mkdir done_$now && find tmp/user-profiles/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
 
 
 scp root@174.138.27.130:'/root/run/done_*.zip' /Users/quang/Downloads/ok/user-profiles/
@@ -45,12 +45,12 @@ User.where("is_tracked=true").each do |u|
 end
 
 
-usernames = User.where("(fullscans_needed=true OR is_tracked=true OR fullscans_needed=false) and (is_trashed is null or is_trashed=false)").select(:id, :username).collect {|p| p.username}
+usernames = User.where("(fullscans_needed IS NOT NULL OR is_tracked=true) and (is_trashed is null or is_trashed=false)").select(:id, :username).collect {|p| p.username}
 usernames.uniq.sort.each do |username|
   commands.push "./GetUserProfile.sh #{username}"
 end
 
-slipt_commands_to_files(commands, 15*4)
+slipt_commands_to_files(commands, 15)
 
 
 
