@@ -451,6 +451,7 @@ def helper_get_product_by_node_data n
 end
 
 
+
 sql = '
 
   insert into post_hunter(post_id, user_id)
