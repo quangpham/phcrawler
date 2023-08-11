@@ -512,6 +512,13 @@ sql = '
   ) t
   where u.id = t.user_id;
 
+  update users u set gen_reviews_count=t.reviews_count
+  from (
+      select user_id,count(product_id) as reviews_count from product_reviewer
+      group by user_id
+  ) t
+  where u.id = t.user_id;
+
 
 
 

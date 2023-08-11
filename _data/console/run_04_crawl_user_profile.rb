@@ -44,7 +44,7 @@ User.where("is_tracked=true").each do |u|
   end
 end
 
-
+commands = []
 usernames = User.where("(fullscans_needed IS NOT NULL OR is_tracked=true) and (is_trashed is null or is_trashed=false)").select(:id, :username).collect {|p| p.username}
 usernames.uniq.sort.each do |username|
   commands.push "./GetUserProfile.sh #{username}"
