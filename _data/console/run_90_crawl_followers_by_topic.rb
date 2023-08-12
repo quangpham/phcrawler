@@ -63,7 +63,7 @@ def import_followers json_path="tmp/run/tmp/"
           edges.each do |e|
             user = helper_get_user_by_node_data(e["node"])
             user.save
-            raw_sql += "INSERT INTO topic_subscriber (topic_id, user_id) VALUES(#{topic_id},#{user.id}) ON CONFLICT (topic_id, user_id) DO NOTHING;"
+            raw_sql += "INSERT INTO topic_subscriber (topic_id, user_id, is_subscriber) VALUES(#{topic_id},#{user.id}, true) ON CONFLICT (topic_id, user_id) DO NOTHING;"
           end
           ActiveRecord::Base.connection.execute(raw_sql)
           system "rm #{fn}"
