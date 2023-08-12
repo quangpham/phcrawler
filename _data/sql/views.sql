@@ -74,3 +74,9 @@ SELECT user_topic_view.id,
 FROM user_topic_view
 WHERE user_topic_view.topic_id = 48 AND user_topic_view.followers > 10 AND user_topic_view.followers < 200 AND user_topic_view.last_active_at > (now() - '30 days'::interval)
 GROUP BY user_topic_view.id;
+
+
+
+
+insert into tracked_user_followings(user_id, following_id, "action")
+select 5849596 as user_id, id as following_id, 'follow' as "action" from users where followers < 60 and id in (select distinct user_id from topic_subscriber where topic_id in (48) and is_subscriber=true and upvotes_count > 10) and id not in (select following_id from tracked_user_followings where user_id=5849596)
