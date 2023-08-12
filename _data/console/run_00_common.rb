@@ -592,3 +592,19 @@ from (
 where t1.id = t2.user_id;
 
 '
+
+update_sql = '
+CREATE TABLE _tmp (user_id int4,topic_id int4,post_id int4);
+
+insert into _tmp(user_id,topic_id,post_id)
+select pu.user_id,pt.topic_id,pu.post_id
+from post_upvoter pu
+inner join post_topic pt on pt.post_id=pu.post_id
+where pt.topic_id!=352;
+
+insert into topic_subscriber(user_id,topic_id) select user_id,topic_id from _tmp on CONFLICT(user_id, topic_id) DO NOTHING;
+
+update topic_subscriber set upvotes_count=t.upvotes_count
+from (select user_id,topic_id,count(post_id) as upvotes_count from _tmp group by user_id,topic_id) t
+where topic_subscriber.user_id=t.user_id and topic_subscriber.topic_id=t.topic_id;
+'
