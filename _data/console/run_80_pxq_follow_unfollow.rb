@@ -12,7 +12,7 @@ ActiveRecord::Base.connection.execute(raw_sql.join(";"))
 
 
 following_ids = []
-TrackedUserFollowing.where("user_id=#{pxq85_id} and action='follow'").order(:following_id).limit(20).each do |u|
+TrackedUserFollowing.where("user_id=#{pxq85_id} and action='follow'").order(:following_id).limit(60).each do |u|
   system "cd _data/scripts/ && ./KevinPhamfollowAUser.sh #{u.following_id}"
   fn = "_data/scripts/tmp/pxq85-followed/#{u.following_id}.json"
   data = parse_json(File.read(fn))
