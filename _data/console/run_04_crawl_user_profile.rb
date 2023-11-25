@@ -1,29 +1,10 @@
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@174.138.27.130:/root/a.zip
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.152.12:/root/a.zip
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@165.22.249.185:/root/a.zip
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@143.198.200.191:/root/a.zip
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.200.108:/root/a.zip
+ssh root@157.245.200.108 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./_run1.sh &'
 
+ssh root@157.245.200.108 'ls -1 run/tmp/user-profiles/ | wc -l'
 
-ssh root@174.138.27.130 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./_run1.sh &'
-ssh root@157.245.152.12 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./_run2.sh &'
-ssh root@165.22.249.185 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./_run3.sh &'
-ssh root@143.198.200.191 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./_run4.sh &'
-
-ssh root@174.138.27.130 'ls -1 run/tmp/user-profiles/ | wc -l'
-ssh root@157.245.152.12 'ls -1 run/tmp/user-profiles/ | wc -l'
-ssh root@165.22.249.185 'ls -1 run/tmp/user-profiles/ | wc -l'
-ssh root@143.198.200.191 'ls -1 run/tmp/user-profiles/ | wc -l'
-
-now=$(date +%H%M%S) && ssh root@174.138.27.130 "cd /root/run/ && rm -rf done* && mkdir done_$now && find tmp/user-profiles/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
-now=$(date +%H%M%S) && ssh root@157.245.152.12 "cd /root/run/ && rm -rf done* && mkdir done_$now && find tmp/user-profiles/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
-now=$(date +%H%M%S) && ssh root@165.22.249.185 "cd /root/run/ && rm -rf done* && mkdir done_$now && find tmp/user-profiles/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
-now=$(date +%H%M%S) && ssh root@143.198.200.191 "cd /root/run/ && rm -rf done* && mkdir done_$now && find tmp/user-profiles/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
-
-
-scp root@174.138.27.130:'/root/run/done_*.zip' /Users/quang/Downloads/ok/user-profiles/
-scp root@157.245.152.12:'/root/run/done_*.zip' /Users/quang/Downloads/ok/user-profiles/
-scp root@165.22.249.185:'/root/run/done_*.zip' /Users/quang/Downloads/ok/user-profiles/
-scp root@143.198.200.191:'/root/run/done_*.zip' /Users/quang/Downloads/ok/user-profiles/
+now=$(date +%H%M%S) && ssh root@157.245.200.108 "cd /root/run/ && rm -rf done* && mkdir done_$now && find tmp/user-profiles/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
+scp root@157.245.200.108:'/root/run/done_*.zip' /Users/quang/Downloads/ok/user-profiles/
 
 
 
@@ -80,6 +61,23 @@ def import_profiles json_path="tmp/run/tmp/", fullscans_needed=true
 end
 
 
-import_profiles "/Users/quang/Downloads/ok/user-profiles", true
+10.times { import_profiles "/Users/quang/Downloads/ok/user-profiles", true }
 import_profiles "/Users/quang/Downloads/ok/user-followers", false
 import_profiles "/Users/quang/Downloads/ok/user-following", false
+
+
+
+
+def import_zprofiles json_path="tmp/run/tmp/"
+  Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
+    next if !(File.exist?(fn) && !File.zero?(fn))
+    data = parse_json(File.read(fn))
+    next if data.nil?
+    user = helper_get_user_by_node_data(data)
+    user.save
+    system "rm #{fn}"
+  end
+end
+
+
+10.times { import_zprofiles "/Users/quang/Downloads/ok/users-json" }

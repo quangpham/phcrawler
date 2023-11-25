@@ -11,25 +11,26 @@
 
 # update posts set sys_votes_count=array_length(uniq(upvoter_ids||commenter_ids||hunter_ids||maker_ids),1);
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@174.138.27.130:/root/a.zip
-ssh root@174.138.27.130 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./run.sh &'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.200.108:/root/a.zip
+ssh root@157.245.200.108 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./run.sh &'
 
-ssh root@174.138.27.130 'ls -1 run/tmp/voters-by-post/ | wc -l'
+ssh root@157.245.200.108 'ls -1 run/tmp/voters-by-post/ | wc -l'
 
-now=$(date +%H%M%S) && ssh root@174.138.27.130 "cd /root/run/ && mkdir done_$now && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
-scp root@174.138.27.130:/root/run/done_$now.zip /Users/quang/Downloads/ok/voters-by-post/
+now=$(date +%H%M%S) && ssh root@157.245.200.108 "cd /root/run/ && mkdir done_$now && find tmp/voters-by-post/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
+scp root@157.245.200.108:/root/run/done_$now.zip /Users/quang/Downloads/ok/voters-by-post/
 
 
 commands = []
 slugs = []
 slugs += Post.where("fullscans_needed=true and (is_trashed is null or is_trashed=false)").select(:id, :slug).collect {|p| p.slug}
-slugs += Post.where("org_created_at > now() - interval '30 day' and (is_trashed is null or is_trashed=false)").select(:id, :slug).collect {|p| p.slug}
-slugs += Post.where("org_updated_at > now() - interval '15 day' and (is_trashed is null or is_trashed=false)").select(:id, :slug).collect {|p| p.slug}
+slugs += Post.where("org_created_at > now() - interval '60 day' and (is_trashed is null or is_trashed=false)").select(:id, :slug).collect {|p| p.slug}
+slugs += Post.where("org_updated_at > now() - interval '45 day' and (is_trashed is null or is_trashed=false)").select(:id, :slug).collect {|p| p.slug}
+# slugs += Post.where("(is_trashed is null or is_trashed=false)").select(:id, :slug).collect {|p| p.slug}
 slugs.uniq.sort.each do |slug|
   commands.push "./GetVotersByPost.sh #{slug} 100000"
 end
 
-slipt_commands_to_files(commands, 20)
+slipt_commands_to_files(commands, 15)
 
 # Buoc 21
 # Sync len server de chay
@@ -67,6 +68,6 @@ def import_voters json_path="tmp/run/tmp/"
   end
 end
 
-import_voters "/Users/quang/Downloads/ok/voters-by-post"
+10.times {import_voters "/Users/quang/Downloads/ok/voters-by-post"}
 
 import_voters "tmp/run/tmp/voters-by-post"

@@ -3,14 +3,14 @@
 #
 
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@174.138.27.130:/root/a.zip
-ssh root@174.138.27.130 'cd /root/ && rm -rf run* && unzip a.zip'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.200.108:/root/a.zip
+ssh root@157.245.200.108 'cd /root/ && rm -rf run* && unzip a.zip'
 
-ssh root@174.138.27.130 'ls -1 run/tmp/followers-by-topic/ | wc -l'
+ssh root@157.245.200.108 'ls -1 run/tmp/followers-by-topic/ | wc -l'
 
 mkdir -p /Users/quang/Downloads/ok/followers-by-topic/
-ssh root@174.138.27.130 "cd /root/run/ && mkdir done_03_a && find tmp/followers-by-topic/ -name '*.json' -exec mv -t done_03_a/ {} + && zip -r done_03_a.zip done_03_a/"
-scp root@174.138.27.130:/root/run/done_03_a.zip /Users/quang/Downloads/ok/followers-by-topic/
+ssh root@157.245.200.108 "cd /root/run/ && mkdir done_03_a && find tmp/followers-by-topic/ -name '*.json' -exec mv -t done_03_a/ {} + && zip -r done_03_a.zip done_03_a/"
+scp root@157.245.200.108:/root/run/done_03_a.zip /Users/quang/Downloads/ok/followers-by-topic/
 
 commands = []
 Topic.all.order("followers_count").each do |t|
@@ -20,7 +20,7 @@ slipt_commands_to_files(commands, 15)
 
 ##
 max_num = 100
-max_followers_to_crawl = 10000
+max_followers_to_crawl = 30000
 cursors = Cursor.where("page%#{max_num}=0").order(:page)
 Topic.where("followers_count is not null").order("followers_count").each do |t|
   max = t.followers_count < max_followers_to_crawl ? t.followers_count : max_followers_to_crawl

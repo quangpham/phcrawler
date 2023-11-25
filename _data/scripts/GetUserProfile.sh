@@ -38,6 +38,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
 
         id username
         name headline websiteUrl twitterUsername about createdAt
+        avatarUrl
         isMaker isTrashed
         followersCount followingsCount badgesCount
         productsCount collectionsCount votesCount

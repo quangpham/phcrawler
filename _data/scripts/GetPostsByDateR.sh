@@ -46,7 +46,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
                     contributors(limit:200) {
                         role
                         user {
-                            id name username headline twitterUsername
+                            id name username headline twitterUsername avatarUrl
                             websiteUrl followersCount followingsCount
                             isMaker isTrashed badgesCount
                             karmaBadge{score} createdAt

@@ -12,15 +12,15 @@
 #
 
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@174.138.27.130:/root/a.zip
-ssh root@174.138.27.130 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./run.sh &'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.200.108:/root/a.zip
+ssh root@157.245.200.108 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./run.sh &'
 
-ssh root@174.138.27.130 'ls -1 run/tmp/posts-by-product/ | wc -l'
-ssh root@174.138.27.130 'ls -1 run/tmp/reviewers-by-product/ | wc -l'
+ssh root@157.245.200.108 'ls -1 run/tmp/posts-by-product/ | wc -l'
+ssh root@157.245.200.108 'ls -1 run/tmp/reviewers-by-product/ | wc -l'
 
 mkdir -p /Users/quang/Downloads/ok/posts-by-product/
-now=$(date +%H%M%S) && ssh root@174.138.27.130 "cd /root/run/ && mkdir -p done_$now/a done_$now/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_$now/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_$now/b/ {} + && zip -r done_$now.zip done_$now/"
-scp root@174.138.27.130:/root/run/done_$now.zip /Users/quang/Downloads/ok/posts-by-product/
+now=$(date +%H%M%S) && ssh root@157.245.200.108 "cd /root/run/ && mkdir -p done_$now/a done_$now/b tmp/reviewers-by-product/ && find tmp/posts-by-product/ -name '*.json' -exec mv -t done_$now/a/ {} + && find tmp/reviewers-by-product/ -name '*.json' -exec mv -t done_$now/b/ {} + && zip -r done_$now.zip done_$now/"
+scp root@157.245.200.108:/root/run/done_$now.zip /Users/quang/Downloads/ok/posts-by-product/
 
 
 
@@ -28,9 +28,10 @@ scp root@174.138.27.130:/root/run/done_$now.zip /Users/quang/Downloads/ok/posts-
 commands = []
 slugs = []
 slugs += Product.where(fullscans_needed: true).select(:id, :slug).collect {|p| p.slug}
-slugs += Product.where("(id in (select distinct product_id from posts where org_created_at > now() - interval '30 day') ) and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
-slugs += Product.where("(id in (select distinct product_id from posts where org_updated_at > now() - interval '15 day') ) and (is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
-slugs.uniq.sort.each do |slug|
+slugs += Product.where("(id in (select distinct product_id from posts where org_created_at > now() - interval '60 day') ) and (is_trashed=false or is_trashed is null)").order(:id).select(:id, :slug).collect {|p| p.slug}
+slugs += Product.where("(id in (select distinct product_id from posts where org_updated_at > now() - interval '45 day') ) and (is_trashed=false or is_trashed is null)").order(:id).select(:id, :slug).collect {|p| p.slug}
+# slugs += Product.where("(is_trashed=false or is_trashed is null)").select(:id, :slug).collect {|p| p.slug}
+slugs.uniq.each do |slug|
   commands.push "./GetPostsByProductR.sh #{slug}"
 end
 
@@ -42,7 +43,7 @@ slipt_commands_to_files(commands, 15)
 # Update mot vai thuoc tinh cua posts
 # Update them voters
 
-def import_posts json_path="tmp/run/tmp/"
+def import_posts_by_product json_path="tmp/run/tmp/"
   Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
     next if !(File.exist?(fn) && !File.zero?(fn))
     data = parse_json(File.read(fn))
@@ -56,6 +57,6 @@ def import_posts json_path="tmp/run/tmp/"
   end
 end
 
-import_posts "/Users/quang/Downloads/ok/posts-by-product"
-import_posts "/Users/quang/Projects/upbase/phcrawler/tmp/run/tmp/posts-by-product"
-import_posts "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp/posts-by-product"
+10.times { import_posts_by_product "/Users/quang/Downloads/ok/posts-by-product" }
+import_posts_by_product "/Users/quang/Projects/upbase/phcrawler/tmp/run/tmp/posts-by-product"
+import_posts_by_product "/Users/quang/Projects/upbase/phcrawler/_data/scripts/tmp/posts-by-product"

@@ -9,19 +9,19 @@
 # Tao lenh crawl toan bo post trong 60 ngay vua qua
 
 
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@174.138.27.130:/root/a.zip
-ssh root@174.138.27.130 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./run.sh &'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.200.108:/root/a.zip
+ssh root@157.245.200.108 'cd /root/ && rm -rf run* && unzip a.zip && cd /root/run/ && ./run.sh &'
 
-ssh root@174.138.27.130 'ls -1 run/tmp/posts-by-date/ | wc -l'
+ssh root@157.245.200.108 'ls -1 run/tmp/posts-by-date/ | wc -l'
 
 mkdir -p /Users/quang/Downloads/ok/posts-by-date/
-now=$(date +%H%M%S) && ssh root@174.138.27.130 "cd /root/run/ && mkdir done_$now && find tmp/posts-by-date/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
-scp root@174.138.27.130:/root/run/done_$now.zip /Users/quang/Downloads/ok/posts-by-date/
+now=$(date +%H%M%S) && ssh root@157.245.200.108 "cd /root/run/ && mkdir done_$now && find tmp/posts-by-date/ -name '*.json' -exec mv -t done_$now/ {} + && zip -r done_$now.zip done_$now/"
+scp root@157.245.200.108:/root/run/done_$now.zip /Users/quang/Downloads/ok/posts-by-date/
 
 
 
 commands = []
-(1..60).to_a.reverse.to_a.each do |i|
+(1..30).to_a.reverse.to_a.each do |i|
   if a = PostArchive.find_or_create_by(sys_created_at: i.days.ago)
     if a.week_day.nil?
       a.update(week_day: a.sys_created_at.strftime('%^a'))
@@ -33,7 +33,7 @@ end
 slipt_commands_to_files(commands, 15)
 
 ###
-def import_posts json_path="tmp/run/tmp/"
+def import_posts_by_date json_path="tmp/run/tmp/"
   Dir["#{json_path}/**/*.json".gsub("//","/")].shuffle.each do |fn|
     next if !(File.exist?(fn) && !File.zero?(fn))
     data = parse_json(File.read(fn))
@@ -58,7 +58,13 @@ def import_posts json_path="tmp/run/tmp/"
   end
 end
 
-import_posts "/Users/quang/Downloads/ok/posts-by-date/"
-import_posts "tmp/run/tmp/posts-by-date/"
+100.times {
+  begin
+    import_posts_by_date "/Users/quang/Downloads/ok/posts-by-date/"
+  rescue
+  end
+}
 
-import_posts "_data/scripts/tmp/posts-by-date/"
+import_posts_by_date "tmp/run/tmp/posts-by-date/"
+
+import_posts_by_date "_data/scripts/tmp/posts-by-date/"

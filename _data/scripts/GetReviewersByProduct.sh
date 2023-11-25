@@ -41,7 +41,7 @@ curl 'https://www.producthunt.com/frontend/graphql' \
                 node {
                   id createdAt
                   user {
-                    id name username headline twitterUsername
+                    id name username headline twitterUsername avatarUrl
                     websiteUrl followersCount followingsCount
                     isMaker isTrashed badgesCount
                     karmaBadge{score}  createdAt

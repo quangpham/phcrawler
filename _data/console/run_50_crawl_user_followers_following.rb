@@ -1,10 +1,10 @@
-scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@174.138.27.130:/root/a.zip
-ssh root@174.138.27.130 'cd /root/ && rm -rf run* && unzip a.zip'
+scp /Users/quang/Projects/upbase/phcrawler/tmp/run.zip root@157.245.200.108:/root/a.zip
+ssh root@157.245.200.108 'cd /root/ && rm -rf run* && unzip a.zip'
 
-ssh root@174.138.27.130 'ls -1 run/tmp/user-profiles/ | wc -l'
+ssh root@157.245.200.108 'ls -1 run/tmp/user-profiles/ | wc -l'
 
-ssh root@174.138.27.130 "cd /root/run/ && rm -rf done* && mkdir done_04_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_04_a/ {} + && zip -r done_04_a.zip done_04_a/"
-scp root@174.138.27.130:/root/run/done_04_a.zip /Users/quang/Downloads/ok/user-profiles/
+ssh root@157.245.200.108 "cd /root/run/ && rm -rf done* && mkdir done_04_a && find tmp/user-profiles/ -name '*.json' -exec mv -t done_04_a/ {} + && zip -r done_04_a.zip done_04_a/"
+scp root@157.245.200.108:/root/run/done_04_a.zip /Users/quang/Downloads/ok/user-profiles/
 
 
 
